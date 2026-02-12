@@ -38,13 +38,21 @@ from torch.utils.data import Dataset, DataLoader
 from torch.optim import AdamW
 
 from transformers import (
-    BertTokenizer, 
-    BertForSequenceClassification,
-    BertConfig,
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    AutoConfig,
     get_linear_schedule_with_warmup
 )
 
 from tqdm import tqdm
+
+# TAWOS database connectivity
+try:
+    from tawos_connector import TAWOSConnector, TAWOSConfig, fetch_tawos_data
+    TAWOS_AVAILABLE = True
+except ImportError:
+    TAWOS_AVAILABLE = False
+    TAWOSConfig = None  # Type hint placeholder
 
 # Configure logging
 logging.basicConfig(
@@ -74,7 +82,7 @@ class Config:
     """
     
     # Model parameters
-    MODEL_NAME = 'bert-base-uncased'
+    MODEL_NAME = 'distilbert-base-uncased'
     MAX_LENGTH = 512  # As specified in dissertation
     NUM_LABELS = 2    # Binary: 'design' or 'general'
     
@@ -122,23 +130,23 @@ class DesignMiningDataset(Dataset):
         self, 
         texts: List[str], 
         labels: List[int],
-        tokenizer: BertTokenizer,
+        tokenizer,
         max_length: int = 512
     ):
         self.texts = texts
         self.labels = labels
         self.tokenizer = tokenizer
         self.max_length = max_length
-    
+
     def __len__(self) -> int:
         return len(self.texts)
-    
+
     def __getitem__(self, idx: int) -> Dict[str, torch.Tensor]:
         text = str(self.texts[idx])
         label = self.labels[idx]
-        
-        # Tokenize with BERT tokenizer
-        # This automatically adds [CLS] and [SEP] tokens
+
+        # Tokenize with model tokenizer
+        # This automatically adds special tokens (e.g. [CLS]/[SEP] or <s>/</s>)
         encoding = self.tokenizer(
             text,
             add_special_tokens=True,
@@ -170,7 +178,7 @@ class JIRATicketDataset(Dataset):
     def __init__(
         self,
         data: pd.DataFrame,
-        tokenizer: BertTokenizer,
+        tokenizer,
         max_length: int = 512,
         title_col: str = 'title',
         description_col: str = 'description',
@@ -238,7 +246,7 @@ class JIRATicketDataset(Dataset):
 
 class DataPreprocessor:
     """Preprocessor for software engineering text data.
-    
+
     Implements preprocessing steps from dissertation Section 4.2.1:
     - Remove duplicates
     - Remove automatically generated issues
@@ -247,52 +255,82 @@ class DataPreprocessor:
     - Remove URLs, email addresses, system-generated info
     - Apply software-specific stop words
     """
-    
-    # Software engineering stop words (based on Mahadi et al. vocabulary)
-    SOFTWARE_STOPWORDS = {
-        'null', 'none', 'n/a', 'na', 'undefined', 'todo', 'fixme',
-        'http', 'https', 'www', 'com', 'org', 'net', 'io',
-        'github', 'gitlab', 'bitbucket', 'jira', 'confluence',
-        'import', 'export', 'class', 'def', 'function', 'return',
-        'true', 'false', 'boolean', 'string', 'int', 'float',
-        'public', 'private', 'protected', 'static', 'void',
-        'try', 'catch', 'finally', 'throw', 'throws', 'exception'
-    }
-    
-    def __init__(self, min_words: int = 7):
+
+    def __init__(self, min_words: int = 7, stopwords_file: str = 'software_stopwords.txt', verbose: bool = True):
         self.min_words = min_words
+        self.verbose = verbose
+        self.SOFTWARE_STOPWORDS = self._load_stopwords(stopwords_file)
+
+        # Statistics tracking
+        self.stats = {
+            'total_processed': 0,
+            'duplicates_removed': 0,
+            'auto_generated_removed': 0,
+            'short_texts_removed': 0,
+            'chars_removed_cleaning': 0
+        }
+
+    @staticmethod
+    def _load_stopwords(filepath: str) -> set:
+        """Load software engineering stop words from file.
+
+        Based on Mahadi et al. vocabulary from enhanced_literature.txt
+        """
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                stopwords = {line.strip() for line in f if line.strip()}
+            logger.info(f"Loaded {len(stopwords)} stop words from {filepath}")
+            return stopwords
+        except FileNotFoundError:
+            logger.warning(f"Stopwords file not found: {filepath}. Using empty set.")
+            return set()
         
     def clean_text(self, text: str) -> str:
         """Clean and normalize text."""
         import re
-        
+
         if pd.isna(text) or text is None:
             return ""
-        
-        text = str(text)
-        
+
+        original_text = str(text)
+        original_len = len(original_text)
+        text = original_text
+
         # Remove URLs
         text = re.sub(r'http[s]?://\S+', '', text)
         text = re.sub(r'www\.\S+', '', text)
-        
+
         # Remove email addresses
         text = re.sub(r'\S+@\S+', '', text)
-        
+
         # Remove file paths
         text = re.sub(r'[A-Za-z]:\\[\S]+', '', text)
         text = re.sub(r'/[\S]+/[\S]+', '', text)
-        
+
         # Remove code blocks (markdown style)
         text = re.sub(r'```[\s\S]*?```', '', text)
         text = re.sub(r'`[^`]+`', '', text)
-        
+
         # Remove special characters but keep basic punctuation
         text = re.sub(r'[^\w\s.,!?;:\-\']', ' ', text)
-        
+
         # Normalize whitespace
         text = re.sub(r'\s+', ' ', text)
-        
-        return text.strip()
+
+        cleaned_text = text.strip()
+
+        # Track statistics
+        chars_removed = original_len - len(cleaned_text)
+        self.stats['chars_removed_cleaning'] += chars_removed
+
+        # Verbose logging for first few examples
+        if self.verbose and self.stats['total_processed'] < 3 and chars_removed > 10:
+            logger.info(f"\n--- Text Cleaning Example #{self.stats['total_processed'] + 1} ---")
+            logger.info(f"Original ({original_len} chars): {original_text[:200]}{'...' if len(original_text) > 200 else ''}")
+            logger.info(f"Cleaned ({len(cleaned_text)} chars):  {cleaned_text[:200]}{'...' if len(cleaned_text) > 200 else ''}")
+            logger.info(f"Removed: {chars_removed} characters")
+
+        return cleaned_text
     
     def is_auto_generated(self, text: str) -> bool:
         """Check if text appears to be auto-generated."""
@@ -306,10 +344,14 @@ class DataPreprocessor:
             r'^Dependabot',
             r'^renovate\[bot\]'
         ]
-        
+
         import re
         for pattern in auto_patterns:
             if re.search(pattern, str(text), re.IGNORECASE):
+                if self.verbose and self.stats['auto_generated_removed'] < 3:
+                    logger.info(f"\n--- Auto-Generated Detection Example #{self.stats['auto_generated_removed'] + 1} ---")
+                    logger.info(f"Matched pattern: {pattern}")
+                    logger.info(f"Text: {str(text)[:150]}{'...' if len(str(text)) > 150 else ''}")
                 return True
         return False
     
@@ -317,31 +359,88 @@ class DataPreprocessor:
         """Count words after removing stop words."""
         words = text.lower().split()
         meaningful_words = [w for w in words if w not in self.SOFTWARE_STOPWORDS]
+        removed_words = [w for w in words if w in self.SOFTWARE_STOPWORDS]
+
+        # Verbose logging for examples
+        if self.verbose and self.stats['short_texts_removed'] < 3 and len(meaningful_words) < self.min_words:
+            logger.info(f"\n--- Short Text Example (will be removed) #{self.stats['short_texts_removed'] + 1} ---")
+            logger.info(f"Original text: {text[:200]}{'...' if len(text) > 200 else ''}")
+            logger.info(f"Total words: {len(words)}")
+            logger.info(f"Meaningful words after stopword removal: {len(meaningful_words)}")
+            logger.info(f"Stopwords removed: {removed_words[:10]}{'...' if len(removed_words) > 10 else ''}")
+            logger.info(f"Meaningful words: {meaningful_words}")
+            logger.info(f"Threshold: {self.min_words} words")
+
         return len(meaningful_words)
     
     def preprocess_dataframe(self, df: pd.DataFrame, text_col: str) -> pd.DataFrame:
         """Apply all preprocessing steps to a dataframe."""
+        logger.info("\n" + "="*60)
+        logger.info("PREPROCESSING PIPELINE")
+        logger.info("="*60)
         logger.info(f"Starting preprocessing on {len(df)} records...")
-        
+
+        # Show sample of original data
+        if self.verbose and len(df) > 0:
+            logger.info(f"\n--- Original Data Sample ---")
+            for i in range(min(2, len(df))):
+                logger.info(f"Example {i+1}: {df[text_col].iloc[i][:150]}{'...' if len(str(df[text_col].iloc[i])) > 150 else ''}")
+
         # Remove duplicates
         initial_count = len(df)
         df = df.drop_duplicates(subset=[text_col])
-        logger.info(f"Removed {initial_count - len(df)} duplicates")
-        
+        duplicates_removed = initial_count - len(df)
+        self.stats['duplicates_removed'] = duplicates_removed
+        logger.info(f"\n[Step 1/4] Duplicate Removal: Removed {duplicates_removed} duplicates ({duplicates_removed/initial_count*100:.1f}%)")
+        logger.info(f"  Remaining: {len(df)} records")
+
         # Clean text
+        logger.info(f"\n[Step 2/4] Text Cleaning: Removing URLs, emails, code blocks, special characters...")
+        self.stats['total_processed'] = 0
         df[text_col] = df[text_col].apply(self.clean_text)
-        
+        logger.info(f"  Total characters removed: {self.stats['chars_removed_cleaning']:,}")
+
         # Remove auto-generated
+        logger.info(f"\n[Step 3/4] Auto-Generated Detection: Checking for bot-generated content...")
+        self.stats['auto_generated_removed'] = 0
         auto_mask = df[text_col].apply(self.is_auto_generated)
+        auto_count = auto_mask.sum()
         df = df[~auto_mask]
-        logger.info(f"Removed {auto_mask.sum()} auto-generated entries")
-        
+        self.stats['auto_generated_removed'] = auto_count
+        logger.info(f"  Removed {auto_count} auto-generated entries ({auto_count/initial_count*100:.1f}%)")
+        logger.info(f"  Remaining: {len(df)} records")
+
         # Remove short texts
+        logger.info(f"\n[Step 4/4] Short Text Removal: Filtering texts with < {self.min_words} meaningful words...")
+        self.stats['short_texts_removed'] = 0
         word_counts = df[text_col].apply(self.word_count_after_stopwords)
+        short_mask = word_counts < self.min_words
+        short_count = short_mask.sum()
         df = df[word_counts >= self.min_words]
-        logger.info(f"Removed {(word_counts < self.min_words).sum()} short entries")
-        
-        logger.info(f"Final dataset size: {len(df)} records")
+        self.stats['short_texts_removed'] = short_count
+        logger.info(f"  Removed {short_count} short entries ({short_count/initial_count*100:.1f}%)")
+        logger.info(f"  Remaining: {len(df)} records")
+
+        # Show sample of processed data
+        if self.verbose and len(df) > 0:
+            logger.info(f"\n--- Processed Data Sample ---")
+            for i in range(min(2, len(df))):
+                text = df[text_col].iloc[i]
+                wc = len([w for w in text.lower().split() if w not in self.SOFTWARE_STOPWORDS])
+                logger.info(f"Example {i+1} ({wc} meaningful words): {text[:150]}{'...' if len(text) > 150 else ''}")
+
+        # Summary statistics
+        logger.info("\n" + "="*60)
+        logger.info("PREPROCESSING SUMMARY")
+        logger.info("="*60)
+        logger.info(f"Initial records:        {initial_count:>8,}")
+        logger.info(f"Duplicates removed:     {duplicates_removed:>8,} ({duplicates_removed/initial_count*100:>5.1f}%)")
+        logger.info(f"Auto-generated removed: {auto_count:>8,} ({auto_count/initial_count*100:>5.1f}%)")
+        logger.info(f"Short texts removed:    {short_count:>8,} ({short_count/initial_count*100:>5.1f}%)")
+        logger.info(f"Final records:          {len(df):>8,} ({len(df)/initial_count*100:>5.1f}%)")
+        logger.info(f"Total reduction:        {initial_count - len(df):>8,} ({(initial_count - len(df))/initial_count*100:>5.1f}%)")
+        logger.info("="*60 + "\n")
+
         return df.reset_index(drop=True)
 
 
@@ -430,17 +529,25 @@ class DesignMiningTrainer:
         self.device = config.DEVICE
         
         # Initialize tokenizer
-        self.tokenizer = BertTokenizer.from_pretrained(config.MODEL_NAME)
-        
+        self.tokenizer = AutoTokenizer.from_pretrained(config.MODEL_NAME)
+
         # Initialize model with configuration
-        model_config = BertConfig.from_pretrained(
+        model_config = AutoConfig.from_pretrained(
             config.MODEL_NAME,
             num_labels=config.NUM_LABELS,
-            hidden_dropout_prob=config.DROPOUT_RATE,
-            attention_probs_dropout_prob=config.DROPOUT_RATE
         )
-        
-        self.model = BertForSequenceClassification.from_pretrained(
+        # Set dropout where supported by the architecture
+        if hasattr(model_config, 'hidden_dropout_prob'):
+            model_config.hidden_dropout_prob = config.DROPOUT_RATE
+        if hasattr(model_config, 'attention_probs_dropout_prob'):
+            model_config.attention_probs_dropout_prob = config.DROPOUT_RATE
+        # DistilBERT uses different attribute names
+        if hasattr(model_config, 'dropout'):
+            model_config.dropout = config.DROPOUT_RATE
+        if hasattr(model_config, 'attention_dropout'):
+            model_config.attention_dropout = config.DROPOUT_RATE
+
+        self.model = AutoModelForSequenceClassification.from_pretrained(
             config.MODEL_NAME,
             config=model_config
         )
@@ -710,8 +817,8 @@ class DesignMiningTrainer:
     
     def load_model(self, path: str):
         """Load model and tokenizer."""
-        self.model = BertForSequenceClassification.from_pretrained(path)
-        self.tokenizer = BertTokenizer.from_pretrained(path)
+        self.model = AutoModelForSequenceClassification.from_pretrained(path)
+        self.tokenizer = AutoTokenizer.from_pretrained(path)
         self.model.to(self.device)
         logger.info(f"Model loaded from {path}")
 
@@ -722,16 +829,70 @@ class DesignMiningTrainer:
 
 class TransferLearningPipeline:
     """Pipeline for transfer learning from Stack Overflow to TAWOS dataset.
-    
+
     Implements dissertation Section 4.2.2:
     1. Fine-tune BERT on Stack Overflow dataset (already labeled)
     2. Apply to TAWOS dataset to generate labels
     3. Second fine-tuning with smaller learning rate on TAWOS
+
+    Supports two data sources for TAWOS:
+    - File-based: Load from CSV file
+    - Database: Connect to TAWOS MySQL database
     """
-    
-    def __init__(self, config: Config):
+
+    def __init__(self, config: Config, tawos_config: Optional['TAWOSConfig'] = None):
         self.config = config
         self.trainer = DesignMiningTrainer(config)
+        self.tawos_config = tawos_config
+        self.tawos_connector = None
+
+        # Initialize TAWOS connector if config provided
+        if tawos_config and TAWOS_AVAILABLE:
+            self.tawos_connector = TAWOSConnector(tawos_config)
+
+    def connect_tawos_db(self) -> bool:
+        """Connect to TAWOS MySQL database.
+
+        Returns:
+            True if connection successful
+        """
+        if not TAWOS_AVAILABLE:
+            logger.error("TAWOS connector not available. Install mysql-connector-python")
+            return False
+
+        if not self.tawos_connector:
+            logger.error("TAWOS config not provided")
+            return False
+
+        return self.tawos_connector.connect()
+
+    def fetch_tawos_from_db(
+        self,
+        projects: Optional[List[str]] = None,
+        include_comments: bool = False,
+        max_issues: Optional[int] = None
+    ) -> Tuple[List[str], pd.DataFrame]:
+        """Fetch TAWOS issues from MySQL database.
+
+        Args:
+            projects: Optional list of Apache project keys to filter
+            include_comments: Whether to include comment text
+            max_issues: Maximum number of issues to fetch
+
+        Returns:
+            Tuple of (texts list, full DataFrame)
+        """
+        if not self.tawos_connector:
+            raise RuntimeError("TAWOS connector not initialized")
+
+        df = self.tawos_connector.fetch_issues(
+            include_comments=include_comments,
+            projects=projects,
+            limit=max_issues
+        )
+
+        texts = df['text'].tolist() if not df.empty else []
+        return texts, df
     
     def stage1_finetune_stackoverflow(
         self,
@@ -816,20 +977,20 @@ class TransferLearningPipeline:
         confidence_threshold: float = 0.8
     ) -> Dict:
         """Stage 3: Second fine-tuning on high-confidence TAWOS samples.
-        
+
         Uses smaller learning rate and fewer epochs as per dissertation.
         """
         logger.info("\n" + "="*60)
         logger.info("STAGE 3: Second Fine-tuning on TAWOS Dataset")
         logger.info("="*60)
-        
+
         # Filter to high-confidence samples
         high_conf_mask = [c >= confidence_threshold for c in confidences]
         filtered_texts = [t for t, m in zip(tawos_texts, high_conf_mask) if m]
         filtered_labels = [l for l, m in zip(tawos_labels, high_conf_mask) if m]
-        
+
         logger.info(f"Using {len(filtered_texts)} high-confidence samples")
-        
+
         # Split
         train_texts, val_texts, train_labels, val_labels = train_test_split(
             filtered_texts, filtered_labels,
@@ -837,22 +998,151 @@ class TransferLearningPipeline:
             random_state=self.config.RANDOM_SEED,
             stratify=filtered_labels
         )
-        
+
         # Create data loaders
         train_loader, val_loader, _ = self.trainer.create_data_loaders(
             train_texts, train_labels,
             val_texts, val_labels
         )
-        
+
         # Train with smaller learning rate and fewer epochs
         history = self.trainer.train(
-            train_loader, 
+            train_loader,
             val_loader,
             num_epochs=self.config.SECOND_FINETUNE_EPOCHS,
             learning_rate=self.config.SECOND_FINETUNE_LR
         )
-        
+
         return history
+
+    def export_labeled_tawos(
+        self,
+        df: pd.DataFrame,
+        labels: List[int],
+        confidences: List[float],
+        output_path: str,
+        confidence_threshold: float = 0.0
+    ) -> str:
+        """Export labeled TAWOS data to CSV.
+
+        Args:
+            df: Original DataFrame from TAWOS
+            labels: Predicted labels (0=non-design, 1=design)
+            confidences: Prediction confidence scores
+            output_path: Path to save labeled CSV
+            confidence_threshold: Minimum confidence to include
+
+        Returns:
+            Path to saved file
+        """
+        logger.info("\n" + "="*60)
+        logger.info("Exporting Labeled TAWOS Dataset")
+        logger.info("="*60)
+
+        # Add predictions to DataFrame
+        df_labeled = df.copy()
+        df_labeled['predicted_label'] = labels
+        df_labeled['label_name'] = ['design' if l == 1 else 'non-design' for l in labels]
+        df_labeled['confidence'] = confidences
+
+        # Filter by confidence threshold
+        if confidence_threshold > 0:
+            df_labeled = df_labeled[df_labeled['confidence'] >= confidence_threshold]
+            logger.info(f"Filtered to {len(df_labeled)} samples with confidence >= {confidence_threshold}")
+
+        # Save to CSV
+        df_labeled.to_csv(output_path, index=False)
+        logger.info(f"Saved labeled dataset to: {output_path}")
+
+        # Log statistics
+        design_count = sum(1 for l in df_labeled['predicted_label'] if l == 1)
+        total = len(df_labeled)
+        logger.info(f"Total issues: {total}")
+        logger.info(f"Design issues: {design_count} ({design_count/total*100:.1f}%)")
+        logger.info(f"Non-design issues: {total - design_count} ({(total-design_count)/total*100:.1f}%)")
+        logger.info(f"Average confidence: {df_labeled['confidence'].mean():.4f}")
+
+        return output_path
+
+    def run_full_pipeline_with_db(
+        self,
+        so_texts: List[str],
+        so_labels: List[int],
+        tawos_projects: Optional[List[str]] = None,
+        include_comments: bool = False,
+        max_tawos_issues: Optional[int] = None,
+        confidence_threshold: float = 0.8,
+        output_path: Optional[str] = None
+    ) -> Dict:
+        """Run complete transfer learning pipeline with TAWOS database.
+
+        Args:
+            so_texts: Stack Overflow texts for initial training
+            so_labels: Stack Overflow labels
+            tawos_projects: Optional list of Apache projects to include
+            include_comments: Whether to include JIRA comments
+            max_tawos_issues: Maximum number of TAWOS issues
+            confidence_threshold: Threshold for label confidence
+            output_path: Path to save labeled TAWOS data
+
+        Returns:
+            Dictionary with pipeline results
+        """
+        logger.info("\n" + "="*60)
+        logger.info("FULL TRANSFER LEARNING PIPELINE WITH TAWOS DATABASE")
+        logger.info("="*60)
+
+        results = {}
+
+        # Connect to TAWOS
+        if not self.connect_tawos_db():
+            raise ConnectionError("Failed to connect to TAWOS database")
+
+        try:
+            # Stage 1: Fine-tune on Stack Overflow
+            results['stage1'] = self.stage1_finetune_stackoverflow(so_texts, so_labels)
+
+            # Fetch TAWOS data from database
+            logger.info("\nFetching TAWOS data from database...")
+            tawos_texts, tawos_df = self.fetch_tawos_from_db(
+                projects=tawos_projects,
+                include_comments=include_comments,
+                max_issues=max_tawos_issues
+            )
+
+            logger.info(f"Fetched {len(tawos_texts)} TAWOS issues")
+            results['tawos_fetched'] = len(tawos_texts)
+
+            # Stage 2: Label TAWOS
+            tawos_labels, confidences = self.stage2_label_tawos(
+                tawos_texts,
+                confidence_threshold=confidence_threshold
+            )
+            results['stage2'] = {
+                'total_labeled': len(tawos_labels),
+                'high_confidence': sum(1 for c in confidences if c >= confidence_threshold),
+                'design_predicted': sum(tawos_labels)
+            }
+
+            # Export labeled data
+            if output_path:
+                self.export_labeled_tawos(
+                    tawos_df, tawos_labels, confidences,
+                    output_path, confidence_threshold=0.0
+                )
+                results['labeled_output'] = output_path
+
+            # Stage 3: Second fine-tuning
+            results['stage3'] = self.stage3_finetune_tawos(
+                tawos_texts, tawos_labels, confidences,
+                confidence_threshold=confidence_threshold
+            )
+
+        finally:
+            if self.tawos_connector:
+                self.tawos_connector.disconnect()
+
+        return results
 
 
 # =============================================================================
@@ -998,6 +1288,56 @@ def generate_sample_data(n_samples: int = 1000) -> Tuple[List[str], List[int]]:
 
 
 # =============================================================================
+# Metrics Tracking
+# =============================================================================
+
+def save_metrics_to_csv(
+    metrics: Dict,
+    config: Config,
+    output_file: str = 'training_metrics.csv'
+):
+    """Save training metrics to CSV file for tracking across runs.
+
+    Args:
+        metrics: Dictionary containing all metrics to save
+        config: Configuration object with hyperparameters
+        output_file: Path to CSV file (will append if exists)
+    """
+    import csv
+    from pathlib import Path
+
+    # Check if file exists to determine if we need headers
+    file_exists = Path(output_file).exists()
+
+    # Add timestamp as run ID
+    run_id = datetime.now().strftime('%Y%m%d_%H%M%S')
+    metrics['run_id'] = run_id
+    metrics['timestamp'] = datetime.now().isoformat()
+
+    # Flatten the metrics dictionary
+    flat_metrics = {}
+    for key, value in metrics.items():
+        if isinstance(value, dict):
+            # Flatten nested dictionaries
+            for sub_key, sub_value in value.items():
+                flat_metrics[f"{key}_{sub_key}"] = sub_value
+        else:
+            flat_metrics[key] = value
+
+    # Write to CSV
+    with open(output_file, 'a', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=sorted(flat_metrics.keys()))
+
+        # Write header if new file
+        if not file_exists:
+            writer.writeheader()
+
+        writer.writerow(flat_metrics)
+
+    logger.info(f"Metrics saved to {output_file} (run_id: {run_id})")
+
+
+# =============================================================================
 # Main Entry Point
 # =============================================================================
 
@@ -1027,6 +1367,12 @@ def main():
         help='Path to TAWOS dataset'
     )
     parser.add_argument(
+        '--val_data',
+        type=str,
+        default=None,
+        help='Path to held-out validation CSV (if not provided, validation split is taken from training data)'
+    )
+    parser.add_argument(
         '--output_dir',
         type=str,
         default='./model_output',
@@ -1038,13 +1384,116 @@ def main():
         default=5,
         help='Number of training epochs'
     )
-    
+    parser.add_argument(
+        '--learning_rate',
+        type=float,
+        default=2e-5,
+        help='Learning rate for training'
+    )
+    parser.add_argument(
+        '--batch_size',
+        type=int,
+        default=16,
+        help='Batch size for training'
+    )
+    parser.add_argument(
+        '--dropout',
+        type=float,
+        default=0.1,
+        help='Dropout rate (0.0 to 1.0)'
+    )
+    parser.add_argument(
+        '--max_length',
+        type=int,
+        default=512,
+        help='Maximum sequence length for BERT'
+    )
+    parser.add_argument(
+        '--min_words',
+        type=int,
+        default=7,
+        help='Minimum meaningful words after stopword removal'
+    )
+    parser.add_argument(
+        '--warmup_ratio',
+        type=float,
+        default=0.1,
+        help='Warmup ratio for learning rate scheduler'
+    )
+
+    # TAWOS Database connection arguments
+    parser.add_argument(
+        '--db_host',
+        type=str,
+        default='localhost',
+        help='TAWOS MySQL database host'
+    )
+    parser.add_argument(
+        '--db_port',
+        type=int,
+        default=3306,
+        help='TAWOS MySQL database port'
+    )
+    parser.add_argument(
+        '--db_name',
+        type=str,
+        default='tawos',
+        help='TAWOS database name'
+    )
+    parser.add_argument(
+        '--db_user',
+        type=str,
+        default='root',
+        help='TAWOS database user'
+    )
+    parser.add_argument(
+        '--db_password',
+        type=str,
+        default='',
+        help='TAWOS database password'
+    )
+    parser.add_argument(
+        '--tawos_projects',
+        type=str,
+        nargs='+',
+        default=None,
+        help='List of Apache project keys to include (e.g., HADOOP SPARK)'
+    )
+    parser.add_argument(
+        '--include_comments',
+        action='store_true',
+        help='Include JIRA comments in text'
+    )
+    parser.add_argument(
+        '--max_tawos_issues',
+        type=int,
+        default=None,
+        help='Maximum number of TAWOS issues to fetch'
+    )
+    parser.add_argument(
+        '--confidence_threshold',
+        type=float,
+        default=0.8,
+        help='Confidence threshold for labeling (0.0-1.0)'
+    )
+    parser.add_argument(
+        '--labeled_output',
+        type=str,
+        default=None,
+        help='Path to save labeled TAWOS dataset CSV'
+    )
+
     args = parser.parse_args()
-    
+
     # Configuration
     config = Config()
     config.OUTPUT_DIR = args.output_dir
     config.NUM_EPOCHS = args.epochs
+    config.LEARNING_RATE = args.learning_rate
+    config.BATCH_SIZE = args.batch_size
+    config.DROPOUT_RATE = args.dropout
+    config.MAX_LENGTH = args.max_length
+    config.WARMUP_RATIO = args.warmup_ratio
     
     logger.info("="*60)
     logger.info("BERT-based Design Mining Training Pipeline")
@@ -1128,38 +1577,388 @@ def main():
         
         # Save model
         trainer.save_model(config.OUTPUT_DIR)
-        
+
+    elif args.mode == 'full':
+        # Full mode with real data from CSV
+        logger.info("\n" + "="*60)
+        logger.info("Running in FULL mode with real data")
+        logger.info("="*60)
+
+        if not args.stackoverflow_path:
+            logger.error("Full mode requires --stackoverflow_path")
+            return
+
+        # Load data from CSV
+        logger.info(f"\nLoading data from: {args.stackoverflow_path}")
+        try:
+            df = pd.read_csv(args.stackoverflow_path)
+            logger.info(f"Loaded {len(df)} records")
+            logger.info(f"Columns: {list(df.columns)}")
+
+            # Check for required columns
+            # Assuming CSV has 'text' and 'label' columns
+            # Adjust these column names based on your actual CSV structure
+            text_col = 'text' if 'text' in df.columns else df.columns[0]
+            label_col = 'label' if 'label' in df.columns else df.columns[1]
+
+            logger.info(f"Using text column: '{text_col}'")
+            logger.info(f"Using label column: '{label_col}'")
+
+            # Display label distribution before encoding
+            if label_col in df.columns:
+                label_dist = df[label_col].value_counts()
+                logger.info(f"\nOriginal label distribution:")
+                for label, count in label_dist.items():
+                    logger.info(f"  {label}: {count} ({count/len(df)*100:.1f}%)")
+
+            # Encode labels to integers
+            logger.info("\nEncoding labels to integers...")
+            unique_labels = df[label_col].unique()
+            logger.info(f"Unique labels found: {unique_labels}")
+
+            # Create label mapping
+            # Try to detect if labels are already numeric
+            try:
+                # Check if labels can be converted to int
+                df[label_col] = df[label_col].astype(int)
+                logger.info("Labels are numeric - using as-is")
+                label_mapping = {i: i for i in df[label_col].unique()}
+            except (ValueError, TypeError):
+                # Labels are categorical strings - create mapping
+                # Assume 'design' or similar -> 1, 'general' or 'non-design' -> 0
+                label_mapping = {}
+                for label in unique_labels:
+                    label_str = str(label).lower()
+                    if 'design' in label_str or label_str in ['1', 'true', 'yes']:
+                        label_mapping[label] = 1
+                    else:
+                        label_mapping[label] = 0
+
+                logger.info(f"Label mapping: {label_mapping}")
+                df[label_col] = df[label_col].map(label_mapping)
+
+            # Verify all labels are 0 or 1
+            if not set(df[label_col].unique()).issubset({0, 1}):
+                logger.error(f"Invalid labels after encoding: {df[label_col].unique()}")
+                logger.error("Labels must be 0 (non-design) or 1 (design)")
+                return
+
+            logger.info(f"\nEncoded label distribution:")
+            label_dist = df[label_col].value_counts()
+            for label, count in label_dist.items():
+                label_name = "design" if label == 1 else "non-design"
+                logger.info(f"  {label} ({label_name}): {count} ({count/len(df)*100:.1f}%)")
+
+            # Initialize preprocessor
+            logger.info("\nInitializing data preprocessor...")
+            preprocessor = DataPreprocessor(min_words=args.min_words, verbose=True)
+
+            # Preprocess data
+            df_clean = preprocessor.preprocess_dataframe(df, text_col)
+
+            # Extract texts and labels (labels are now integers)
+            texts = df_clean[text_col].tolist()
+            labels = df_clean[label_col].tolist()
+
+            # Verify labels are integers
+            logger.info(f"Label types after extraction: {type(labels[0]) if labels else 'empty'}")
+            logger.info(f"Sample labels: {labels[:5] if len(labels) >= 5 else labels}")
+
+            # Split data
+            if args.val_data:
+                # Use separate validation file
+                logger.info(f"\nLoading validation data from: {args.val_data}")
+                df_val = pd.read_csv(args.val_data)
+                logger.info(f"Loaded {len(df_val)} validation records")
+
+                # Detect columns in validation data
+                val_text_col = 'text' if 'text' in df_val.columns else df_val.columns[0]
+                val_label_col = 'label' if 'label' in df_val.columns else df_val.columns[1]
+
+                # Encode validation labels
+                try:
+                    df_val[val_label_col] = df_val[val_label_col].astype(int)
+                except (ValueError, TypeError):
+                    for label in df_val[val_label_col].unique():
+                        label_str = str(label).lower()
+                        if 'design' in label_str or label_str in ['1', 'true', 'yes']:
+                            label_mapping[label] = 1
+                        else:
+                            label_mapping[label] = 0
+                    df_val[val_label_col] = df_val[val_label_col].map(label_mapping)
+
+                # Preprocess validation data
+                val_preprocessor = DataPreprocessor(min_words=args.min_words, verbose=False)
+                df_val_clean = val_preprocessor.preprocess_dataframe(df_val, val_text_col)
+
+                val_texts = df_val_clean[val_text_col].tolist()
+                val_labels = df_val_clean[val_label_col].tolist()
+
+                # Split training data into train + test only
+                train_texts, test_texts, train_labels, test_labels = train_test_split(
+                    texts, labels,
+                    test_size=0.15,
+                    random_state=config.RANDOM_SEED,
+                    stratify=labels
+                )
+            else:
+                # Split training data into train/val/test
+                train_texts, temp_texts, train_labels, temp_labels = train_test_split(
+                    texts, labels,
+                    test_size=0.3,
+                    random_state=config.RANDOM_SEED,
+                    stratify=labels
+                )
+                val_texts, test_texts, val_labels, test_labels = train_test_split(
+                    temp_texts, temp_labels,
+                    test_size=0.5,
+                    random_state=config.RANDOM_SEED,
+                    stratify=temp_labels
+                )
+
+            total_samples = len(train_texts) + len(val_texts) + len(test_texts)
+            logger.info(f"\n" + "="*60)
+            logger.info("DATA SPLIT")
+            logger.info("="*60)
+            if args.val_data:
+                logger.info(f"  Validation source: {args.val_data}")
+            logger.info(f"  Training:   {len(train_texts):>6,} samples")
+            logger.info(f"  Validation: {len(val_texts):>6,} samples")
+            logger.info(f"  Test:       {len(test_texts):>6,} samples")
+            logger.info("="*60)
+
+            # Initialize trainer
+            logger.info("\nInitializing BERT model...")
+            trainer = DesignMiningTrainer(config)
+
+            # Create data loaders
+            logger.info("Creating data loaders...")
+            train_loader, val_loader, test_loader = trainer.create_data_loaders(
+                train_texts, train_labels,
+                val_texts, val_labels,
+                test_texts, test_labels
+            )
+
+            # Train
+            logger.info("\nStarting training...")
+            history = trainer.train(train_loader, val_loader)
+
+            # Final evaluation
+            test_metrics = None
+            if test_loader:
+                logger.info("\n" + "="*60)
+                logger.info("Final Test Set Evaluation")
+                logger.info("="*60)
+                test_loss, test_metrics = trainer.evaluate(test_loader)
+                MetricsCalculator.print_metrics(test_metrics, "Test")
+
+            # Save model
+            trainer.save_model(config.OUTPUT_DIR)
+
+            # Collect and save metrics to CSV
+            logger.info("\n" + "="*60)
+            logger.info("Saving metrics to CSV")
+            logger.info("="*60)
+
+            metrics_to_save = {
+                # Configuration
+                'mode': args.mode,
+                'model_name': config.MODEL_NAME,
+                'max_length': config.MAX_LENGTH,
+                'batch_size': config.BATCH_SIZE,
+                'learning_rate': config.LEARNING_RATE,
+                'num_epochs': config.NUM_EPOCHS,
+                'dropout_rate': config.DROPOUT_RATE,
+                'random_seed': config.RANDOM_SEED,
+
+                # Data statistics
+                'data_source': args.stackoverflow_path,
+                'initial_samples': len(df),
+                'final_samples': len(df_clean),
+                'train_samples': len(train_texts),
+                'val_samples': len(val_texts),
+                'test_samples': len(test_texts),
+                'duplicates_removed': preprocessor.stats['duplicates_removed'],
+                'auto_generated_removed': preprocessor.stats['auto_generated_removed'],
+                'short_texts_removed': preprocessor.stats['short_texts_removed'],
+
+                # Best validation metrics (from training history)
+                'best_val_epoch': len(history['val_metrics']),
+                'best_val': history['val_metrics'][-1] if history['val_metrics'] else {},
+
+                # Final test metrics
+                'test': test_metrics if test_metrics else {},
+
+                # Training info
+                'output_dir': config.OUTPUT_DIR,
+                'device': str(config.DEVICE),
+            }
+
+            # Save to CSV
+            csv_path = os.path.join(config.OUTPUT_DIR, 'training_metrics.csv')
+            save_metrics_to_csv(metrics_to_save, config, csv_path)
+
+            # Also save a detailed JSON version
+            json_path = os.path.join(config.OUTPUT_DIR, f'run_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json')
+            with open(json_path, 'w') as f:
+                # Add full training history
+                metrics_to_save['full_history'] = {
+                    'train_loss': [float(x) for x in history['train_loss']],
+                    'val_loss': [float(x) for x in history['val_loss']],
+                    'val_metrics_per_epoch': history['val_metrics']
+                }
+                json.dump(metrics_to_save, f, indent=2, default=str)
+
+            logger.info(f"Detailed metrics saved to {json_path}")
+
+        except FileNotFoundError:
+            logger.error(f"File not found: {args.stackoverflow_path}")
+            return
+        except Exception as e:
+            logger.error(f"Error loading or processing data: {e}")
+            import traceback
+            traceback.print_exc()
+            return
+
     elif args.mode == 'transfer':
         # Full transfer learning pipeline
         logger.info("\n" + "="*60)
         logger.info("Running TRANSFER LEARNING pipeline")
         logger.info("="*60)
-        
-        if not args.stackoverflow_path or not args.tawos_path:
-            logger.error("Transfer mode requires --stackoverflow_path and --tawos_path")
+
+        if not args.stackoverflow_path:
+            logger.error("Transfer mode requires --stackoverflow_path")
             return
-        
-        # Load datasets (you'll need to implement proper loading)
-        # This is a placeholder - replace with actual data loading
-        logger.info(f"Loading Stack Overflow data from: {args.stackoverflow_path}")
-        logger.info(f"Loading TAWOS data from: {args.tawos_path}")
-        
-        # For demo, generate sample data
-        so_texts, so_labels = generate_sample_data(1000)
-        tawos_texts, _ = generate_sample_data(500)
-        
-        # Initialize transfer learning pipeline
-        pipeline = TransferLearningPipeline(config)
-        
-        # Stage 1: Fine-tune on Stack Overflow
-        pipeline.stage1_finetune_stackoverflow(so_texts, so_labels)
-        
-        # Stage 2: Label TAWOS
-        tawos_labels, confidences = pipeline.stage2_label_tawos(tawos_texts)
-        
-        # Stage 3: Second fine-tuning
-        pipeline.stage3_finetune_tawos(tawos_texts, tawos_labels, confidences)
-        
+
+        # Check if using database or file for TAWOS
+        use_db = args.tawos_path is None
+
+        if use_db:
+            if not TAWOS_AVAILABLE:
+                logger.error("TAWOS database mode requires mysql-connector-python")
+                logger.error("Install with: pip install mysql-connector-python")
+                return
+
+            logger.info("Using TAWOS MySQL database connection")
+            logger.info(f"  Host: {args.db_host}:{args.db_port}")
+            logger.info(f"  Database: {args.db_name}")
+            logger.info(f"  User: {args.db_user}")
+            if args.tawos_projects:
+                logger.info(f"  Projects: {', '.join(args.tawos_projects)}")
+
+        # Load Stack Overflow data
+        logger.info(f"\nLoading Stack Overflow data from: {args.stackoverflow_path}")
+        try:
+            df_so = pd.read_csv(args.stackoverflow_path)
+
+            # Detect columns
+            text_col = 'text' if 'text' in df_so.columns else df_so.columns[0]
+            label_col = 'label' if 'label' in df_so.columns else df_so.columns[1]
+
+            # Encode labels
+            try:
+                df_so[label_col] = df_so[label_col].astype(int)
+            except (ValueError, TypeError):
+                unique_labels = df_so[label_col].unique()
+                label_mapping = {}
+                for label in unique_labels:
+                    label_str = str(label).lower()
+                    if 'design' in label_str or label_str in ['1', 'true', 'yes']:
+                        label_mapping[label] = 1
+                    else:
+                        label_mapping[label] = 0
+                df_so[label_col] = df_so[label_col].map(label_mapping)
+
+            so_texts = df_so[text_col].tolist()
+            so_labels = df_so[label_col].tolist()
+
+            logger.info(f"Loaded {len(so_texts)} Stack Overflow samples")
+            logger.info(f"Design: {sum(so_labels)}, Non-design: {len(so_labels) - sum(so_labels)}")
+
+        except Exception as e:
+            logger.error(f"Error loading Stack Overflow data: {e}")
+            return
+
+        if use_db:
+            # Initialize TAWOS config for database connection
+            tawos_config = TAWOSConfig(
+                host=args.db_host,
+                port=args.db_port,
+                database=args.db_name,
+                user=args.db_user,
+                password=args.db_password,
+                projects=args.tawos_projects or [],
+                max_issues=args.max_tawos_issues
+            )
+
+            # Initialize pipeline with database connector
+            pipeline = TransferLearningPipeline(config, tawos_config=tawos_config)
+
+            # Set default output path if not specified
+            output_path = args.labeled_output or os.path.join(
+                config.OUTPUT_DIR,
+                f'tawos_labeled_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+            )
+
+            # Run full pipeline with database
+            results = pipeline.run_full_pipeline_with_db(
+                so_texts=so_texts,
+                so_labels=so_labels,
+                tawos_projects=args.tawos_projects,
+                include_comments=args.include_comments,
+                max_tawos_issues=args.max_tawos_issues,
+                confidence_threshold=args.confidence_threshold,
+                output_path=output_path
+            )
+
+            logger.info("\n" + "="*60)
+            logger.info("TRANSFER LEARNING RESULTS")
+            logger.info("="*60)
+            logger.info(f"TAWOS issues fetched: {results.get('tawos_fetched', 0)}")
+            if 'stage2' in results:
+                logger.info(f"Design issues predicted: {results['stage2'].get('design_predicted', 0)}")
+                logger.info(f"High confidence labels: {results['stage2'].get('high_confidence', 0)}")
+            if 'labeled_output' in results:
+                logger.info(f"Labeled dataset saved to: {results['labeled_output']}")
+
+        else:
+            # File-based TAWOS mode
+            logger.info(f"Loading TAWOS data from file: {args.tawos_path}")
+            try:
+                df_tawos = pd.read_csv(args.tawos_path)
+                text_col = 'text' if 'text' in df_tawos.columns else df_tawos.columns[0]
+                tawos_texts = df_tawos[text_col].tolist()
+                logger.info(f"Loaded {len(tawos_texts)} TAWOS samples")
+            except Exception as e:
+                logger.error(f"Error loading TAWOS data: {e}")
+                return
+
+            # Initialize pipeline (no database)
+            pipeline = TransferLearningPipeline(config)
+
+            # Stage 1: Fine-tune on Stack Overflow
+            pipeline.stage1_finetune_stackoverflow(so_texts, so_labels)
+
+            # Stage 2: Label TAWOS
+            tawos_labels, confidences = pipeline.stage2_label_tawos(
+                tawos_texts,
+                confidence_threshold=args.confidence_threshold
+            )
+
+            # Export labeled data if output path specified
+            if args.labeled_output:
+                df_tawos['predicted_label'] = tawos_labels
+                df_tawos['confidence'] = confidences
+                df_tawos['label_name'] = ['design' if l == 1 else 'non-design' for l in tawos_labels]
+                df_tawos.to_csv(args.labeled_output, index=False)
+                logger.info(f"Saved labeled dataset to: {args.labeled_output}")
+
+            # Stage 3: Second fine-tuning
+            pipeline.stage3_finetune_tawos(
+                tawos_texts, tawos_labels, confidences,
+                confidence_threshold=args.confidence_threshold
+            )
+
         # Save final model
         pipeline.trainer.save_model(config.OUTPUT_DIR)
     

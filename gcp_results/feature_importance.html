@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset='utf-8'>
+<title>Feature Attribution Heatmaps</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #fafafa; }
+  h1 { color: #333; border-bottom: 2px solid #666; padding-bottom: 10px; }
+  .example { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .meta { font-size: 14px; color: #666; margin-bottom: 12px; }
+  .meta span { margin-right: 20px; }
+  .category { font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; }
+  .category-TP { background: #28a745; }
+  .category-TN { background: #007bff; }
+  .category-FP { background: #dc3545; }
+  .category-FN { background: #fd7e14; }
+  .heatmap { line-height: 2.0; font-size: 15px; word-wrap: break-word; }
+  .token { padding: 2px 1px; border-radius: 3px; }
+  .legend { display: flex; align-items: center; gap: 10px; margin: 20px 0; font-size: 14px; }
+  .legend-bar { width: 300px; height: 20px; border-radius: 4px; 
+    background: linear-gradient(to right, rgba(0,100,255,0.5), rgba(255,255,255,0), rgba(255,50,0,0.5)); }
+  .method-note { font-size: 13px; color: #888; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 10px; }
+</style>
+</head><body>
+<h1>Token Attribution Heatmaps</h1>
+<p>Integrated Gradients attributions showing which tokens most influence the model's output.</p>
+<div class='legend'>
+  <span>Negative (against class)</span>
+  <div class='legend-bar'></div>
+  <span>Positive (supports class)</span>
+</div>
+<div class='example'>
+<div class='meta'>
+  <span><b>DM-26570</b> (DM)</span>
+  <span>True: <b>Design</b></span>
+  <span>Predicted: <b>Design</b> (99.9%)</span>
+  <span class='category category-TP'>TP</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(255,252,252,0.01)'>short</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>en</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> the</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> names</span>
+<span class='token' style='background: rgba(250,250,255,0.02)'> of</span>
+<span class='token' style='background: rgba(250,250,255,0.02)'> classes</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> and</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> tasks</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> in</span>
+<span class='token' style='background: rgba(255,236,236,0.07)'> metrics</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'>-</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'>p</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'>ip</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>eline</span>
+<span class='token' style='background: rgba(255,238,238,0.06)'>-</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>framework</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> [</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>SE</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'>P</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>]</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> """</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>The</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> names</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> are</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> getting</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> unw</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>ield</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>y</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> -</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> come</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> up</span>
+<span class='token' style='background: rgba(244,244,255,0.04)'> with</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> (</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>and</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> implement</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'>)</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'> a</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> new</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> naming</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'> scheme</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> so</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> the</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> names</span>
+<span class='token' style='background: rgba(239,239,255,0.06)'> of</span>
+<span class='token' style='background: rgba(255,237,237,0.07)'> files</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>,</span>
+<span class='token' style='background: rgba(249,249,255,0.02)'> classes</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>,</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> tasks</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>,</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> etc</span>
+<span class='token' style='background: rgba(239,239,255,0.06)'>.</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> aren</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>'t</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> so</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> long</span>
+<span class='token' style='background: rgba(242,242,255,0.05)'>."</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>""</span>
+</div></div>
+<div class='example'>
+<div class='meta'>
+  <span><b>SERVER-51715</b> (SERVER)</span>
+  <span>True: <b>Non-Design</b></span>
+  <span>Predicted: <b>Non-Design</b> (100.0%)</span>
+  <span class='category category-TN'>TN</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(255,242,242,0.05)'>"</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>W</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'>rap</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> tim</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'>est</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>amps</span>
+<span class='token' style='background: rgba(251,251,255,0.02)'> with</span>
+<span class='token' style='background: rgba(241,241,255,0.05)'> to</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'>json</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'>()</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> in</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> log</span>
+<span class='token' style='background: rgba(250,250,255,0.02)'> lines</span>
+<span class='token' style='background: rgba(232,232,255,0.09)'> in</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> opt</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>ime</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'>.</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>js</span>
+<span class='token' style='background: rgba(233,233,255,0.08)'>"</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> [</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>SE</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>P</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>]</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> """</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>In</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> BF</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>-</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>19</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'>108</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'>Âł</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'>we</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> see</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> that</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> log</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> lines</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> that</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> conc</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>aten</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>ate</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> tim</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>est</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>amps</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> can</span>
+<span class='token' style='background: rgba(251,251,255,0.01)'> error</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> out</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> due</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> to</span>
+<span class='token' style='background: rgba(250,250,255,0.02)'>Âł</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> changes</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> introduced</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> in</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> SER</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'>VER</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>-</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>218</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>61</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'>.</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> We</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> should</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> wrap</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> tim</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>est</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>amps</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> with</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> {{</span>
+<span class='token' style='background: rgba(251,251,255,0.01)'>to</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>json</span>
+<span class='token' style='background: rgba(255,241,241,0.05)'>()</span>
+<span class='token' style='background: rgba(255,243,243,0.05)'>}}</span>
+<span class='token' style='background: rgba(250,250,255,0.02)'> to</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> prevent</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'> logging</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> from</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> throwing</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> the</span>
+<span class='token' style='background: rgba(251,251,255,0.01)'> error</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> {{</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>C</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>annot</span>
+<span class='token' style='background: rgba(247,247,255,0.03)'> to</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>String</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> tim</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'>est</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'>amps</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>}}</span>
+<span class='token' style='background: rgba(246,246,255,0.03)'>."</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>""</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> [</span>
+<span class='token' style='background: rgba(255,223,223,0.12)'>SE</span>
+<span class='token' style='background: rgba(255,238,238,0.06)'>P</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'>]</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> "</span>
+<span class='token' style='background: rgba(255,243,243,0.05)'>Author</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>:{</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>'</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>name</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>':</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> '</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'><</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>USER</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>>,</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> '</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>email</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'>':</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> '</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'><</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>EMA</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>IL</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>></span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>',</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> '</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>username</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'>':</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> '</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>ali</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'>mir</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'>'</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'>}</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> Message</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>:</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> SER</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>VER</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'>517</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'>15</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Wrap</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> tim</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>est</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>amps</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> with</span>
+<span class='token' style='background: rgba(246,246,255,0.03)'> to</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>json</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> in</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> log</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> lines</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> in</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> opt</span>
+<span class='token' style='background: rgba(251,251,255,0.02)'>ime</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>.</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'>js</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> Branch</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>:</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> master</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> https</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>://</span>
+<span class='token' style='background: rgba(255,228,228,0.11)'>github</span>
+<span class='token' style='background: rgba(255,243,243,0.05)'>.</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>com</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>/</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>mong</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>od</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>b</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>/</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>m</span>
+<span class='token' style='background: rgba(255,234,234,0.08)'>ongo</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>/</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>commit</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>/</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>ad</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>8</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>e</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>80</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>b</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>9</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>e</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>8</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>29</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>c</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>9</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>e</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>6</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>ee</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>e</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>224</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>c</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>2</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>c</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>224</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>24</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>18</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>e</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>9</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>486</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>f</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>27</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'>"</span>
+</div></div>
+<div class='example'>
+<div class='meta'>
+  <span><b>SERVER-51696</b> (SERVER)</span>
+  <span>True: <b>Non-Design</b></span>
+  <span>Predicted: <b>Design</b> (99.7%)</span>
+  <span class='category category-FP'>FP</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(173,173,255,0.32)'>"</span>
+<span class='token' style='background: rgba(94,94,255,0.63)'>Write</span>
+<span class='token' style='background: rgba(255,206,206,0.19)'> unit</span>
+<span class='token' style='background: rgba(215,215,255,0.15)'>/</span>
+<span class='token' style='background: rgba(126,126,255,0.50)'>integ</span>
+<span class='token' style='background: rgba(255,89,89,0.65)'>ration</span>
+<span class='token' style='background: rgba(255,233,233,0.08)'> tests</span>
+<span class='token' style='background: rgba(0,0,255,0.70)'> to</span>
+<span class='token' style='background: rgba(84,84,255,0.67)'> verify</span>
+<span class='token' style='background: rgba(94,94,255,0.63)'> correctness</span>
+<span class='token' style='background: rgba(211,211,255,0.17)'> of</span>
+<span class='token' style='background: rgba(255,150,150,0.41)'> the</span>
+<span class='token' style='background: rgba(255,175,175,0.31)'> Res</span>
+<span class='token' style='background: rgba(87,87,255,0.66)'>hard</span>
+<span class='token' style='background: rgba(236,236,255,0.07)'>ing</span>
+<span class='token' style='background: rgba(204,204,255,0.20)'> commit</span>
+<span class='token' style='background: rgba(246,246,255,0.03)'> step</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> "</span>
+<span class='token' style='background: rgba(200,200,255,0.21)'> [</span>
+<span class='token' style='background: rgba(143,143,255,0.44)'>SE</span>
+<span class='token' style='background: rgba(227,227,255,0.11)'>P</span>
+<span class='token' style='background: rgba(191,191,255,0.25)'>]</span>
+</div></div>
+<div class='example'>
+<div class='meta'>
+  <span><b>DM-27153</b> (DM)</span>
+  <span>True: <b>Design</b></span>
+  <span>Predicted: <b>Non-Design</b> (50.1%)</span>
+  <span class='category category-FN'>FN</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(255,236,236,0.07)'>Default</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'>ing</span>
+<span class='token' style='background: rgba(219,219,255,0.14)'> the</span>
+<span class='token' style='background: rgba(230,230,255,0.10)'> instrument</span>
+<span class='token' style='background: rgba(255,227,227,0.11)'> in</span>
+<span class='token' style='background: rgba(212,212,255,0.17)'> registry</span>
+<span class='token' style='background: rgba(245,245,255,0.04)'> [</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>SE</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'>P</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'>]</span>
+<span class='token' style='background: rgba(255,227,227,0.11)'> """</span>
+<span class='token' style='background: rgba(225,225,255,0.12)'>Unlike</span>
+<span class='token' style='background: rgba(231,231,255,0.09)'> gen</span>
+<span class='token' style='background: rgba(255,219,219,0.14)'>2</span>
+<span class='token' style='background: rgba(255,217,217,0.15)'>,</span>
+<span class='token' style='background: rgba(249,249,255,0.02)'> gen</span>
+<span class='token' style='background: rgba(255,188,188,0.26)'>3</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> can</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'> work</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> with</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> multiple</span>
+<span class='token' style='background: rgba(226,226,255,0.11)'> instruments</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> and</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> so</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> therefore</span>
+<span class='token' style='background: rgba(249,249,255,0.02)'> generally</span>
+<span class='token' style='background: rgba(248,248,255,0.02)'> requires</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> that</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> an</span>
+<span class='token' style='background: rgba(233,233,255,0.08)'> instrument</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> be</span>
+<span class='token' style='background: rgba(240,240,255,0.06)'> specified</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'> in</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> a</span>
+<span class='token' style='background: rgba(255,229,229,0.10)'> data</span>
+<span class='token' style='background: rgba(210,210,255,0.18)'>Id</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> or</span>
+<span class='token' style='background: rgba(255,238,238,0.06)'> where</span>
+<span class='token' style='background: rgba(255,230,230,0.10)'> clause</span>
+<span class='token' style='background: rgba(255,233,233,0.08)'> when</span>
+<span class='token' style='background: rgba(255,232,232,0.09)'> selecting</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'> datasets</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>.</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> </span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> </span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> This</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> requirement</span>
+<span class='token' style='background: rgba(255,237,237,0.07)'> to</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> always</span>
+<span class='token' style='background: rgba(241,241,255,0.05)'> specify</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> an</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> ""</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>""</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>un</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'>necessary</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>""</span>
+<span class='token' style='background: rgba(255,243,243,0.05)'>""</span>
+<span class='token' style='background: rgba(235,235,255,0.07)'> instrument</span>
+<span class='token' style='background: rgba(255,230,230,0.10)'> has</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> generated</span>
+<span class='token' style='background: rgba(255,241,241,0.05)'> some</span>
+<span class='token' style='background: rgba(225,225,255,0.12)'> negative</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> feedback</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'>.</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> </span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> </span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> </span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> The</span>
+<span class='token' style='background: rgba(235,235,255,0.07)'> problem</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'> with</span>
+<span class='token' style='background: rgba(237,237,255,0.07)'> globally</span>
+<span class='token' style='background: rgba(255,234,234,0.08)'> declaring</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> that</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> a</span>
+<span class='token' style='background: rgba(217,217,255,0.15)'> registry</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> only</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> has</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> one</span>
+<span class='token' style='background: rgba(234,234,255,0.08)'> instrument</span>
+<span class='token' style='background: rgba(251,251,255,0.01)'> is</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> that</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> if</span>
+<span class='token' style='background: rgba(255,243,243,0.05)'> you</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> ever</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> change</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'> your</span>
+<span class='token' style='background: rgba(237,237,255,0.07)'> mind</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> (</span>
+<span class='token' style='background: rgba(255,234,234,0.08)'>say</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> adding</span>
+<span class='token' style='background: rgba(240,240,255,0.06)'> LAT</span>
+<span class='token' style='background: rgba(244,244,255,0.04)'>ISS</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'> data</span>
+<span class='token' style='background: rgba(255,226,226,0.11)'> to</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> an</span>
+<span class='token' style='background: rgba(226,226,255,0.11)'> LS</span>
+<span class='token' style='background: rgba(255,141,141,0.44)'>ST</span>
+<span class='token' style='background: rgba(0,0,255,0.70)'>Cam</span>
+<span class='token' style='background: rgba(247,247,255,0.03)'> registry</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'>)</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> then</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> all</span>
+<span class='token' style='background: rgba(236,236,255,0.07)'> the</span>
+<span class='token' style='background: rgba(255,222,222,0.13)'> code</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> that</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> assume</span>
+<span class='token' style='background: rgba(237,237,255,0.07)'> the</span>
+<span class='token' style='background: rgba(240,240,255,0.06)'> instrument</span>
+<span class='token' style='background: rgba(255,233,233,0.08)'> would</span>
+<span class='token' style='background: rgba(255,214,214,0.16)'> default</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> now</span>
+<span class='token' style='background: rgba(239,239,255,0.06)'> breaks</span>
+<span class='token' style='background: rgba(249,249,255,0.02)'>.</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> </span>
+<span class='token' style='background: rgba(239,239,255,0.06)'> One</span>
+<span class='token' style='background: rgba(205,205,255,0.19)'> proposal</span>
+<span class='token' style='background: rgba(255,220,220,0.13)'> is</span>
+<span class='token' style='background: rgba(255,243,243,0.05)'> to</span>
+<span class='token' style='background: rgba(255,241,241,0.05)'> treat</span>
+<span class='token' style='background: rgba(242,242,255,0.05)'> instrument</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'> as</span>
+<span class='token' style='background: rgba(246,246,255,0.03)'> a</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> special</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> property</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> (</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>see</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> also</span>
+<span class='token' style='background: rgba(242,242,255,0.05)'> DM</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>27</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'>152</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>)</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> and</span>
+<span class='token' style='background: rgba(237,237,255,0.07)'> allow</span>
+<span class='token' style='background: rgba(245,245,255,0.04)'> for</span>
+<span class='token' style='background: rgba(232,232,255,0.09)'> instruments</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> to</span>
+<span class='token' style='background: rgba(248,248,255,0.03)'> be</span>
+<span class='token' style='background: rgba(243,243,255,0.05)'> associated</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> with</span>
+<span class='token' style='background: rgba(244,244,255,0.04)'> specific</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> collections</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>.</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> If</span>
+<span class='token' style='background: rgba(255,233,233,0.08)'> you</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> are</span>
+<span class='token' style='background: rgba(248,248,255,0.02)'> using</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> collection</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> ""</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>""</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'>H</span>
+<span class='token' style='background: rgba(250,250,255,0.02)'>SC</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'>/</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>raw</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'>/</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>all</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>""</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'>""</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> then</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> it</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> is</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> likely</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'> that</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> a</span>
+<span class='token' style='background: rgba(249,249,255,0.02)'> single</span>
+<span class='token' style='background: rgba(240,240,255,0.06)'> instrument</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> is</span>
+<span class='token' style='background: rgba(240,240,255,0.06)'> relevant</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>.</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> If</span>
+<span class='token' style='background: rgba(247,247,255,0.03)'> a</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> collection</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> happens</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> to</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> include</span>
+<span class='token' style='background: rgba(255,238,238,0.06)'> data</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> from</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> multiple</span>
+<span class='token' style='background: rgba(229,229,255,0.10)'> instruments</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> it</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> would</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> not</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> be</span>
+<span class='token' style='background: rgba(243,243,255,0.04)'> associated</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'> with</span>
+<span class='token' style='background: rgba(251,251,255,0.01)'> a</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> default</span>
+<span class='token' style='background: rgba(245,245,255,0.04)'>ed</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> instrument</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> but</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> that</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> would</span>
+<span class='token' style='background: rgba(251,251,255,0.01)'> be</span>
+<span class='token' style='background: rgba(244,244,255,0.04)'> rare</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> and</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> in</span>
+<span class='token' style='background: rgba(251,251,255,0.02)'> most</span>
+<span class='token' style='background: rgba(237,237,255,0.07)'> cases</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> would</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> have</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> been</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> deliberately</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> configured</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'> to</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> be</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> like</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> that</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>."</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'>""</span>
+</div></div>
+<div class='example'>
+<div class='meta'>
+  <span><b>DNN-7847</b> (DNN)</span>
+  <span>True: <b>Design</b></span>
+  <span>Predicted: <b>Design</b> (99.9%)</span>
+  <span class='category category-TP'>TP</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(255,252,252,0.01)'>D</span>
+<span class='token' style='background: rgba(255,170,170,0.33)'>CC</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> -</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'> Move</span>
+<span class='token' style='background: rgba(255,152,152,0.40)'> cache</span>
+<span class='token' style='background: rgba(255,179,179,0.30)'> from</span>
+<span class='token' style='background: rgba(255,199,199,0.22)'> repository</span>
+<span class='token' style='background: rgba(243,243,255,0.05)'> classes</span>
+<span class='token' style='background: rgba(255,165,165,0.35)'> to</span>
+<span class='token' style='background: rgba(241,241,255,0.05)'> managers</span>
+<span class='token' style='background: rgba(218,218,255,0.14)'> classes</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> [</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>SE</span>
+<span class='token' style='background: rgba(255,199,199,0.22)'>P</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>]</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'> """</span>
+<span class='token' style='background: rgba(233,233,255,0.09)'>Currently</span>
+<span class='token' style='background: rgba(255,185,185,0.27)'> the</span>
+<span class='token' style='background: rgba(255,172,172,0.33)'> cache</span>
+<span class='token' style='background: rgba(255,200,200,0.21)'> logic</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'> for</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> the</span>
+<span class='token' style='background: rgba(238,238,255,0.06)'> management</span>
+<span class='token' style='background: rgba(255,206,206,0.19)'> of</span>
+<span class='token' style='background: rgba(255,225,225,0.11)'> the</span>
+<span class='token' style='background: rgba(255,238,238,0.07)'> entities</span>
+<span class='token' style='background: rgba(255,190,190,0.25)'> of</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> the</span>
+<span class='token' style='background: rgba(242,242,255,0.05)'> D</span>
+<span class='token' style='background: rgba(255,196,196,0.23)'>CC</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> is</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> located</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'> at</span>
+<span class='token' style='background: rgba(255,235,235,0.08)'> the</span>
+<span class='token' style='background: rgba(255,191,191,0.25)'> repository</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> level</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>.</span>
+<span class='token' style='background: rgba(255,215,215,0.15)'> It</span>
+<span class='token' style='background: rgba(255,205,205,0.19)'> should</span>
+<span class='token' style='background: rgba(255,223,223,0.12)'> be</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> located</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> inside</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> the</span>
+<span class='token' style='background: rgba(255,231,231,0.09)'> manager</span>
+<span class='token' style='background: rgba(205,205,255,0.19)'> classes</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>,</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> and</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> the</span>
+<span class='token' style='background: rgba(255,211,211,0.17)'> repository</span>
+<span class='token' style='background: rgba(226,226,255,0.11)'> classes</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'> should</span>
+<span class='token' style='background: rgba(255,237,237,0.07)'> be</span>
+<span class='token' style='background: rgba(243,243,255,0.04)'> only</span>
+<span class='token' style='background: rgba(255,231,231,0.09)'> in</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> charge</span>
+<span class='token' style='background: rgba(255,225,225,0.12)'> of</span>
+<span class='token' style='background: rgba(255,164,164,0.35)'> data</span>
+<span class='token' style='background: rgba(255,178,178,0.30)'> access</span>
+<span class='token' style='background: rgba(248,248,255,0.03)'> management</span>
+<span class='token' style='background: rgba(249,249,255,0.02)'>.</span>
+<span class='token' style='background: rgba(202,202,255,0.21)'> </span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> This</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> change</span>
+<span class='token' style='background: rgba(227,227,255,0.11)'> affects</span>
+<span class='token' style='background: rgba(247,247,255,0.03)'> mainly</span>
+<span class='token' style='background: rgba(255,183,183,0.28)'> to</span>
+<span class='token' style='background: rgba(226,226,255,0.11)'> Dynamic</span>
+<span class='token' style='background: rgba(255,229,229,0.10)'> Content</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> Types</span>
+<span class='token' style='background: rgba(255,244,244,0.04)'>,</span>
+<span class='token' style='background: rgba(248,248,255,0.02)'> Field</span>
+<span class='token' style='background: rgba(255,217,217,0.15)'> Definitions</span>
+<span class='token' style='background: rgba(255,242,242,0.05)'> and</span>
+<span class='token' style='background: rgba(248,248,255,0.03)'> Tem</span>
+<span class='token' style='background: rgba(255,183,183,0.28)'>plates</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>."</span>
+<span class='token' style='background: rgba(239,239,255,0.06)'>""</span>
+</div></div>
+<div class='example'>
+<div class='meta'>
+  <span><b>MULE-14758</b> (MULE)</span>
+  <span>True: <b>Design</b></span>
+  <span>Predicted: <b>Design</b> (99.9%)</span>
+  <span class='category category-TP'>TP</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(255,247,247,0.03)'>M</span>
+<span class='token' style='background: rgba(245,245,255,0.04)'>ule</span>
+<span class='token' style='background: rgba(255,225,225,0.12)'> 4</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'> -</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'> Architecture</span>
+<span class='token' style='background: rgba(255,228,228,0.11)'> documentation</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'> [</span>
+<span class='token' style='background: rgba(255,243,243,0.04)'>SE</span>
+<span class='token' style='background: rgba(255,233,233,0.08)'>P</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>]</span>
+<span class='token' style='background: rgba(255,241,241,0.05)'> """</span>
+<span class='token' style='background: rgba(255,238,238,0.07)'>Ep</span>
+<span class='token' style='background: rgba(247,247,255,0.03)'>ic</span>
+<span class='token' style='background: rgba(233,233,255,0.09)'> for</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> M</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>ule</span>
+<span class='token' style='background: rgba(255,234,234,0.08)'> 4</span>
+<span class='token' style='background: rgba(255,237,237,0.07)'> architecture</span>
+<span class='token' style='background: rgba(255,240,240,0.06)'> documentation</span>
+<span class='token' style='background: rgba(249,249,255,0.02)'>."</span>
+<span class='token' style='background: rgba(255,233,233,0.08)'>""</span>
+</div></div>
+<div class='example'>
+<div class='meta'>
+  <span><b>DNN-10742</b> (DNN)</span>
+  <span>True: <b>Non-Design</b></span>
+  <span>Predicted: <b>Non-Design</b> (100.0%)</span>
+  <span class='category category-TN'>TN</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(255,253,253,0.01)'>Display</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> of</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> long</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> page</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> name</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> is</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> incorrect</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> while</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> selecting</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> page</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> name</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> from</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> drop</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'>down</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> field</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'>(</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>s</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>)</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> [</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>SE</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>P</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>]</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> """</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>The</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> display</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> of</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> long</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> page</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> name</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> under</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> drop</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>down</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> field</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>(</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>s</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>)</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> has</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> to</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> be</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> improved</span>
+<span class='token' style='background: rgba(250,250,255,0.02)'>.</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> *</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>+</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>T</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>ested</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> Environment</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>:</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>+</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>*</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> *</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>v</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>.</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> 09</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>.</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>02</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'>.</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>00</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> (</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>344</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>)</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> -</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> 7</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>14</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>*</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> *</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>+</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>Step</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>s</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> To</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> Reprodu</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>ce</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>:</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>+</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>*</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> #</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Go</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> to</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> PB</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> -></span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> CONT</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>ENT</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> -></span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> Pages</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> #</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Click</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> on</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> one</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> of</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> the</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> pages</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> Eg</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>.</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> Home</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> #</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> In</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> Details</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> tab</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> -></span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> Click</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> on</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> ""</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>""</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>Parent</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Page</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>""</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>""</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> drop</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>down</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> and</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> view</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> the</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> display</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> of</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> page</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> with</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> long</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> name</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> #</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> In</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Details</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> tab</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> -></span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> Click</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> on</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> ""</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>""</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>Ex</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>isting</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>""</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>""</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> radio</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> button</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> -></span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Click</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> on</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> ""</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>""</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>Ex</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>isting</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Page</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>""</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>""</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> drop</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>down</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> and</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> view</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> the</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> display</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> of</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> page</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> with</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> long</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> name</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> *</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>+</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>Ex</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>pected</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> Result</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>:</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>+</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>*</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> !</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>sc</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>reenshot</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>1</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>.</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>png</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>|</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>th</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>umbnail</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>!</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> *</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>+</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>Act</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>ual</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> Result</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>:</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>+</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>*</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> !</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>image</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>2018</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>02</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>03</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>-</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>17</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>-</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>01</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>52</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>07</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>1</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>.</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>png</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>|</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>th</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>umbnail</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>!</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> !</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>image</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>2018</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>02</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>03</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>-</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>17</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>04</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>35</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>135</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>.</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>png</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>|</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>th</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>umbnail</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>!</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> """</span>
+</div></div>
+<div class='example'>
+<div class='meta'>
+  <span><b>JRASERVER-71617</b> (JRASERVER)</span>
+  <span>True: <b>Non-Design</b></span>
+  <span>Predicted: <b>Non-Design</b> (100.0%)</span>
+  <span class='category category-TN'>TN</span>
+</div>
+<div class='heatmap'>
+<span class='token' style='background: rgba(255,254,254,0.00)'>P</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'>ag</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>ination</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> and</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> refresh</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> button</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> are</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> not</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> directly</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> visible</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> when</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> banner</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> is</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> used</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> [</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>SE</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>P</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>]</span>
+<span class='token' style='background: rgba(255,246,246,0.03)'> """</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>h</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>3</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>.</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Issue</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> Summary</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> If</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> any</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> kind</span>
+<span class='token' style='background: rgba(255,245,245,0.04)'> of</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> announcement</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> banner</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> is</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> used</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> results</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> summary</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> in</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> Issue</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> Search</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> is</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> not</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> directly</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> visible</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> and</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> additional</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> scroll</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>bar</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> is</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> added</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>.</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> h</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>3</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>.</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> Steps</span>
+<span class='token' style='background: rgba(255,243,243,0.05)'> to</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> Reprodu</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>ce</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> #</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> Set</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> any</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> kind</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'> of</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> announcement</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> banner</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>.</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> #</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> Go</span>
+<span class='token' style='background: rgba(255,243,243,0.04)'> to</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Issue</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Search</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> and</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> turn</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> on</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> the</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> List</span>
+<span class='token' style='background: rgba(255,239,239,0.06)'> Mode</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>.</span>
+<span class='token' style='background: rgba(252,252,255,0.01)'> </span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> h</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>3</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>.</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> Ex</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>pected</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> Results</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Pag</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>ination</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> and</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> refresh</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> buttons</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> always</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'> visible</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'>.</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> No</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> double</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> vertical</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> scroll</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>bar</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'>.</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> !</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>image</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>2020</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>09</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>25</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>15</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>50</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>25</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>439</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>.</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>png</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>|</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'>width</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>=</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>520</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>,</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>height</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>=</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>287</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>!</span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.00)'> h</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>3</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>.</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> Actual</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Results</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> </span>
+<span class='token' style='background: rgba(255,253,253,0.01)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> </span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> Pag</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'>ination</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'> and</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> refresh</span>
+<span class='token' style='background: rgba(255,248,248,0.02)'> button</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'> are</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> hidden</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>.</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> Double</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> scroll</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>bar</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'> appears</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>.</span>
+<span class='token' style='background: rgba(253,253,255,0.01)'> </span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> !</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>image</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>2020</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>09</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>25</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>15</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,253,253,0.00)'>51</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'>17</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>-</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>5</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>32</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>.</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>png</span>
+<span class='token' style='background: rgba(255,249,249,0.02)'>|</span>
+<span class='token' style='background: rgba(255,248,248,0.03)'>width</span>
+<span class='token' style='background: rgba(255,251,251,0.02)'>=</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'>456</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>,</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>height</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>=</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>232</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'>!</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> </span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> h</span>
+<span class='token' style='background: rgba(255,253,253,0.01)'>3</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>.</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> Work</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'>around</span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(253,253,255,0.00)'> </span>
+<span class='token' style='background: rgba(254,254,255,0.00)'> </span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> Turn</span>
+<span class='token' style='background: rgba(255,254,254,0.00)'> off</span>
+<span class='token' style='background: rgba(255,252,252,0.01)'> the</span>
+<span class='token' style='background: rgba(255,251,251,0.01)'> banner</span>
+<span class='token' style='background: rgba(255,250,250,0.02)'>."</span>
+<span class='token' style='background: rgba(255,247,247,0.03)'>""</span>
+</div></div>
+<div class='method-note'>
+Method: Layer Integrated Gradients (Sundararajan et al., 2017) on RoBERTa embedding layer.<br>
+Red = token supports the attributed class. Blue = token opposes it.<br>
+Attributions are normalized per-sample.
+</div>
+</body></html>

@@ -1,0 +1,614 @@
+{
+  "model": "gcp_results/roberta_stage2_stage3_manual_balanced",
+  "method": "Integrated Gradients (Sundararajan et al., 2017)",
+  "n_samples": 200,
+  "attribution_target": "true_label",
+  "n_design_samples": 100,
+  "n_nondesign_samples": 100,
+  "n_steps": 30,
+  "min_word_count": 3,
+  "top_design_words": [
+    {
+      "word": "design",
+      "mean_attribution": 0.1076,
+      "std_attribution": 0.0708,
+      "count": 6
+    },
+    {
+      "word": "debugger",
+      "mean_attribution": 0.1014,
+      "std_attribution": 0.0361,
+      "count": 3
+    },
+    {
+      "word": "automation",
+      "mean_attribution": 0.0953,
+      "std_attribution": 0.1108,
+      "count": 3
+    },
+    {
+      "word": "indexing",
+      "mean_attribution": 0.0894,
+      "std_attribution": 0.0572,
+      "count": 4
+    },
+    {
+      "word": "queue",
+      "mean_attribution": 0.074,
+      "std_attribution": 0.0374,
+      "count": 3
+    },
+    {
+      "word": "message",
+      "mean_attribution": 0.0621,
+      "std_attribution": 0.0633,
+      "count": 3
+    },
+    {
+      "word": "architecture",
+      "mean_attribution": 0.062,
+      "std_attribution": 0.0126,
+      "count": 3
+    },
+    {
+      "word": "keys",
+      "mean_attribution": 0.055,
+      "std_attribution": 0.0165,
+      "count": 3
+    },
+    {
+      "word": "issues.",
+      "mean_attribution": 0.05,
+      "std_attribution": 0.0424,
+      "count": 3
+    },
+    {
+      "word": "documentation",
+      "mean_attribution": 0.0483,
+      "std_attribution": 0.0323,
+      "count": 7
+    },
+    {
+      "word": "dcc",
+      "mean_attribution": 0.0452,
+      "std_attribution": 0.0505,
+      "count": 3
+    },
+    {
+      "word": "paste",
+      "mean_attribution": 0.0452,
+      "std_attribution": 0.0421,
+      "count": 3
+    },
+    {
+      "word": "updates",
+      "mean_attribution": 0.0445,
+      "std_attribution": 0.0439,
+      "count": 5
+    },
+    {
+      "word": "repository",
+      "mean_attribution": 0.0436,
+      "std_attribution": 0.0624,
+      "count": 9
+    },
+    {
+      "word": "workspace",
+      "mean_attribution": 0.0434,
+      "std_attribution": 0.0129,
+      "count": 3
+    },
+    {
+      "word": "settings",
+      "mean_attribution": 0.041,
+      "std_attribution": 0.0157,
+      "count": 4
+    },
+    {
+      "word": "gen3",
+      "mean_attribution": 0.0397,
+      "std_attribution": 0.0536,
+      "count": 3
+    },
+    {
+      "word": "certificates",
+      "mean_attribution": 0.0387,
+      "std_attribution": 0.0505,
+      "count": 4
+    },
+    {
+      "word": "error",
+      "mean_attribution": 0.0331,
+      "std_attribution": 0.0135,
+      "count": 3
+    },
+    {
+      "word": "logic",
+      "mean_attribution": 0.0326,
+      "std_attribution": 0.0673,
+      "count": 3
+    },
+    {
+      "word": "osn",
+      "mean_attribution": 0.0323,
+      "std_attribution": 0.0008,
+      "count": 3
+    },
+    {
+      "word": "items",
+      "mean_attribution": 0.032,
+      "std_attribution": 0.0143,
+      "count": 4
+    },
+    {
+      "word": "indexes",
+      "mean_attribution": 0.03,
+      "std_attribution": 0.0061,
+      "count": 6
+    },
+    {
+      "word": "out",
+      "mean_attribution": 0.0296,
+      "std_attribution": 0.0457,
+      "count": 3
+    },
+    {
+      "word": "access",
+      "mean_attribution": 0.0278,
+      "std_attribution": 0.0695,
+      "count": 6
+    },
+    {
+      "word": "during",
+      "mean_attribution": 0.0278,
+      "std_attribution": 0.0492,
+      "count": 3
+    },
+    {
+      "word": "integer",
+      "mean_attribution": 0.0277,
+      "std_attribution": 0.0237,
+      "count": 6
+    },
+    {
+      "word": "authentication",
+      "mean_attribution": 0.0259,
+      "std_attribution": 0.1047,
+      "count": 12
+    },
+    {
+      "word": "file",
+      "mean_attribution": 0.0255,
+      "std_attribution": 0.0287,
+      "count": 6
+    },
+    {
+      "word": "feature",
+      "mean_attribution": 0.0252,
+      "std_attribution": 0.0294,
+      "count": 7
+    },
+    {
+      "word": "channels",
+      "mean_attribution": 0.0251,
+      "std_attribution": 0.005,
+      "count": 3
+    },
+    {
+      "word": "data",
+      "mean_attribution": 0.0251,
+      "std_attribution": 0.0614,
+      "count": 13
+    },
+    {
+      "word": "loaded",
+      "mean_attribution": 0.0248,
+      "std_attribution": 0.0114,
+      "count": 3
+    },
+    {
+      "word": "output",
+      "mean_attribution": 0.0238,
+      "std_attribution": 0.0143,
+      "count": 3
+    },
+    {
+      "word": "client",
+      "mean_attribution": 0.0232,
+      "std_attribution": 0.0536,
+      "count": 6
+    },
+    {
+      "word": "types.",
+      "mean_attribution": 0.0231,
+      "std_attribution": 0.039,
+      "count": 3
+    },
+    {
+      "word": "redirect",
+      "mean_attribution": 0.0221,
+      "std_attribution": 0.0237,
+      "count": 3
+    },
+    {
+      "word": "names",
+      "mean_attribution": 0.0218,
+      "std_attribution": 0.0069,
+      "count": 3
+    },
+    {
+      "word": "linux",
+      "mean_attribution": 0.0215,
+      "std_attribution": 0.0116,
+      "count": 3
+    },
+    {
+      "word": "request",
+      "mean_attribution": 0.021,
+      "std_attribution": 0.014,
+      "count": 5
+    },
+    {
+      "word": "document",
+      "mean_attribution": 0.0203,
+      "std_attribution": 0.0036,
+      "count": 3
+    },
+    {
+      "word": "\"\"\"currently,",
+      "mean_attribution": 0.0203,
+      "std_attribution": 0.0138,
+      "count": 4
+    },
+    {
+      "word": "sal",
+      "mean_attribution": 0.0197,
+      "std_attribution": 0.0155,
+      "count": 8
+    },
+    {
+      "word": "default",
+      "mean_attribution": 0.0194,
+      "std_attribution": 0.047,
+      "count": 10
+    },
+    {
+      "word": "\"\"\"h3.",
+      "mean_attribution": 0.0193,
+      "std_attribution": 0.0227,
+      "count": 10
+    },
+    {
+      "word": "post",
+      "mean_attribution": 0.0192,
+      "std_attribution": 0.0102,
+      "count": 4
+    },
+    {
+      "word": "views",
+      "mean_attribution": 0.0188,
+      "std_attribution": 0.0129,
+      "count": 3
+    },
+    {
+      "word": "rest",
+      "mean_attribution": 0.0185,
+      "std_attribution": 0.077,
+      "count": 33
+    },
+    {
+      "word": "index",
+      "mean_attribution": 0.0182,
+      "std_attribution": 0.027,
+      "count": 10
+    },
+    {
+      "word": "approach",
+      "mean_attribution": 0.0182,
+      "std_attribution": 0.0221,
+      "count": 6
+    }
+  ],
+  "top_nondesign_words": [
+    {
+      "word": "plugin",
+      "mean_attribution": 0.0955,
+      "std_attribution": 0.0527,
+      "count": 9
+    },
+    {
+      "word": "docker",
+      "mean_attribution": 0.0901,
+      "std_attribution": 0.1361,
+      "count": 10
+    },
+    {
+      "word": "resource",
+      "mean_attribution": 0.0883,
+      "std_attribution": 0.0638,
+      "count": 5
+    },
+    {
+      "word": "connector",
+      "mean_attribution": 0.0852,
+      "std_attribution": 0.0148,
+      "count": 5
+    },
+    {
+      "word": "login",
+      "mean_attribution": 0.0849,
+      "std_attribution": 0.0437,
+      "count": 5
+    },
+    {
+      "word": "host",
+      "mean_attribution": 0.0817,
+      "std_attribution": 0.0474,
+      "count": 3
+    },
+    {
+      "word": "inbound",
+      "mean_attribution": 0.0778,
+      "std_attribution": 0.053,
+      "count": 3
+    },
+    {
+      "word": "helm",
+      "mean_attribution": 0.0738,
+      "std_attribution": 0.0304,
+      "count": 3
+    },
+    {
+      "word": "channel",
+      "mean_attribution": 0.0706,
+      "std_attribution": 0.0784,
+      "count": 4
+    },
+    {
+      "word": "nexus",
+      "mean_attribution": 0.0672,
+      "std_attribution": 0.0426,
+      "count": 6
+    },
+    {
+      "word": "rest",
+      "mean_attribution": 0.0663,
+      "std_attribution": 0.0683,
+      "count": 5
+    },
+    {
+      "word": "portal",
+      "mean_attribution": 0.0613,
+      "std_attribution": 0.0301,
+      "count": 8
+    },
+    {
+      "word": "domain",
+      "mean_attribution": 0.0608,
+      "std_attribution": 0.0125,
+      "count": 3
+    },
+    {
+      "word": "limits",
+      "mean_attribution": 0.0568,
+      "std_attribution": 0.0302,
+      "count": 4
+    },
+    {
+      "word": "csi",
+      "mean_attribution": 0.0539,
+      "std_attribution": 0.0164,
+      "count": 3
+    },
+    {
+      "word": "app",
+      "mean_attribution": 0.0532,
+      "std_attribution": 0.0192,
+      "count": 16
+    },
+    {
+      "word": "mesos",
+      "mean_attribution": 0.053,
+      "std_attribution": 0.0369,
+      "count": 7
+    },
+    {
+      "word": "custom",
+      "mean_attribution": 0.0497,
+      "std_attribution": 0.0307,
+      "count": 9
+    },
+    {
+      "word": "supports",
+      "mean_attribution": 0.0495,
+      "std_attribution": 0.0204,
+      "count": 4
+    },
+    {
+      "word": "password",
+      "mean_attribution": 0.0488,
+      "std_attribution": 0.0076,
+      "count": 4
+    },
+    {
+      "word": "individual",
+      "mean_attribution": 0.0469,
+      "std_attribution": 0.0422,
+      "count": 3
+    },
+    {
+      "word": "module",
+      "mean_attribution": 0.0467,
+      "std_attribution": 0.0093,
+      "count": 4
+    },
+    {
+      "word": "better",
+      "mean_attribution": 0.0445,
+      "std_attribution": 0.0376,
+      "count": 3
+    },
+    {
+      "word": "ticket",
+      "mean_attribution": 0.0433,
+      "std_attribution": 0.0231,
+      "count": 3
+    },
+    {
+      "word": "support",
+      "mean_attribution": 0.0426,
+      "std_attribution": 0.0376,
+      "count": 9
+    },
+    {
+      "word": "coverage",
+      "mean_attribution": 0.0418,
+      "std_attribution": 0.0482,
+      "count": 3
+    },
+    {
+      "word": "proxy",
+      "mean_attribution": 0.0414,
+      "std_attribution": 0.0205,
+      "count": 6
+    },
+    {
+      "word": "browse",
+      "mean_attribution": 0.0409,
+      "std_attribution": 0.0146,
+      "count": 4
+    },
+    {
+      "word": "work",
+      "mean_attribution": 0.04,
+      "std_attribution": 0.0345,
+      "count": 9
+    },
+    {
+      "word": "required",
+      "mean_attribution": 0.0397,
+      "std_attribution": 0.038,
+      "count": 3
+    },
+    {
+      "word": "migrated",
+      "mean_attribution": 0.0393,
+      "std_attribution": 0.011,
+      "count": 3
+    },
+    {
+      "word": "rebuild.",
+      "mean_attribution": 0.0387,
+      "std_attribution": 0.0286,
+      "count": 4
+    },
+    {
+      "word": "logging",
+      "mean_attribution": 0.0386,
+      "std_attribution": 0.0072,
+      "count": 3
+    },
+    {
+      "word": "jira",
+      "mean_attribution": 0.0373,
+      "std_attribution": 0.0455,
+      "count": 11
+    },
+    {
+      "word": "example",
+      "mean_attribution": 0.0367,
+      "std_attribution": 0.0341,
+      "count": 7
+    },
+    {
+      "word": "maven",
+      "mean_attribution": 0.0355,
+      "std_attribution": 0.0205,
+      "count": 9
+    },
+    {
+      "word": "allow",
+      "mean_attribution": 0.0353,
+      "std_attribution": 0.0176,
+      "count": 3
+    },
+    {
+      "word": "apache",
+      "mean_attribution": 0.0347,
+      "std_attribution": 0.0113,
+      "count": 3
+    },
+    {
+      "word": "behavior.",
+      "mean_attribution": 0.0346,
+      "std_attribution": 0.0137,
+      "count": 5
+    },
+    {
+      "word": "lsstcam",
+      "mean_attribution": 0.0344,
+      "std_attribution": 0.014,
+      "count": 4
+    },
+    {
+      "word": "however",
+      "mean_attribution": 0.0321,
+      "std_attribution": 0.0337,
+      "count": 3
+    },
+    {
+      "word": "system",
+      "mean_attribution": 0.0313,
+      "std_attribution": 0.013,
+      "count": 5
+    },
+    {
+      "word": "attachment",
+      "mean_attribution": 0.0311,
+      "std_attribution": 0.0303,
+      "count": 22
+    },
+    {
+      "word": "join",
+      "mean_attribution": 0.031,
+      "std_attribution": 0.027,
+      "count": 3
+    },
+    {
+      "word": "stream",
+      "mean_attribution": 0.031,
+      "std_attribution": 0.0094,
+      "count": 3
+    },
+    {
+      "word": "solution",
+      "mean_attribution": 0.0308,
+      "std_attribution": 0.0144,
+      "count": 3
+    },
+    {
+      "word": "health",
+      "mean_attribution": 0.03,
+      "std_attribution": 0.0034,
+      "count": 4
+    },
+    {
+      "word": "package",
+      "mean_attribution": 0.0293,
+      "std_attribution": 0.0349,
+      "count": 4
+    },
+    {
+      "word": "does",
+      "mean_attribution": 0.0291,
+      "std_attribution": 0.0712,
+      "count": 21
+    },
+    {
+      "word": "under",
+      "mean_attribution": 0.029,
+      "std_attribution": 0.0334,
+      "count": 5
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "dataset": "SO test set (held-out, balanced \u2014 Stage 3 never saw this)",
+    "n": 30001,
+    "positive_rate": 0.5,
+    "accuracy": 0.8845,
+    "precision": 0.8553,
+    "recall": 0.9255,
+    "f1": 0.8891,
+    "auc": 0.9548,
+    "tp": 13883,
+    "tn": 12653,
+    "fp": 2348,
+    "fn": 1117
+  },
+  {
+    "dataset": "TAWOS manually-labelled (in-sample for Stage 3)",
+    "n": 1786,
+    "positive_rate": 0.2777,
+    "accuracy": 0.8264,
+    "precision": 0.6755,
+    "recall": 0.7218,
+    "f1": 0.6979,
+    "auc": 0.8848,
+    "tp": 358,
+    "tn": 1118,
+    "fp": 172,
+    "fn": 138
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "experiment_id": "bert_baseline_0308_2027",
+    "type": "local",
+    "config": {
+      "name": "bert_baseline",
+      "model": "bert-base-uncased",
+      "learning_rate": 2e-05,
+      "batch_size": 32,
+      "epochs": 3,
+      "dropout": 0.1
+    }
+  },
+  {
+    "experiment_id": "bert_conservative_large_batch_0308_2027",
+    "type": "local",
+    "config": {
+      "name": "bert_conservative_large_batch",
+      "model": "bert-base-uncased",
+      "learning_rate": 1e-05,
+      "batch_size": 32,
+      "epochs": 3,
+      "dropout": 0.1
+    }
+  },
+  {
+    "experiment_id": "bert_very_conservative_0308_2027",
+    "type": "local",
+    "config": {
+      "name": "bert_very_conservative",
+      "model": "bert-base-uncased",
+      "learning_rate": 5e-06,
+      "batch_size": 16,
+      "epochs": 5,
+      "dropout": 0.1
+    }
+  }
+]

@@ -1,0 +1,259 @@
+{
+  "overall": {
+    "accuracy": 0.9393,
+    "precision": 0.9117,
+    "recall": 0.9727,
+    "f1": 0.9412,
+    "tp": 4853,
+    "tn": 4525,
+    "fp": 470,
+    "fn": 136,
+    "d_agreement": 0.9727,
+    "n_agreement": 0.9059
+  },
+  "per_project": [
+    {
+      "project": "APSTUD",
+      "d_agree": 39,
+      "d_total": 42,
+      "d_pct": 92.9,
+      "n_agree": 181,
+      "n_total": 185,
+      "n_pct": 97.8
+    },
+    {
+      "project": "BAM",
+      "d_agree": 396,
+      "d_total": 404,
+      "d_pct": 98.0,
+      "n_agree": 179,
+      "n_total": 185,
+      "n_pct": 96.8
+    },
+    {
+      "project": "COMPASS",
+      "d_agree": 17,
+      "d_total": 17,
+      "d_pct": 100.0,
+      "n_agree": 180,
+      "n_total": 185,
+      "n_pct": 97.3
+    },
+    {
+      "project": "CONFCLOUD",
+      "d_agree": 440,
+      "d_total": 444,
+      "d_pct": 99.1,
+      "n_agree": 183,
+      "n_total": 185,
+      "n_pct": 98.9
+    },
+    {
+      "project": "CONFSERVER",
+      "d_agree": 32,
+      "d_total": 35,
+      "d_pct": 91.4,
+      "n_agree": 183,
+      "n_total": 185,
+      "n_pct": 98.9
+    },
+    {
+      "project": "CWD",
+      "d_agree": 354,
+      "d_total": 370,
+      "d_pct": 95.7,
+      "n_agree": 156,
+      "n_total": 185,
+      "n_pct": 84.3
+    },
+    {
+      "project": "DM",
+      "d_agree": 53,
+      "d_total": 58,
+      "d_pct": 91.4,
+      "n_agree": 152,
+      "n_total": 185,
+      "n_pct": 82.2
+    },
+    {
+      "project": "DNN",
+      "d_agree": 34,
+      "d_total": 35,
+      "d_pct": 97.1,
+      "n_agree": 171,
+      "n_total": 185,
+      "n_pct": 92.4
+    },
+    {
+      "project": "EVG",
+      "d_agree": 255,
+      "d_total": 262,
+      "d_pct": 97.3,
+      "n_agree": 155,
+      "n_total": 185,
+      "n_pct": 83.8
+    },
+    {
+      "project": "FAB",
+      "d_agree": 36,
+      "d_total": 38,
+      "d_pct": 94.7,
+      "n_agree": 107,
+      "n_total": 185,
+      "n_pct": 57.8
+    },
+    {
+      "project": "FE",
+      "d_agree": 126,
+      "d_total": 132,
+      "d_pct": 95.5,
+      "n_agree": 178,
+      "n_total": 185,
+      "n_pct": 96.2
+    },
+    {
+      "project": "INDY",
+      "d_agree": 56,
+      "d_total": 59,
+      "d_pct": 94.9,
+      "n_agree": 172,
+      "n_total": 185,
+      "n_pct": 93.0
+    },
+    {
+      "project": "IS",
+      "d_agree": 260,
+      "d_total": 266,
+      "d_pct": 97.7,
+      "n_agree": 159,
+      "n_total": 185,
+      "n_pct": 85.9
+    },
+    {
+      "project": "JAVA",
+      "d_agree": 110,
+      "d_total": 120,
+      "d_pct": 91.7,
+      "n_agree": 181,
+      "n_total": 185,
+      "n_pct": 97.8
+    },
+    {
+      "project": "JRACLOUD",
+      "d_agree": 659,
+      "d_total": 666,
+      "d_pct": 98.9,
+      "n_agree": 179,
+      "n_total": 185,
+      "n_pct": 96.8
+    },
+    {
+      "project": "JRASERVER",
+      "d_agree": 63,
+      "d_total": 65,
+      "d_pct": 96.9,
+      "n_agree": 180,
+      "n_total": 185,
+      "n_pct": 97.3
+    },
+    {
+      "project": "JSWCLOUD",
+      "d_agree": 149,
+      "d_total": 155,
+      "d_pct": 96.1,
+      "n_agree": 172,
+      "n_total": 185,
+      "n_pct": 93.0
+    },
+    {
+      "project": "JSWSERVER",
+      "d_agree": 149,
+      "d_total": 151,
+      "d_pct": 98.7,
+      "n_agree": 182,
+      "n_total": 185,
+      "n_pct": 98.4
+    },
+    {
+      "project": "MDL",
+      "d_agree": 822,
+      "d_total": 842,
+      "d_pct": 97.6,
+      "n_agree": 166,
+      "n_total": 185,
+      "n_pct": 89.7
+    },
+    {
+      "project": "MESOS",
+      "d_agree": 56,
+      "d_total": 59,
+      "d_pct": 94.9,
+      "n_agree": 177,
+      "n_total": 185,
+      "n_pct": 95.7
+    },
+    {
+      "project": "MULE",
+      "d_agree": 45,
+      "d_total": 48,
+      "d_pct": 93.8,
+      "n_agree": 153,
+      "n_total": 185,
+      "n_pct": 82.7
+    },
+    {
+      "project": "NEXUS",
+      "d_agree": 41,
+      "d_total": 42,
+      "d_pct": 97.6,
+      "n_agree": 169,
+      "n_total": 185,
+      "n_pct": 91.4
+    },
+    {
+      "project": "SERVER",
+      "d_agree": 96,
+      "d_total": 100,
+      "d_pct": 96.0,
+      "n_agree": 173,
+      "n_total": 185,
+      "n_pct": 93.5
+    },
+    {
+      "project": "STL",
+      "d_agree": 151,
+      "d_total": 154,
+      "d_pct": 98.1,
+      "n_agree": 145,
+      "n_total": 185,
+      "n_pct": 78.4
+    },
+    {
+      "project": "TIMOB",
+      "d_agree": 33,
+      "d_total": 35,
+      "d_pct": 94.3,
+      "n_agree": 174,
+      "n_total": 185,
+      "n_pct": 94.1
+    },
+    {
+      "project": "TISTUD",
+      "d_agree": 114,
+      "d_total": 118,
+      "d_pct": 96.6,
+      "n_agree": 172,
+      "n_total": 185,
+      "n_pct": 93.0
+    },
+    {
+      "project": "XD",
+      "d_agree": 267,
+      "d_total": 272,
+      "d_pct": 98.2,
+      "n_agree": 146,
+      "n_total": 185,
+      "n_pct": 78.9
+    }
+  ]
+}

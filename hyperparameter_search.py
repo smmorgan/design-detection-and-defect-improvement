@@ -36,101 +36,131 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 
-# Define hyperparameter search space
+# Hyperparameter grid (preprocessing removed — use --no_preprocess always)
 HYPERPARAMETER_GRID = {
-    # Learning rates to try
-    'learning_rate': [
-        1e-5,   # Lower - more conservative
-        2e-5,   # Current default
-        3e-5,   # Higher - faster learning
-        5e-5    # Even higher
-    ],
-
-    # Batch sizes
-    'batch_size': [
-        8,      # Smaller - better gradients, slower
-        16,     # Current default
-        32,     # Larger - faster training
-    ],
-
-    # Training epochs
-    'epochs': [
-        3,      # Fewer - prevent overfitting
-        5,      # Current default
-        7,      # More - better convergence
-        10      # Many - risk overfitting
-    ],
-
-    # Dropout rates
-    'dropout': [
-        0.1,    # Current default - low
-        0.2,    # Medium
-        0.3,    # Higher - more regularization
-    ],
-
-    # Min words threshold
-    'min_words': [
-        5,      # Include shorter texts
-        7,      # Current default
-        10,     # Stricter filtering
-    ],
+    'learning_rate': [1e-5, 2e-5, 3e-5],
+    'batch_size': [16, 32],
+    'epochs': [3, 5],
+    'dropout': [0.1, 0.2],
 }
 
-
-# Suggested configurations based on common patterns
-SUGGESTED_CONFIGS = [
-    # Conservative: prevent overfitting
+# Targeted search: a few well-chosen configs per model for full-scale (140k+) datasets.
+# Based on known behaviour at scale: 5e-5 collapses, 1-2e-5 stable, 3 epochs often sufficient.
+TARGETED_CONFIGS = [
+    # --- bert-base-uncased ---
     {
-        'name': 'conservative',
+        'name': 'bert_conservative',
+        'model': 'bert-base-uncased',
         'learning_rate': 1e-5,
-        'batch_size': 8,
-        'epochs': 7,
-        'dropout': 0.3,
-        'min_words': 7,
-        'description': 'Low LR, small batch, high dropout to prevent overfitting'
-    },
-
-    # Aggressive: maximize learning
-    {
-        'name': 'aggressive',
-        'learning_rate': 5e-5,
-        'batch_size': 32,
-        'epochs': 10,
+        'batch_size': 16,
+        'epochs': 3,
         'dropout': 0.1,
-        'min_words': 5,
-        'description': 'High LR, large batch, many epochs for maximum learning'
+        'description': 'BERT: conservative LR, 3 epochs',
     },
-
-    # Balanced: good starting point
     {
-        'name': 'balanced',
+        'name': 'bert_standard',
+        'model': 'bert-base-uncased',
         'learning_rate': 2e-5,
         'batch_size': 16,
-        'epochs': 10,
-        'dropout': 0.2,
-        'min_words': 7,
-        'description': 'Balanced settings, more epochs'
+        'epochs': 3,
+        'dropout': 0.1,
+        'description': 'BERT: standard LR, 3 epochs',
     },
-
-    # Fine-tuning focused
     {
-        'name': 'fine_tune',
+        'name': 'bert_longer',
+        'model': 'bert-base-uncased',
+        'learning_rate': 2e-5,
+        'batch_size': 16,
+        'epochs': 5,
+        'dropout': 0.1,
+        'description': 'BERT: standard LR, 5 epochs',
+    },
+    # --- distilbert-base-uncased ---
+    {
+        'name': 'distilbert_conservative',
+        'model': 'distilbert-base-uncased',
         'learning_rate': 1e-5,
         'batch_size': 16,
-        'epochs': 10,
-        'dropout': 0.2,
-        'min_words': 7,
-        'description': 'Lower LR for careful fine-tuning, more epochs'
+        'epochs': 3,
+        'dropout': 0.1,
+        'description': 'DistilBERT: conservative LR, 3 epochs',
     },
+    {
+        'name': 'distilbert_standard',
+        'model': 'distilbert-base-uncased',
+        'learning_rate': 2e-5,
+        'batch_size': 16,
+        'epochs': 3,
+        'dropout': 0.1,
+        'description': 'DistilBERT: standard LR, 3 epochs',
+    },
+    {
+        'name': 'distilbert_longer',
+        'model': 'distilbert-base-uncased',
+        'learning_rate': 2e-5,
+        'batch_size': 16,
+        'epochs': 5,
+        'dropout': 0.1,
+        'description': 'DistilBERT: standard LR, 5 epochs',
+    },
+    # --- roberta-base ---
+    {
+        'name': 'roberta_conservative',
+        'model': 'roberta-base',
+        'learning_rate': 1e-5,
+        'batch_size': 16,
+        'epochs': 3,
+        'dropout': 0.1,
+        'description': 'RoBERTa: conservative LR, 3 epochs',
+    },
+    {
+        'name': 'roberta_standard',
+        'model': 'roberta-base',
+        'learning_rate': 2e-5,
+        'batch_size': 16,
+        'epochs': 3,
+        'dropout': 0.1,
+        'description': 'RoBERTa: standard LR, 3 epochs',
+    },
+]
 
-    # Recommended optimized
+
+# Suggested configurations (no min_words — preprocessing disabled)
+SUGGESTED_CONFIGS = [
+    {
+        'name': 'conservative',
+        'model': 'bert-base-uncased',
+        'learning_rate': 1e-5,
+        'batch_size': 16,
+        'epochs': 3,
+        'dropout': 0.1,
+        'description': 'Conservative LR, 3 epochs'
+    },
+    {
+        'name': 'standard',
+        'model': 'bert-base-uncased',
+        'learning_rate': 2e-5,
+        'batch_size': 16,
+        'epochs': 3,
+        'dropout': 0.1,
+        'description': 'Standard BERT fine-tuning settings'
+    },
+    {
+        'name': 'longer',
+        'model': 'bert-base-uncased',
+        'learning_rate': 2e-5,
+        'batch_size': 16,
+        'epochs': 5,
+        'dropout': 0.1,
+        'description': 'Standard LR, more epochs'
+    },
     {
         'name': 'optimized',
+        'model': 'bert-base-uncased',
         'learning_rate': 1e-5,
         'batch_size': 32,
-        'epochs': 10,
-        'dropout': 0.2,
-        'min_words': 7,
+        'epochs': 5,
+        'dropout': 0.1,
         'warmup_ratio': 0.15,
         'description': 'Recommended settings for best performance'
     },
@@ -171,17 +201,19 @@ class ExperimentRunner:
         print(f"{'='*80}\n")
 
         # Build command
+        model_name = config.get('model', 'distilbert-base-uncased')
         cmd = [
             sys.executable,  # Use current Python interpreter
             'train_design_classifier.py',
             '--mode', 'full',
+            '--no_preprocess',
+            '--model', model_name,
             '--stackoverflow_path', self.train_data,
             '--output_dir', str(experiment_dir),
-            '--epochs', str(config.get('epochs', 5)),
+            '--epochs', str(config.get('epochs', 3)),
             '--learning_rate', str(config.get('learning_rate', 2e-5)),
             '--batch_size', str(config.get('batch_size', 16)),
             '--dropout', str(config.get('dropout', 0.1)),
-            '--min_words', str(config.get('min_words', 7)),
         ]
 
         # Add optional parameters
@@ -302,14 +334,10 @@ except:
             label_mapping[label] = 0
     df[label_col] = df[label_col].map(label_mapping)
 
-# Preprocess
-preprocessor = DataPreprocessor(min_words=7, verbose=False)
-df_clean = preprocessor.preprocess_dataframe(df, text_col)
+texts = df[text_col].tolist()
+labels = df[label_col].tolist()
 
-texts = df_clean[text_col].tolist()
-labels = df_clean[label_col].tolist()
-
-print(f"After preprocessing: {{len(texts)}} samples")
+print(f"Loaded {{len(texts)}} samples (no preprocessing)")
 
 # Load model
 config = Config()
@@ -470,13 +498,23 @@ def main():
         action='store_true',
         help='Run full grid search over parameter space (WARNING: many experiments!)'
     )
+    parser.add_argument(
+        '--targeted_search',
+        action='store_true',
+        help='Run targeted configs across bert/distilbert/roberta (recommended for full-scale datasets)'
+    )
 
     args = parser.parse_args()
 
     # Initialize runner
     runner = ExperimentRunner(args.train_data, args.val_data, args.output_dir)
 
-    if args.grid_search:
+    if args.targeted_search:
+        print(f"Running {len(TARGETED_CONFIGS)} targeted configurations across bert/distilbert/roberta...")
+        for config in TARGETED_CONFIGS:
+            runner.run_experiment(config)
+
+    elif args.grid_search:
         print("⚠️  Grid search will run many experiments!")
         print(f"   Total combinations: {len(HYPERPARAMETER_GRID['learning_rate'])} × "
               f"{len(HYPERPARAMETER_GRID['batch_size'])} × "
@@ -530,7 +568,9 @@ def main():
                     print(f"     {key:20s}: {value}")
 
         print("\n\nUsage:")
-        print(f"  # Run all configs:")
+        print(f"  # Targeted search (recommended for full-scale datasets):")
+        print(f"  python {sys.argv[0]} --train_data <path> --output_dir <dir> --targeted_search")
+        print(f"\n  # Run all suggested configs:")
         print(f"  python {sys.argv[0]} --train_data <path> --val_data <path> --run_all")
         print(f"\n  # Run specific config:")
         print(f"  python {sys.argv[0]} --train_data <path> --val_data <path> --config optimized")

@@ -1,0 +1,14 @@
+[
+  {
+    "experiment_id": "bert_conservative_0308_1515",
+    "instance_name": "hparam-bert-conservative-0308-1515",
+    "config": {
+      "name": "bert_conservative",
+      "model": "bert-base-uncased",
+      "learning_rate": 1e-05,
+      "batch_size": 16,
+      "epochs": 3,
+      "dropout": 0.1
+    }
+  }
+]

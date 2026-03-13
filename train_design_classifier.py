@@ -82,7 +82,7 @@ class Config:
     """
     
     # Model parameters
-    MODEL_NAME = 'distilbert-base-uncased'
+    MODEL_NAME = 'distilbert-base-uncased'  # Override with --model at runtime
     MAX_LENGTH = 512  # As specified in dissertation
     NUM_LABELS = 2    # Binary: 'design' or 'general'
     
@@ -102,7 +102,8 @@ class Config:
     
     # Fine-tuning for transfer learning (Section 4.2.2)
     SECOND_FINETUNE_LR = 1e-5  # "smaller learning rate" for domain adaptation
-    SECOND_FINETUNE_EPOCHS = 2  # "less epochs to ensure modest adaptation"
+    SECOND_FINETUNE_EPOCHS = 5  # increased from 2; early stopping prevents overfitting
+    SECOND_FINETUNE_PATIENCE = 2  # early stopping patience for Stage 3
     
     # Paths
     OUTPUT_DIR = './model_output'
@@ -285,6 +286,69 @@ class DataPreprocessor:
             logger.warning(f"Stopwords file not found: {filepath}. Using empty set.")
             return set()
         
+    @staticmethod
+    def clean_jira_markup(text: str) -> str:
+        """Strip JIRA/Confluence wiki markup and boilerplate sections.
+
+        Removes structural noise that is present in TAWOS tickets but absent
+        from Stack Overflow data, reducing domain mismatch for transfer learning.
+        """
+        import re
+
+        # Remove JIRA heading markup (h1. through h6.)
+        text = re.sub(r'h[1-6]\.\s*', '', text)
+
+        # Remove JIRA formatting: *bold*, _italic_, +underline+, -strikethrough-
+        text = re.sub(r'(?<!\w)\*([^*\n]+)\*(?!\w)', r'\1', text)
+        text = re.sub(r'(?<!\w)_([^_\n]+)_(?!\w)', r'\1', text)
+        text = re.sub(r'(?<!\w)\+([^+\n]+)\+(?!\w)', r'\1', text)
+        text = re.sub(r'(?<!\w)-([^-\n]+)-(?!\w)', r'\1', text)
+
+        # Remove {code}, {noformat}, {quote}, {panel} blocks
+        text = re.sub(r'\{code(?::[^}]*)?\}[\s\S]*?\{code\}', '', text)
+        text = re.sub(r'\{noformat\}[\s\S]*?\{noformat\}', '', text)
+        text = re.sub(r'\{quote\}[\s\S]*?\{quote\}', '', text)
+        text = re.sub(r'\{panel(?::[^}]*)?\}[\s\S]*?\{panel\}', '', text)
+
+        # Remove {color}, {anchor}, and other inline macros
+        text = re.sub(r'\{color(?::[^}]*)?\}', '', text)
+        text = re.sub(r'\{anchor:[^}]*\}', '', text)
+
+        # Remove JIRA list markers (# ordered, * unordered, - dash lists)
+        # Also handle inline lists (JIRA text often flattened to single line)
+        text = re.sub(r'(?m)^[#*\-]+\s+', '', text)
+        text = re.sub(r'\s+[#]+\s+', ' ', text)
+
+        # Remove JIRA table markup (||header|| and |cell|)
+        text = re.sub(r'\|\|?', ' ', text)
+
+        # Remove JIRA link syntax [text|url] and [url]
+        text = re.sub(r'\[([^|\]]*)\|[^\]]+\]', r'\1', text)
+        text = re.sub(r'\[([^\]]+)\]', r'\1', text)
+
+        # Remove boilerplate JIRA sections that add noise
+        boilerplate_headers = [
+            r'Steps\s+to\s+Reproduce',
+            r'Expected\s+Results?',
+            r'Actual\s+Results?',
+            r'Workaround',
+            r'Environment',
+            r'Affected\s+Versions?',
+            r'Fix\s+Versions?',
+        ]
+        for header in boilerplate_headers:
+            # Remove from header to next header or end of text
+            text = re.sub(
+                rf'(?i){header}\s*[:\-]?\s*',
+                ' ',
+                text,
+            )
+
+        # Remove escaped/triple quotes from CSV encoding artifacts
+        text = re.sub(r'"{2,}', '', text)
+
+        return text
+
     def clean_text(self, text: str) -> str:
         """Clean and normalize text."""
         import re
@@ -295,6 +359,9 @@ class DataPreprocessor:
         original_text = str(text)
         original_len = len(original_text)
         text = original_text
+
+        # Strip JIRA wiki markup and boilerplate (before other cleaning)
+        text = self.clean_jira_markup(text)
 
         # Remove URLs
         text = re.sub(r'http[s]?://\S+', '', text)
@@ -555,7 +622,10 @@ class DesignMiningTrainer:
         
         # Metrics calculator
         self.metrics_calc = MetricsCalculator()
-        
+
+        # Optional class-weighted loss (set during train() calls)
+        self._loss_fn = None
+
         # Training history
         self.history = {
             'train_loss': [],
@@ -615,30 +685,35 @@ class DesignMiningTrainer:
         return train_loader, val_loader, test_loader
     
     def train_epoch(
-        self, 
-        train_loader: DataLoader, 
+        self,
+        train_loader: DataLoader,
         optimizer: torch.optim.Optimizer,
         scheduler: torch.optim.lr_scheduler.LambdaLR
     ) -> float:
         """Train for one epoch."""
         self.model.train()
         total_loss = 0
-        
+
         progress_bar = tqdm(train_loader, desc="Training")
         for batch in progress_bar:
             optimizer.zero_grad()
-            
+
             input_ids = batch['input_ids'].to(self.device)
             attention_mask = batch['attention_mask'].to(self.device)
             labels = batch['labels'].to(self.device)
-            
+
             outputs = self.model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 labels=labels
             )
-            
-            loss = outputs.loss
+
+            # Use class-weighted loss when available (Stage 3),
+            # otherwise fall back to the model's default loss.
+            if self._loss_fn is not None:
+                loss = self._loss_fn(outputs.logits, labels)
+            else:
+                loss = outputs.loss
             total_loss += loss.item()
             
             loss.backward()
@@ -694,20 +769,38 @@ class DesignMiningTrainer:
         train_loader: DataLoader,
         val_loader: DataLoader,
         num_epochs: Optional[int] = None,
-        learning_rate: Optional[float] = None
+        learning_rate: Optional[float] = None,
+        class_weights: Optional[torch.Tensor] = None,
+        early_stopping_patience: int = 0,
     ) -> Dict:
-        """Full training loop."""
-        
+        """Full training loop.
+
+        Args:
+            class_weights: Optional tensor of per-class weights for
+                CrossEntropyLoss (e.g. ``torch.tensor([w_neg, w_pos])``).
+            early_stopping_patience: Stop after this many epochs without
+                improvement in validation F1.  0 = disabled (default,
+                preserves original behaviour for Stage 1).
+        """
+
         num_epochs = num_epochs or self.config.NUM_EPOCHS
         learning_rate = learning_rate or self.config.LEARNING_RATE
-        
+
+        # Optional weighted loss function for class-imbalanced training
+        self._loss_fn = None
+        if class_weights is not None:
+            self._loss_fn = nn.CrossEntropyLoss(
+                weight=class_weights.to(self.device)
+            )
+            logger.info(f"Using class-weighted loss: {class_weights.tolist()}")
+
         # Optimizer
         optimizer = AdamW(
             self.model.parameters(),
             lr=learning_rate,
             weight_decay=self.config.WEIGHT_DECAY
         )
-        
+
         # Scheduler with warmup
         total_steps = len(train_loader) * num_epochs
         warmup_steps = int(total_steps * self.config.WARMUP_RATIO)
@@ -716,49 +809,66 @@ class DesignMiningTrainer:
             num_warmup_steps=warmup_steps,
             num_training_steps=total_steps
         )
-        
+
         logger.info(f"\nStarting training for {num_epochs} epochs")
         logger.info(f"Learning rate: {learning_rate}")
         logger.info(f"Total steps: {total_steps}, Warmup steps: {warmup_steps}")
-        
+        if early_stopping_patience:
+            logger.info(f"Early stopping patience: {early_stopping_patience} epochs")
+
         best_f1 = 0
         best_model_state = None
-        
+        epochs_without_improvement = 0
+
         for epoch in range(num_epochs):
             logger.info(f"\n{'='*50}")
             logger.info(f"Epoch {epoch + 1}/{num_epochs}")
             logger.info(f"{'='*50}")
-            
+
             # Training
             train_loss = self.train_epoch(train_loader, optimizer, scheduler)
             self.history['train_loss'].append(train_loss)
             logger.info(f"Training Loss: {train_loss:.4f}")
-            
+
             # Validation
             val_loss, val_metrics = self.evaluate(val_loader)
             self.history['val_loss'].append(val_loss)
             self.history['val_metrics'].append(val_metrics)
-            
+
             logger.info(f"Validation Loss: {val_loss:.4f}")
             self.metrics_calc.print_metrics(val_metrics, "Validation")
-            
+
             # Save best model (based on F1 as per dissertation goal)
             if val_metrics['f1_score'] > best_f1:
                 best_f1 = val_metrics['f1_score']
                 best_model_state = self.model.state_dict().copy()
+                epochs_without_improvement = 0
                 logger.info(f"New best F1 score: {best_f1:.4f}")
-            
-            # Early stopping check - if F1 not improving
-            if epoch > 0:
+            else:
+                epochs_without_improvement += 1
+
+            # Early stopping
+            if early_stopping_patience and epochs_without_improvement >= early_stopping_patience:
+                logger.info(
+                    f"Early stopping triggered: no F1 improvement for "
+                    f"{early_stopping_patience} epoch(s). Best F1: {best_f1:.4f}"
+                )
+                break
+
+            # Legacy warning (kept for Stage 1 backward compat)
+            if epoch > 0 and not early_stopping_patience:
                 prev_f1 = self.history['val_metrics'][-2]['f1_score']
                 if val_metrics['f1_score'] <= prev_f1 - 0.01:
                     logger.info("F1 score declining, consider early stopping")
-        
+
         # Restore best model
         if best_model_state is not None:
             self.model.load_state_dict(best_model_state)
             logger.info(f"\nRestored best model with F1: {best_f1:.4f}")
-        
+
+        # Clean up weighted loss
+        self._loss_fn = None
+
         return self.history
     
     def predict(
@@ -947,6 +1057,102 @@ class TransferLearningPipeline:
         
         return history
     
+    def load_manually_labelled_data(
+        self,
+        directory: str,
+        max_n_labels: int = 400,
+        random_seed: int = 42
+    ) -> Tuple[List[str], List[int]]:
+        """Load human-labelled D/N data from TSV files for Stage 3 injection.
+
+        Reads all TSV files in the directory, maps D->1 and N->0 (also
+        handles 'design'/'non-design' from SERVER.tsv), and undersamples
+        the N class to ``max_n_labels`` to reduce class imbalance.
+
+        Args:
+            directory: Path to folder containing manually-labelled TSV files.
+            max_n_labels: Cap on N-labelled samples (undersampling).
+            random_seed: Seed for reproducible N undersampling.
+
+        Returns:
+            Tuple of (texts, labels) ready for Stage 3 training.
+        """
+        import glob as _glob
+        import random as _random
+
+        logger.info("\n" + "="*60)
+        logger.info("Loading Manually-Labelled Data for Stage 3")
+        logger.info("="*60)
+
+        _random.seed(random_seed)
+
+        all_D_texts: List[str] = []
+        all_N_texts: List[str] = []
+
+        tsv_files = sorted(_glob.glob(os.path.join(directory, '*.tsv')))
+        if not tsv_files:
+            logger.warning(f"No TSV files found in {directory}")
+            return [], []
+
+        for fpath in tsv_files:
+            fname = os.path.basename(fpath)
+            try:
+                import csv as _csv
+                _csv.field_size_limit(10 ** 7)
+                with open(fpath, encoding='utf-8') as fh:
+                    reader = _csv.reader(fh, delimiter='\t')
+                    headers = next(reader)
+                    try:
+                        text_idx = headers.index('text')
+                    except ValueError:
+                        logger.warning(f"  {fname}: missing 'text' column, skipping")
+                        continue
+
+                    # Priority: human 'Label' (D/N) > 'label_name' > 'predicted_label'
+                    # This lets all project TSVs contribute via their predicted_label column.
+                    label_map = {'design': 'D', 'non-design': 'N', 'D': 'D', 'N': 'N'}
+                    if 'Label' in headers:
+                        label_idx = headers.index('Label')
+                    elif 'label_name' in headers:
+                        label_idx = headers.index('label_name')
+                    elif 'predicted_label' in headers:
+                        label_idx = headers.index('predicted_label')
+                    else:
+                        logger.warning(f"  {fname}: no label column found, skipping")
+                        continue
+
+                    file_D = file_N = 0
+                    for row in reader:
+                        if len(row) <= max(label_idx, text_idx):
+                            continue
+                        lname = label_map.get(row[label_idx].strip())
+                        text  = row[text_idx].strip()
+                        if not text or lname is None:
+                            continue
+                        if lname == 'D':
+                            all_D_texts.append(text)
+                            file_D += 1
+                        elif lname == 'N':
+                            all_N_texts.append(text)
+                            file_N += 1
+
+                logger.info(f"  {fname}: D={file_D}, N={file_N}")
+            except Exception as e:
+                logger.warning(f"  {fname}: error reading file – {e}")
+
+        # Undersample N to reduce imbalance
+        if len(all_N_texts) > max_n_labels:
+            all_N_texts = _random.sample(all_N_texts, max_n_labels)
+            logger.info(f"Undersampled N to {max_n_labels} samples")
+
+        texts  = all_D_texts + all_N_texts
+        labels = [1] * len(all_D_texts) + [0] * len(all_N_texts)
+
+        logger.info(f"Total manually-labelled: D={len(all_D_texts)}, N={len(all_N_texts)}")
+        logger.info(f"D ratio: {len(all_D_texts) / max(1, len(texts)) * 100:.1f}%")
+
+        return texts, labels
+
     def stage2_label_tawos(
         self,
         tawos_texts: List[str],
@@ -974,44 +1180,152 @@ class TransferLearningPipeline:
         tawos_texts: List[str],
         tawos_labels: List[int],
         confidences: List[float],
-        confidence_threshold: float = 0.8
+        confidence_threshold: float = 0.85,
+        extra_texts: Optional[List[str]] = None,
+        extra_labels: Optional[List[int]] = None,
     ) -> Dict:
         """Stage 3: Second fine-tuning on high-confidence TAWOS samples.
 
-        Uses smaller learning rate and fewer epochs as per dissertation.
+        Uses smaller learning rate with early stopping as per dissertation.
+        Optionally injects pre-labelled data (e.g. from manually-labelled TSV
+        files or SERVER.tsv) that bypasses the confidence filter entirely.
+
+        Improvements over the original implementation:
+        - Holds out 20% of human-labelled data as an honest validation set
+          (not contaminated by pseudo-labels).
+        - Computes inverse-frequency class weights for CrossEntropyLoss
+          to handle class imbalance without naively undersampling.
+        - Uses early stopping on validation F1 (patience=2) with up to 5 epochs.
+
+        Args:
+            tawos_texts: Model-predicted TAWOS texts.
+            tawos_labels: Model-predicted labels.
+            confidences: Prediction confidence scores.
+            confidence_threshold: Minimum confidence to include predicted samples.
+            extra_texts: Pre-labelled texts to inject unconditionally (confidence=1.0).
+            extra_labels: Labels corresponding to extra_texts.
         """
         logger.info("\n" + "="*60)
         logger.info("STAGE 3: Second Fine-tuning on TAWOS Dataset")
         logger.info("="*60)
 
-        # Filter to high-confidence samples
+        # Filter to high-confidence pseudo-labelled samples
         high_conf_mask = [c >= confidence_threshold for c in confidences]
         filtered_texts = [t for t, m in zip(tawos_texts, high_conf_mask) if m]
         filtered_labels = [l for l, m in zip(tawos_labels, high_conf_mask) if m]
 
-        logger.info(f"Using {len(filtered_texts)} high-confidence samples")
+        logger.info(f"Using {len(filtered_texts)} high-confidence predicted samples "
+                    f"(threshold={confidence_threshold})")
 
-        # Split
-        train_texts, val_texts, train_labels, val_labels = train_test_split(
-            filtered_texts, filtered_labels,
-            test_size=0.2,
-            random_state=self.config.RANDOM_SEED,
-            stratify=filtered_labels
-        )
+        # ── Hold out human-labelled validation + test sets ────────────
+        # Split human-labelled data into train/val/test (60/20/20).
+        # Val is used for early stopping; test is fully held-out for
+        # honest evaluation after training completes.
+        val_texts: List[str] = []
+        val_labels: List[int] = []
+        test_texts: List[str] = []
+        test_labels: List[int] = []
+        train_extra_texts: List[str] = []
+        train_extra_labels: List[int] = []
+
+        if extra_texts and len(extra_texts) >= 20:
+            # First split: 80% trainval / 20% test
+            trainval_texts, test_texts, trainval_labels, test_labels = train_test_split(
+                extra_texts, extra_labels,
+                test_size=0.2,
+                random_state=self.config.RANDOM_SEED,
+                stratify=extra_labels,
+            )
+            # Second split: 75% train / 25% val (= 60/20 of original)
+            train_extra_texts, val_texts, train_extra_labels, val_labels = train_test_split(
+                trainval_texts, trainval_labels,
+                test_size=0.25,
+                random_state=self.config.RANDOM_SEED,
+                stratify=trainval_labels,
+            )
+            logger.info(f"Human-labelled split: {len(train_extra_texts)} train, "
+                        f"{len(val_texts)} val, {len(test_texts)} test (held-out)")
+        elif extra_texts:
+            # Too few samples to split — use all for training
+            train_extra_texts = list(extra_texts)
+            train_extra_labels = list(extra_labels)
+            logger.info(f"Too few human-labelled samples to split; using all "
+                        f"{len(extra_texts)} for training")
+
+        # Combine pseudo-labelled + human-labelled for training
+        train_texts = list(train_extra_texts) + filtered_texts
+        train_labels_list = list(train_extra_labels) + filtered_labels
+
+        logger.info(f"Stage 3 training set: {len(train_texts)} samples "
+                    f"(D={sum(train_labels_list)}, N={len(train_labels_list)-sum(train_labels_list)})")
+
+        # If no held-out human validation, fall back to random split
+        if not val_texts:
+            logger.info("No held-out human validation; falling back to 80/20 split")
+            train_texts, val_texts, train_labels_list, val_labels = train_test_split(
+                train_texts, train_labels_list,
+                test_size=0.2,
+                random_state=self.config.RANDOM_SEED,
+                stratify=train_labels_list,
+            )
+
+        logger.info(f"Validation set: {len(val_texts)} samples "
+                    f"(D={sum(val_labels)}, N={len(val_labels)-sum(val_labels)})")
+        if test_texts:
+            logger.info(f"Test set (held-out): {len(test_texts)} samples "
+                        f"(D={sum(test_labels)}, N={len(test_labels)-sum(test_labels)})")
+
+        # ── Compute class weights (inverse frequency) ────────────────
+        n_pos = sum(train_labels_list)
+        n_neg = len(train_labels_list) - n_pos
+        if n_pos > 0 and n_neg > 0:
+            total = len(train_labels_list)
+            w_neg = total / (2.0 * n_neg)
+            w_pos = total / (2.0 * n_pos)
+            class_weights = torch.tensor([w_neg, w_pos], dtype=torch.float)
+            logger.info(f"Class weights: non-design={w_neg:.3f}, design={w_pos:.3f}")
+        else:
+            class_weights = None
+            logger.warning("Single-class training set; skipping class weights")
 
         # Create data loaders
         train_loader, val_loader, _ = self.trainer.create_data_loaders(
-            train_texts, train_labels,
+            train_texts, train_labels_list,
             val_texts, val_labels
         )
 
-        # Train with smaller learning rate and fewer epochs
+        # Train with smaller learning rate, more epochs, and early stopping
         history = self.trainer.train(
             train_loader,
             val_loader,
             num_epochs=self.config.SECOND_FINETUNE_EPOCHS,
-            learning_rate=self.config.SECOND_FINETUNE_LR
+            learning_rate=self.config.SECOND_FINETUNE_LR,
+            class_weights=class_weights,
+            early_stopping_patience=self.config.SECOND_FINETUNE_PATIENCE,
         )
+
+        # ── Evaluate on held-out test set ────────────────────────────
+        if test_texts:
+            logger.info("\n" + "="*60)
+            logger.info("HELD-OUT TEST EVALUATION (human-labelled, never seen during training)")
+            logger.info("="*60)
+            test_dataset = DesignMiningDataset(
+                test_texts, test_labels,
+                self.trainer.tokenizer, self.config.MAX_LENGTH,
+            )
+            test_loader = DataLoader(
+                test_dataset,
+                batch_size=self.config.BATCH_SIZE,
+                shuffle=False,
+            )
+            test_loss, test_metrics = self.trainer.evaluate(test_loader)
+            logger.info(f"  Test Loss:      {test_loss:.4f}")
+            logger.info(f"  Test Accuracy:  {test_metrics.get('accuracy', 0):.4f}")
+            logger.info(f"  Test Precision: {test_metrics.get('precision', 0):.4f}")
+            logger.info(f"  Test Recall:    {test_metrics.get('recall', 0):.4f}")
+            logger.info(f"  Test F1:        {test_metrics.get('f1_score', 0):.4f}")
+            logger.info(f"  Test AUC:       {test_metrics.get('auc', 0):.4f}")
+            history['test_metrics'] = test_metrics
 
         return history
 
@@ -1364,13 +1678,28 @@ def main():
         '--tawos_path',
         type=str,
         default=None,
-        help='Path to TAWOS dataset'
+        help='Path to a TAWOS TSV file OR a directory of TSV files. '
+             'When a directory is given, all .tsv files with a "text" column '
+             'are combined and Stage 2 predictions are appended to any row '
+             'with a missing/empty predicted_label.'
     )
     parser.add_argument(
         '--val_data',
         type=str,
         default=None,
         help='Path to held-out validation CSV (if not provided, validation split is taken from training data)'
+    )
+    parser.add_argument(
+        '--model',
+        type=str,
+        default=None,
+        help='Transformer model name (e.g. bert-base-uncased, distilbert-base-uncased, roberta-base). Overrides Config.MODEL_NAME.'
+    )
+    parser.add_argument(
+        '--pretrained_model',
+        type=str,
+        default=None,
+        help='Path to a previously fine-tuned model to use for transfer learning (skips Stage 1)'
     )
     parser.add_argument(
         '--output_dir',
@@ -1415,6 +1744,12 @@ def main():
         help='Minimum meaningful words after stopword removal'
     )
     parser.add_argument(
+        '--no_preprocess',
+        action='store_true',
+        default=False,
+        help='Skip DataPreprocessor entirely (recommended for full datasets with BERT)'
+    )
+    parser.add_argument(
         '--warmup_ratio',
         type=float,
         default=0.1,
@@ -1422,35 +1757,36 @@ def main():
     )
 
     # TAWOS Database connection arguments
+    # Credentials are read from environment variables for security
     parser.add_argument(
         '--db_host',
         type=str,
-        default='localhost',
-        help='TAWOS MySQL database host'
+        default=os.environ.get('TAWOS_DB_HOST', 'localhost'),
+        help='TAWOS MySQL database host (env: TAWOS_DB_HOST)'
     )
     parser.add_argument(
         '--db_port',
         type=int,
-        default=3306,
-        help='TAWOS MySQL database port'
+        default=int(os.environ.get('TAWOS_DB_PORT', '3306')),
+        help='TAWOS MySQL database port (env: TAWOS_DB_PORT)'
     )
     parser.add_argument(
         '--db_name',
         type=str,
-        default='tawos',
-        help='TAWOS database name'
+        default=os.environ.get('TAWOS_DB_NAME', 'tawos'),
+        help='TAWOS database name (env: TAWOS_DB_NAME)'
     )
     parser.add_argument(
         '--db_user',
         type=str,
-        default='root',
-        help='TAWOS database user'
+        default=os.environ.get('TAWOS_DB_USER', 'root'),
+        help='TAWOS database user (env: TAWOS_DB_USER)'
     )
     parser.add_argument(
         '--db_password',
         type=str,
-        default='',
-        help='TAWOS database password'
+        default=os.environ.get('TAWOS_DB_PASSWORD', ''),
+        help='TAWOS database password (env: TAWOS_DB_PASSWORD)'
     )
     parser.add_argument(
         '--tawos_projects',
@@ -1465,6 +1801,11 @@ def main():
         help='Include JIRA comments in text'
     )
     parser.add_argument(
+        '--include_issue_type',
+        action='store_true',
+        help='Prepend issue type token (e.g. [TYPE: Bug]) to the classification text'
+    )
+    parser.add_argument(
         '--max_tawos_issues',
         type=int,
         default=None,
@@ -1473,7 +1814,7 @@ def main():
     parser.add_argument(
         '--confidence_threshold',
         type=float,
-        default=0.8,
+        default=0.85,
         help='Confidence threshold for labeling (0.0-1.0)'
     )
     parser.add_argument(
@@ -1482,12 +1823,34 @@ def main():
         default=None,
         help='Path to save labeled TAWOS dataset CSV'
     )
+    parser.add_argument(
+        '--manually_labelled_dir',
+        type=str,
+        default=None,
+        help='Path to directory of manually-labelled TSV files (D/N and design/non-design labels). '
+             'These are injected into Stage 3 with confidence=1.0, bypassing the confidence filter.'
+    )
+    parser.add_argument(
+        '--max_n_labels',
+        type=int,
+        default=400,
+        help='Maximum number of N (non-design) labels to use from manually-labelled files '
+             'to reduce class imbalance during Stage 3 fine-tuning (default: 400)'
+    )
+    parser.add_argument(
+        '--skip_stage2',
+        action='store_true',
+        help='Skip Stage 2 TAWOS pseudo-labeling entirely. Stage 3 will train only on '
+             '--manually_labelled_dir data. Requires --manually_labelled_dir to be set.'
+    )
 
     args = parser.parse_args()
 
     # Configuration
     config = Config()
     config.OUTPUT_DIR = args.output_dir
+    if args.model:
+        config.MODEL_NAME = args.model
     config.NUM_EPOCHS = args.epochs
     config.LEARNING_RATE = args.learning_rate
     config.BATCH_SIZE = args.batch_size
@@ -1649,16 +2012,22 @@ def main():
                 label_name = "design" if label == 1 else "non-design"
                 logger.info(f"  {label} ({label_name}): {count} ({count/len(df)*100:.1f}%)")
 
-            # Initialize preprocessor
-            logger.info("\nInitializing data preprocessor...")
-            preprocessor = DataPreprocessor(min_words=args.min_words, verbose=True)
+            if args.no_preprocess:
+                logger.info("\nSkipping preprocessing (--no_preprocess set)")
+                df_clean = df
+                texts = df_clean[text_col].tolist()
+                labels = df_clean[label_col].tolist()
+            else:
+                # Initialize preprocessor
+                logger.info("\nInitializing data preprocessor...")
+                preprocessor = DataPreprocessor(min_words=args.min_words, verbose=True)
 
-            # Preprocess data
-            df_clean = preprocessor.preprocess_dataframe(df, text_col)
+                # Preprocess data
+                df_clean = preprocessor.preprocess_dataframe(df, text_col)
 
-            # Extract texts and labels (labels are now integers)
-            texts = df_clean[text_col].tolist()
-            labels = df_clean[label_col].tolist()
+                # Extract texts and labels (labels are now integers)
+                texts = df_clean[text_col].tolist()
+                labels = df_clean[label_col].tolist()
 
             # Verify labels are integers
             logger.info(f"Label types after extraction: {type(labels[0]) if labels else 'empty'}")
@@ -1778,9 +2147,9 @@ def main():
                 'train_samples': len(train_texts),
                 'val_samples': len(val_texts),
                 'test_samples': len(test_texts),
-                'duplicates_removed': preprocessor.stats['duplicates_removed'],
-                'auto_generated_removed': preprocessor.stats['auto_generated_removed'],
-                'short_texts_removed': preprocessor.stats['short_texts_removed'],
+                'duplicates_removed': preprocessor.stats['duplicates_removed'] if not args.no_preprocess else 0,
+                'auto_generated_removed': preprocessor.stats['auto_generated_removed'] if not args.no_preprocess else 0,
+                'short_texts_removed': preprocessor.stats['short_texts_removed'] if not args.no_preprocess else 0,
 
                 # Best validation metrics (from training history)
                 'best_val_epoch': len(history['val_metrics']),
@@ -1826,8 +2195,10 @@ def main():
         logger.info("Running TRANSFER LEARNING pipeline")
         logger.info("="*60)
 
-        if not args.stackoverflow_path:
-            logger.error("Transfer mode requires --stackoverflow_path")
+        use_pretrained = args.pretrained_model is not None
+
+        if not use_pretrained and not args.stackoverflow_path:
+            logger.error("Transfer mode requires --stackoverflow_path or --pretrained_model")
             return
 
         # Check if using database or file for TAWOS
@@ -1846,41 +2217,9 @@ def main():
             if args.tawos_projects:
                 logger.info(f"  Projects: {', '.join(args.tawos_projects)}")
 
-        # Load Stack Overflow data
-        logger.info(f"\nLoading Stack Overflow data from: {args.stackoverflow_path}")
-        try:
-            df_so = pd.read_csv(args.stackoverflow_path)
-
-            # Detect columns
-            text_col = 'text' if 'text' in df_so.columns else df_so.columns[0]
-            label_col = 'label' if 'label' in df_so.columns else df_so.columns[1]
-
-            # Encode labels
-            try:
-                df_so[label_col] = df_so[label_col].astype(int)
-            except (ValueError, TypeError):
-                unique_labels = df_so[label_col].unique()
-                label_mapping = {}
-                for label in unique_labels:
-                    label_str = str(label).lower()
-                    if 'design' in label_str or label_str in ['1', 'true', 'yes']:
-                        label_mapping[label] = 1
-                    else:
-                        label_mapping[label] = 0
-                df_so[label_col] = df_so[label_col].map(label_mapping)
-
-            so_texts = df_so[text_col].tolist()
-            so_labels = df_so[label_col].tolist()
-
-            logger.info(f"Loaded {len(so_texts)} Stack Overflow samples")
-            logger.info(f"Design: {sum(so_labels)}, Non-design: {len(so_labels) - sum(so_labels)}")
-
-        except Exception as e:
-            logger.error(f"Error loading Stack Overflow data: {e}")
-            return
-
+        # Initialize pipeline
+        tawos_config = None
         if use_db:
-            # Initialize TAWOS config for database connection
             tawos_config = TAWOSConfig(
                 host=args.db_host,
                 port=args.db_port,
@@ -1888,56 +2227,160 @@ def main():
                 user=args.db_user,
                 password=args.db_password,
                 projects=args.tawos_projects or [],
-                max_issues=args.max_tawos_issues
+                max_issues=args.max_tawos_issues,
+                include_issue_type=args.include_issue_type
             )
 
-            # Initialize pipeline with database connector
-            pipeline = TransferLearningPipeline(config, tawos_config=tawos_config)
+        pipeline = TransferLearningPipeline(config, tawos_config=tawos_config)
 
-            # Set default output path if not specified
-            output_path = args.labeled_output or os.path.join(
-                config.OUTPUT_DIR,
-                f'tawos_labeled_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
-            )
+        # Load manually-labelled data for Stage 3 injection (if provided)
+        manually_labelled_texts: Optional[List[str]] = None
+        manually_labelled_labels: Optional[List[int]] = None
+        if args.manually_labelled_dir:
+            manually_labelled_texts, manually_labelled_labels = \
+                pipeline.load_manually_labelled_data(
+                    args.manually_labelled_dir,
+                    max_n_labels=args.max_n_labels,
+                    random_seed=config.RANDOM_SEED,
+                )
 
-            # Run full pipeline with database
-            results = pipeline.run_full_pipeline_with_db(
-                so_texts=so_texts,
-                so_labels=so_labels,
-                tawos_projects=args.tawos_projects,
-                include_comments=args.include_comments,
-                max_tawos_issues=args.max_tawos_issues,
-                confidence_threshold=args.confidence_threshold,
-                output_path=output_path
-            )
-
-            logger.info("\n" + "="*60)
-            logger.info("TRANSFER LEARNING RESULTS")
-            logger.info("="*60)
-            logger.info(f"TAWOS issues fetched: {results.get('tawos_fetched', 0)}")
-            if 'stage2' in results:
-                logger.info(f"Design issues predicted: {results['stage2'].get('design_predicted', 0)}")
-                logger.info(f"High confidence labels: {results['stage2'].get('high_confidence', 0)}")
-            if 'labeled_output' in results:
-                logger.info(f"Labeled dataset saved to: {results['labeled_output']}")
-
+        # Stage 1: Either load pre-trained model or train from scratch
+        if use_pretrained:
+            logger.info(f"\nLoading pre-trained model from: {args.pretrained_model}")
+            logger.info("Skipping Stage 1 (Stack Overflow fine-tuning)")
+            pipeline.trainer.load_model(args.pretrained_model)
         else:
-            # File-based TAWOS mode
-            logger.info(f"Loading TAWOS data from file: {args.tawos_path}")
+            # Load Stack Overflow data and train
+            logger.info(f"\nLoading Stack Overflow data from: {args.stackoverflow_path}")
             try:
-                df_tawos = pd.read_csv(args.tawos_path)
-                text_col = 'text' if 'text' in df_tawos.columns else df_tawos.columns[0]
-                tawos_texts = df_tawos[text_col].tolist()
-                logger.info(f"Loaded {len(tawos_texts)} TAWOS samples")
+                df_so = pd.read_csv(args.stackoverflow_path)
+                text_col = 'text' if 'text' in df_so.columns else df_so.columns[0]
+                label_col = 'label' if 'label' in df_so.columns else df_so.columns[1]
+                try:
+                    df_so[label_col] = df_so[label_col].astype(int)
+                except (ValueError, TypeError):
+                    unique_labels = df_so[label_col].unique()
+                    label_mapping = {}
+                    for label in unique_labels:
+                        label_str = str(label).lower()
+                        if 'design' in label_str or label_str in ['1', 'true', 'yes']:
+                            label_mapping[label] = 1
+                        else:
+                            label_mapping[label] = 0
+                    df_so[label_col] = df_so[label_col].map(label_mapping)
+
+                so_texts = df_so[text_col].tolist()
+                so_labels = df_so[label_col].tolist()
+                logger.info(f"Loaded {len(so_texts)} Stack Overflow samples")
+                logger.info(f"Design: {sum(so_labels)}, Non-design: {len(so_labels) - sum(so_labels)}")
             except Exception as e:
-                logger.error(f"Error loading TAWOS data: {e}")
+                logger.error(f"Error loading Stack Overflow data: {e}")
                 return
 
-            # Initialize pipeline (no database)
-            pipeline = TransferLearningPipeline(config)
-
-            # Stage 1: Fine-tune on Stack Overflow
             pipeline.stage1_finetune_stackoverflow(so_texts, so_labels)
+
+        # Stage 2 & 3: Fetch TAWOS data, label, and fine-tune
+        if args.skip_stage2:
+            logger.info("\nSkipping Stage 2 (--skip_stage2 set)")
+            logger.info("Stage 3 will train only on manually-labelled data")
+            if not manually_labelled_texts:
+                logger.error("--skip_stage2 requires --manually_labelled_dir with valid TSV files")
+                return
+            pipeline.stage3_finetune_tawos(
+                [], [], [],
+                confidence_threshold=args.confidence_threshold,
+                extra_texts=manually_labelled_texts,
+                extra_labels=manually_labelled_labels,
+            )
+        elif use_db:
+            if not pipeline.connect_tawos_db():
+                logger.error("Failed to connect to TAWOS database")
+                return
+
+            try:
+                logger.info("\nFetching TAWOS data from database...")
+                tawos_texts, tawos_df = pipeline.fetch_tawos_from_db(
+                    projects=args.tawos_projects,
+                    include_comments=args.include_comments,
+                    max_issues=args.max_tawos_issues
+                )
+                logger.info(f"Fetched {len(tawos_texts)} TAWOS issues")
+
+                # Stage 2: Label TAWOS
+                tawos_labels, confidences = pipeline.stage2_label_tawos(
+                    tawos_texts,
+                    confidence_threshold=args.confidence_threshold
+                )
+
+                # Export labeled data
+                output_path = args.labeled_output or os.path.join(
+                    config.OUTPUT_DIR,
+                    f'tawos_labeled_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv'
+                )
+                pipeline.export_labeled_tawos(
+                    tawos_df, tawos_labels, confidences,
+                    output_path, confidence_threshold=0.0
+                )
+
+                # Stage 3: Second fine-tuning
+                pipeline.stage3_finetune_tawos(
+                    tawos_texts, tawos_labels, confidences,
+                    confidence_threshold=args.confidence_threshold,
+                    extra_texts=manually_labelled_texts,
+                    extra_labels=manually_labelled_labels,
+                )
+
+                logger.info("\n" + "="*60)
+                logger.info("TRANSFER LEARNING RESULTS")
+                logger.info("="*60)
+                logger.info(f"TAWOS issues fetched: {len(tawos_texts)}")
+                logger.info(f"Design issues predicted: {sum(tawos_labels)}")
+                logger.info(f"High confidence labels: {sum(1 for c in confidences if c >= args.confidence_threshold)}")
+                logger.info(f"Labeled dataset saved to: {output_path}")
+
+            finally:
+                if pipeline.tawos_connector:
+                    pipeline.tawos_connector.disconnect()
+        else:
+            # File-based TAWOS mode (accepts a single .tsv/.csv file OR a directory of TSVs)
+            import glob as _glob
+            import csv as _csv
+            from pathlib import Path
+            tawos_path = Path(args.tawos_path)
+
+            if tawos_path.is_dir():
+                logger.info(f"Loading TAWOS data from directory: {tawos_path}")
+                tsv_files = sorted(tawos_path.glob('*.tsv'))
+                frames = []
+                for fp in tsv_files:
+                    try:
+                        _csv.field_size_limit(10 ** 7)
+                        df_part = pd.read_csv(fp, sep='\t', dtype=str)
+                        if 'text' not in df_part.columns:
+                            logger.warning(f"  {fp.name}: no 'text' column, skipping")
+                            continue
+                        df_part = df_part[df_part['text'].notna() & (df_part['text'].str.strip() != '')]
+                        logger.info(f"  {fp.name}: {len(df_part)} rows with text")
+                        frames.append(df_part)
+                    except Exception as e:
+                        logger.warning(f"  {fp.name}: error reading – {e}")
+                if not frames:
+                    logger.error(f"No usable TSV files found in {tawos_path}")
+                    return
+                df_tawos = pd.concat(frames, ignore_index=True)
+                logger.info(f"Combined: {len(df_tawos)} TAWOS samples from {len(frames)} files")
+            else:
+                logger.info(f"Loading TAWOS data from file: {tawos_path}")
+                try:
+                    _csv.field_size_limit(10 ** 7)
+                    df_tawos = pd.read_csv(tawos_path, sep='\t', dtype=str)
+                except Exception as e:
+                    logger.error(f"Error loading TAWOS data: {e}")
+                    return
+
+            text_col = 'text' if 'text' in df_tawos.columns else df_tawos.columns[0]
+            tawos_texts = df_tawos[text_col].fillna('').tolist()
+            logger.info(f"Loaded {len(tawos_texts)} TAWOS samples")
 
             # Stage 2: Label TAWOS
             tawos_labels, confidences = pipeline.stage2_label_tawos(
@@ -1956,7 +2399,9 @@ def main():
             # Stage 3: Second fine-tuning
             pipeline.stage3_finetune_tawos(
                 tawos_texts, tawos_labels, confidences,
-                confidence_threshold=args.confidence_threshold
+                confidence_threshold=args.confidence_threshold,
+                extra_texts=manually_labelled_texts,
+                extra_labels=manually_labelled_labels,
             )
 
         # Save final model

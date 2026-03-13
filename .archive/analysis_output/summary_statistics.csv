@@ -1,0 +1,4 @@
+Model,Experiments,Mean F1,Std F1,Max F1,Min F1,Mean Accuracy,Max Accuracy,Mean AUC,Max AUC,Best LR,Best Batch,Best Epochs,Best Dropout
+bert-base-uncased,297,0.8056,0.1739,0.9355,0.0000,0.8141,0.9444,0.8982,0.9875,5e-05,16,7,0.1
+distilbert-base-uncased,288,0.7642,0.2427,0.9333,0.0000,0.7959,0.9444,0.8809,0.9624,2e-05,16,7,0.1
+roberta-base,288,0.7482,0.2563,0.9180,0.0000,0.7884,0.9074,0.8778,0.9625,5e-05,8,10,0.2

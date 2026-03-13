@@ -127,14 +127,10 @@ python train_design_classifier.py --mode transfer \
 Connect directly to a TAWOS MySQL database to fetch issues:
 
 ```bash
+# Credentials default from TAWOS_DB_* environment variables (see .environment_variables)
 python train_design_classifier.py --mode transfer \
     --stackoverflow_path ./data/stackoverflow/data.csv \
-    --db_host localhost \
-    --db_port 3306 \
-    --db_name tawos \
-    --db_user root \
-    --db_password yourpassword \
-    --tawos_projects HADOOP SPARK CASSANDRA \
+    --tawos_projects MESOS FAB SERVER \
     --include_comments \
     --max_tawos_issues 10000 \
     --confidence_threshold 0.8 \
@@ -142,17 +138,20 @@ python train_design_classifier.py --mode transfer \
     --output_dir ./models/transfer_learned
 ```
 
+You can also pass credentials explicitly via `--db_host`, `--db_port`, `--db_name`, `--db_user`, `--db_password`.
+
 #### Test TAWOS Database Connection
 
 ```bash
+# Credentials default from TAWOS_DB_* environment variables
 # List available projects
-python tawos_connector.py --host localhost --user root --password pass --list-projects
+python tawos_connector.py --list-projects
 
 # Show database schema
-python tawos_connector.py --host localhost --user root --password pass --schema
+python tawos_connector.py --schema
 
 # Fetch sample issues
-python tawos_connector.py --host localhost --user root --password pass --sample 10
+python tawos_connector.py --sample 10
 ```
 
 ## Training Pipeline
@@ -251,13 +250,10 @@ The trainer supports multiple transformer architectures via the `Config.MODEL_NA
 
 ```bash
 # Full pipeline: StackOverflow → TAWOS labeling → Fine-tuning
+# DB credentials default from TAWOS_DB_* environment variables
 python train_design_classifier.py --mode transfer \
     --stackoverflow_path ./data/stackoverflow.csv \
-    --db_host localhost \
-    --db_name tawos \
-    --db_user root \
-    --db_password secret \
-    --tawos_projects HADOOP SPARK \
+    --tawos_projects MESOS FAB SERVER \
     --include_comments \
     --confidence_threshold 0.8 \
     --labeled_output ./output/labeled_tawos.csv \
@@ -329,7 +325,7 @@ config = TAWOSConfig(
     database="tawos",
     user="root",
     password="password",
-    projects=["HADOOP", "SPARK"],
+    projects=["MESOS", "FAB"],
     max_issues=5000
 )
 
@@ -368,7 +364,7 @@ tawos_config = TAWOSConfig(
     database="tawos",
     user="root",
     password="password",
-    projects=["HADOOP", "CASSANDRA"],
+    projects=["MESOS", "FAB"],
     max_issues=10000
 )
 
@@ -378,7 +374,7 @@ pipeline = TransferLearningPipeline(config, tawos_config=tawos_config)
 results = pipeline.run_full_pipeline_with_db(
     so_texts=stackoverflow_texts,
     so_labels=stackoverflow_labels,
-    tawos_projects=["HADOOP", "CASSANDRA"],
+    tawos_projects=["MESOS", "FAB"],
     include_comments=True,
     confidence_threshold=0.8,
     output_path="./output/labeled_tawos.csv"

@@ -9,9 +9,16 @@ JIRA issues from various Apache projects that can be used for transfer
 learning in design classification.
 
 Database schema reference: https://github.com/SOLAR-group/TAWOS
+
+TAWOS Schema:
+    Issue: ID, Issue_Key, Title, Description, Description_Text, Type,
+           Priority, Status, Resolution, Creation_Date, Project_ID, ...
+    Comment: ID, Comment, Comment_Text, Creation_Date, Issue_ID
+    Project: ID, Project_Key, Name, URL, Description
 """
 
 import logging
+import os
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field
 
@@ -41,7 +48,8 @@ class TAWOSConfig:
     min_text_length: int = 50
     max_issues: Optional[int] = None
     projects: List[str] = field(default_factory=list)
-    issue_types: List[str] = field(default_factory=lambda: ["Bug", "Improvement", "New Feature", "Task", "Sub-task"])
+    include_issue_type: bool = False
+    issue_types: Optional[List[str]] = None  # None = all types; set list to filter
 
 
 class TAWOSConnector:
@@ -49,14 +57,10 @@ class TAWOSConnector:
 
     TAWOS contains structured JIRA issue data including:
     - Issue key, type, status, priority
-    - Summary (title) and description
-    - Comments and attachments
-    - Project information
+    - Title and description (raw and text-only variants)
+    - Comments (raw and text-only variants)
+    - Project information via Project table
     """
-
-    # Standard TAWOS table and column names
-    ISSUES_TABLE = "jira_issue"
-    COMMENTS_TABLE = "jira_issue_comment"
 
     def __init__(self, config: TAWOSConfig):
         """Initialize connector with configuration.
@@ -91,10 +95,9 @@ class TAWOSConnector:
             )
 
             if self.connection.is_connected():
-                db_info = self.connection.get_server_info()
+                db_info = self.connection.server_info
                 logger.info(f"Connected to TAWOS MySQL Server version {db_info}")
 
-                # Verify database
                 cursor = self.connection.cursor()
                 cursor.execute("SELECT DATABASE();")
                 db_name = cursor.fetchone()[0]
@@ -124,13 +127,12 @@ class TAWOSConnector:
 
         cursor = self.connection.cursor()
 
-        # Get all tables
         cursor.execute("SHOW TABLES")
         tables = [row[0] for row in cursor.fetchall()]
 
         schema = {}
         for table in tables:
-            cursor.execute(f"DESCRIBE {table}")
+            cursor.execute(f"DESCRIBE `{table}`")
             columns = [row[0] for row in cursor.fetchall()]
             schema[table] = columns
 
@@ -140,6 +142,7 @@ class TAWOSConnector:
     def fetch_issues(
         self,
         include_comments: bool = False,
+        include_issue_type: Optional[bool] = None,
         projects: Optional[List[str]] = None,
         issue_types: Optional[List[str]] = None,
         limit: Optional[int] = None
@@ -153,66 +156,80 @@ class TAWOSConnector:
             limit: Maximum number of issues to fetch
 
         Returns:
-            DataFrame with columns: key, project, type, summary, description,
-            text (combined), and optionally comments
+            DataFrame with columns: issue_key, project, issue_type, summary,
+            description, text (combined), and optionally comments
         """
         if not self.connection or not self.connection.is_connected():
             raise ConnectionError("Not connected to database")
 
-        # Use config values if not overridden
         projects = projects or self.config.projects
         issue_types = issue_types or self.config.issue_types
         limit = limit or self.config.max_issues
+        if include_issue_type is None:
+            include_issue_type = self.config.include_issue_type
 
         cursor = self.connection.cursor(dictionary=True)
 
-        # Build query with filters
-        query = f"""
+        # Query using actual TAWOS schema:
+        #   Issue table: ID, Issue_Key, Title, Description_Text, Type, ...
+        #   Project table: ID, Project_Key (joined via Issue.Project_ID)
+        query = """
             SELECT
-                i.key as issue_key,
-                i.project_key as project,
-                i.type as issue_type,
-                i.summary,
-                i.description,
-                i.status,
-                i.priority,
-                i.created,
-                i.updated
-            FROM {self.ISSUES_TABLE} i
-            WHERE i.summary IS NOT NULL
-            AND i.description IS NOT NULL
-            AND CHAR_LENGTH(CONCAT(COALESCE(i.summary, ''), ' ', COALESCE(i.description, ''))) >= {self.config.min_text_length}
+                i.ID as id,
+                i.Issue_Key as issue_key,
+                p.Project_Key as project,
+                i.Type as issue_type,
+                i.Title as summary,
+                i.Description_Text as description,
+                i.Status as status,
+                i.Priority as priority,
+                i.Creation_Date as created,
+                i.Last_Updated as updated
+            FROM Issue i
+            JOIN Project p ON i.Project_ID = p.ID
+            WHERE i.Title IS NOT NULL
+            AND i.Description_Text IS NOT NULL
+            AND CHAR_LENGTH(CONCAT(COALESCE(i.Title, ''), ' ', COALESCE(i.Description_Text, ''))) >= %s
         """
+        params = [self.config.min_text_length]
 
         # Add project filter
         if projects:
-            project_list = ", ".join([f"'{p}'" for p in projects])
-            query += f" AND i.project_key IN ({project_list})"
+            placeholders = ", ".join(["%s"] * len(projects))
+            query += f" AND p.Project_Key IN ({placeholders})"
+            params.extend(projects)
 
         # Add issue type filter
         if issue_types:
-            type_list = ", ".join([f"'{t}'" for t in issue_types])
-            query += f" AND i.type IN ({type_list})"
+            placeholders = ", ".join(["%s"] * len(issue_types))
+            query += f" AND i.Type IN ({placeholders})"
+            params.extend(issue_types)
 
-        # Add ordering and limit
-        query += " ORDER BY i.created DESC"
+        query += " ORDER BY i.Creation_Date DESC"
         if limit:
-            query += f" LIMIT {limit}"
+            query += " LIMIT %s"
+            params.append(limit)
 
-        logger.info(f"Fetching issues from TAWOS...")
-        cursor.execute(query)
+        logger.info("Fetching issues from TAWOS...")
+        cursor.execute(query, params)
         issues = cursor.fetchall()
         logger.info(f"Fetched {len(issues)} issues")
 
-        # Convert to DataFrame
         df = pd.DataFrame(issues)
 
         if df.empty:
             logger.warning("No issues found matching criteria")
+            cursor.close()
             return df
 
-        # Combine summary and description into text field
-        df['text'] = df['summary'].fillna('') + ' [SEP] ' + df['description'].fillna('')
+        # Combine title and description into text field
+        if include_issue_type:
+            df['text'] = (
+                '[TYPE: ' + df['issue_type'].fillna('Unknown') + '] '
+                + df['summary'].fillna('') + ' [SEP] ' + df['description'].fillna('')
+            )
+        else:
+            df['text'] = df['summary'].fillna('') + ' [SEP] ' + df['description'].fillna('')
 
         # Fetch comments if requested
         if include_comments and len(df) > 0:
@@ -223,7 +240,7 @@ class TAWOSConnector:
         # Log distribution info
         if 'issue_type' in df.columns:
             type_dist = df['issue_type'].value_counts()
-            logger.info(f"Issue type distribution:")
+            logger.info("Issue type distribution:")
             for issue_type, count in type_dist.items():
                 logger.info(f"  {issue_type}: {count}")
 
@@ -232,43 +249,54 @@ class TAWOSConnector:
     def _add_comments(self, df: pd.DataFrame, cursor) -> pd.DataFrame:
         """Add comments to issues DataFrame.
 
+        Uses Comment table joined by Issue_ID, fetching Comment_Text
+        (the cleaned text version of comments).
+
         Args:
-            df: DataFrame with issues
+            df: DataFrame with issues (must have 'id' column)
             cursor: Database cursor
 
         Returns:
-            DataFrame with comments added
+            DataFrame with comments column added
         """
-        issue_keys = df['issue_key'].tolist()
+        issue_ids = df['id'].tolist()
 
-        # Fetch comments for all issues
-        key_list = ", ".join([f"'{k}'" for k in issue_keys])
+        # Batch fetch comments using Issue_ID foreign key
+        placeholders = ", ".join(["%s"] * len(issue_ids))
         comment_query = f"""
-            SELECT issue_key, body
-            FROM {self.COMMENTS_TABLE}
-            WHERE issue_key IN ({key_list})
-            ORDER BY created
+            SELECT Issue_ID, Comment_Text
+            FROM Comment
+            WHERE Issue_ID IN ({placeholders})
+            ORDER BY Creation_Date
         """
 
-        cursor.execute(comment_query)
+        cursor.execute(comment_query, issue_ids)
         comments = cursor.fetchall()
 
-        # Group comments by issue
+        # Group comments by issue ID
         comments_by_issue = {}
         for row in comments:
-            key = row['issue_key']
-            body = row['body'] or ''
-            if key not in comments_by_issue:
-                comments_by_issue[key] = []
-            comments_by_issue[key].append(body)
+            issue_id = row['Issue_ID']
+            body = row['Comment_Text'] or ''
+            if body.strip():
+                if issue_id not in comments_by_issue:
+                    comments_by_issue[issue_id] = []
+                comments_by_issue[issue_id].append(body)
 
-        # Add to DataFrame
-        df['comments'] = df['issue_key'].apply(
-            lambda k: ' [SEP] '.join(comments_by_issue.get(k, []))
+        # Add comments to DataFrame
+        df['comments'] = df['id'].apply(
+            lambda i: ' [SEP] '.join(comments_by_issue.get(i, []))
         )
 
         # Update text field to include comments
-        df['text'] = df['text'] + ' [SEP] ' + df['comments']
+        has_comments = df['comments'].str.len() > 0
+        df.loc[has_comments, 'text'] = (
+            df.loc[has_comments, 'text'] + ' [SEP] ' + df.loc[has_comments, 'comments']
+        )
+
+        comment_count = sum(1 for v in comments_by_issue.values() if v)
+        logger.info(f"Added comments for {comment_count} issues "
+                     f"({len(comments)} total comments)")
 
         return df
 
@@ -286,17 +314,24 @@ class TAWOSConnector:
 
         cursor = self.connection.cursor()
 
-        query = f"""
-            SELECT COUNT(*)
-            FROM {self.ISSUES_TABLE}
-            WHERE summary IS NOT NULL AND description IS NOT NULL
-        """
-
         if projects:
-            project_list = ", ".join([f"'{p}'" for p in projects])
-            query += f" AND project_key IN ({project_list})"
+            placeholders = ", ".join(["%s"] * len(projects))
+            query = f"""
+                SELECT COUNT(*)
+                FROM Issue i
+                JOIN Project p ON i.Project_ID = p.ID
+                WHERE i.Title IS NOT NULL AND i.Description_Text IS NOT NULL
+                AND p.Project_Key IN ({placeholders})
+            """
+            cursor.execute(query, projects)
+        else:
+            query = """
+                SELECT COUNT(*)
+                FROM Issue
+                WHERE Title IS NOT NULL AND Description_Text IS NOT NULL
+            """
+            cursor.execute(query)
 
-        cursor.execute(query)
         count = cursor.fetchone()[0]
         cursor.close()
 
@@ -306,19 +341,21 @@ class TAWOSConnector:
         """List all available projects in the database.
 
         Returns:
-            List of dicts with project info (key, name, issue_count)
+            List of dicts with project info (project_key, name, issue_count)
         """
         if not self.connection or not self.connection.is_connected():
             raise ConnectionError("Not connected to database")
 
         cursor = self.connection.cursor(dictionary=True)
 
-        query = f"""
+        query = """
             SELECT
-                project_key,
-                COUNT(*) as issue_count
-            FROM {self.ISSUES_TABLE}
-            GROUP BY project_key
+                p.Project_Key as project_key,
+                p.Name as name,
+                COUNT(i.ID) as issue_count
+            FROM Project p
+            LEFT JOIN Issue i ON i.Project_ID = p.ID
+            GROUP BY p.ID, p.Project_Key, p.Name
             ORDER BY issue_count DESC
         """
 
@@ -378,18 +415,26 @@ def fetch_tawos_data(
 
 
 if __name__ == "__main__":
-    # Test connection
     import argparse
 
     parser = argparse.ArgumentParser(description="Test TAWOS database connection")
-    parser.add_argument("--host", default="localhost", help="MySQL host")
-    parser.add_argument("--port", type=int, default=3306, help="MySQL port")
-    parser.add_argument("--database", default="tawos", help="Database name")
-    parser.add_argument("--user", default="root", help="Database user")
-    parser.add_argument("--password", default="", help="Database password")
-    parser.add_argument("--list-projects", action="store_true", help="List available projects")
-    parser.add_argument("--schema", action="store_true", help="Show database schema")
-    parser.add_argument("--sample", type=int, default=5, help="Fetch sample issues")
+    parser.add_argument("--host", default=os.environ.get('TAWOS_DB_HOST', 'localhost'),
+                        help="MySQL host (env: TAWOS_DB_HOST)")
+    parser.add_argument("--port", type=int,
+                        default=int(os.environ.get('TAWOS_DB_PORT', '3306')),
+                        help="MySQL port (env: TAWOS_DB_PORT)")
+    parser.add_argument("--database", default=os.environ.get('TAWOS_DB_NAME', 'tawos'),
+                        help="Database name (env: TAWOS_DB_NAME)")
+    parser.add_argument("--user", default=os.environ.get('TAWOS_DB_USER', 'root'),
+                        help="Database user (env: TAWOS_DB_USER)")
+    parser.add_argument("--password", default=os.environ.get('TAWOS_DB_PASSWORD', ''),
+                        help="Database password (env: TAWOS_DB_PASSWORD)")
+    parser.add_argument("--list-projects", action="store_true",
+                        help="List available projects")
+    parser.add_argument("--schema", action="store_true",
+                        help="Show database schema")
+    parser.add_argument("--sample", type=int, default=5,
+                        help="Fetch sample issues")
 
     args = parser.parse_args()
 
@@ -419,16 +464,17 @@ if __name__ == "__main__":
                 print("\n=== Available Projects ===")
                 projects = connector.list_projects()
                 for p in projects:
-                    print(f"  {p['project_key']}: {p['issue_count']} issues")
+                    print(f"  {p['project_key']} ({p['name']}): {p['issue_count']} issues")
 
             if args.sample > 0:
                 print(f"\n=== Sample Issues (first {args.sample}) ===")
                 df = connector.fetch_issues(limit=args.sample)
                 for _, row in df.iterrows():
                     print(f"\n[{row['issue_key']}] {row['issue_type']}")
-                    print(f"  Summary: {row['summary'][:100]}...")
-                    if row.get('description'):
-                        print(f"  Description: {str(row['description'])[:150]}...")
+                    print(f"  Title: {row['summary'][:100]}...")
+                    desc = str(row.get('description', ''))
+                    if desc:
+                        print(f"  Description: {desc[:150]}...")
         finally:
             connector.disconnect()
     else:

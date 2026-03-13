@@ -207,3 +207,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+.claudignore
+.archive/
+models/
+*training.log
+# Model checkpoints (too large for GitHub)
+*.safetensors
+*.bin
+gcp_results/bert_*/
+gcp_results/roberta_*/
+gcp_results/distilbert_*/

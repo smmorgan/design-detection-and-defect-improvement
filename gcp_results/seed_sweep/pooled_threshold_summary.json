@@ -1,0 +1,158 @@
+{
+  "base_meta": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "mean_f1_per_fold_tuned": 0.7425,
+    "sd_f1_per_fold_tuned": 0.0134,
+    "mean_f1_pooled": 0.7359,
+    "sd_f1_pooled": 0.0155,
+    "mean_per_fold_sd_tuned": 0.0295,
+    "mean_per_fold_sd_pooled": 0.0298,
+    "mean_threshold_range_tuned": 0.0,
+    "mean_threshold_range_pooled": 0.3664,
+    "per_seed": {
+      "42": {
+        "per_fold_tuned": 0.7596,
+        "pooled": 0.7604
+      },
+      "43": {
+        "per_fold_tuned": 0.7276,
+        "pooled": 0.722
+      },
+      "44": {
+        "per_fold_tuned": 0.7493,
+        "pooled": 0.7297
+      },
+      "45": {
+        "per_fold_tuned": 0.7454,
+        "pooled": 0.7411
+      },
+      "46": {
+        "per_fold_tuned": 0.7305,
+        "pooled": 0.726
+      }
+    }
+  },
+  "base_meta_sqrtw": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "mean_f1_per_fold_tuned": 0.7266,
+    "sd_f1_per_fold_tuned": 0.0116,
+    "mean_f1_pooled": 0.7205,
+    "sd_f1_pooled": 0.0147,
+    "mean_per_fold_sd_tuned": 0.0392,
+    "mean_per_fold_sd_pooled": 0.0431,
+    "mean_threshold_range_tuned": 0.5164,
+    "mean_threshold_range_pooled": 0.3491,
+    "per_seed": {
+      "42": {
+        "per_fold_tuned": 0.7338,
+        "pooled": 0.7358
+      },
+      "43": {
+        "per_fold_tuned": 0.7366,
+        "pooled": 0.7282
+      },
+      "44": {
+        "per_fold_tuned": 0.7211,
+        "pooled": 0.7037
+      },
+      "45": {
+        "per_fold_tuned": 0.7326,
+        "pooled": 0.7057
+      },
+      "46": {
+        "per_fold_tuned": 0.7087,
+        "pooled": 0.7291
+      }
+    }
+  },
+  "baseline": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "mean_f1_per_fold_tuned": 0.6965,
+    "sd_f1_per_fold_tuned": 0.0129,
+    "mean_f1_pooled": 0.6838,
+    "sd_f1_pooled": 0.0159,
+    "mean_per_fold_sd_tuned": 0.03,
+    "mean_per_fold_sd_pooled": 0.0342,
+    "mean_threshold_range_tuned": 0.0,
+    "mean_threshold_range_pooled": 0.2573,
+    "per_seed": {
+      "42": {
+        "per_fold_tuned": 0.7117,
+        "pooled": 0.6827
+      },
+      "43": {
+        "per_fold_tuned": 0.6848,
+        "pooled": 0.6989
+      },
+      "44": {
+        "per_fold_tuned": 0.706,
+        "pooled": 0.7004
+      },
+      "45": {
+        "per_fold_tuned": 0.6822,
+        "pooled": 0.6641
+      },
+      "46": {
+        "per_fold_tuned": 0.6979,
+        "pooled": 0.673
+      }
+    }
+  },
+  "modernbert_meta_sqrtw": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "mean_f1_per_fold_tuned": 0.688,
+    "sd_f1_per_fold_tuned": 0.019,
+    "mean_f1_pooled": 0.6673,
+    "sd_f1_pooled": 0.0213,
+    "mean_per_fold_sd_tuned": 0.0439,
+    "mean_per_fold_sd_pooled": 0.0401,
+    "mean_threshold_range_tuned": 0.2518,
+    "mean_threshold_range_pooled": 0.3764,
+    "per_seed": {
+      "42": {
+        "per_fold_tuned": 0.7131,
+        "pooled": 0.6938
+      },
+      "43": {
+        "per_fold_tuned": 0.6993,
+        "pooled": 0.687
+      },
+      "44": {
+        "per_fold_tuned": 0.6726,
+        "pooled": 0.6526
+      },
+      "45": {
+        "per_fold_tuned": 0.6881,
+        "pooled": 0.6509
+      },
+      "46": {
+        "per_fold_tuned": 0.6668,
+        "pooled": 0.652
+      }
+    }
+  }
+}

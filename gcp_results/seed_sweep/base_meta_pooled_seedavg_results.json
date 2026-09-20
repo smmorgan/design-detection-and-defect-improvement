@@ -1,0 +1,56 @@
+{
+  "method": "Seed-averaged LOPO, pooled threshold (5 seeds: [42, 43, 44, 45, 46])",
+  "per_project": [
+    {
+      "project": "CONFSERVER",
+      "f1": 0.805071513720468,
+      "auc": null
+    },
+    {
+      "project": "DM",
+      "f1": 0.6201740462266778,
+      "auc": null
+    },
+    {
+      "project": "DNN",
+      "f1": 0.7845321438887074,
+      "auc": null
+    },
+    {
+      "project": "FAB",
+      "f1": 0.709837884362431,
+      "auc": null
+    },
+    {
+      "project": "JRASERVER",
+      "f1": 0.7948323761381476,
+      "auc": null
+    },
+    {
+      "project": "MESOS",
+      "f1": 0.81406346602738,
+      "auc": null
+    },
+    {
+      "project": "MULE",
+      "f1": 0.7571797535192382,
+      "auc": null
+    },
+    {
+      "project": "NEXUS",
+      "f1": 0.8194939451432319,
+      "auc": null
+    },
+    {
+      "project": "SERVER",
+      "f1": 0.5398624491007167,
+      "auc": null
+    },
+    {
+      "project": "TIMOB",
+      "f1": 0.7134776863729642,
+      "auc": null
+    }
+  ],
+  "mean_f1": 0.7359
+}

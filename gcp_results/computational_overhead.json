@@ -1,0 +1,152 @@
+{
+  "llm_baselines": [
+    {
+      "config": "claude-sonnet-5 zeroshot",
+      "n_tickets": 1786,
+      "wall_clock_s": 5815.890425831007,
+      "wall_clock_per_ticket_s": 3.2563776180464763,
+      "cost_usd": 9.168645000000001,
+      "cost_per_1k_tickets_usd": 5.133619820828668,
+      "input_tokens": 1905520,
+      "output_tokens": 230139
+    },
+    {
+      "config": "claude-sonnet-5 fewshot",
+      "n_tickets": 1786,
+      "wall_clock_s": 5767.544795082009,
+      "wall_clock_per_ticket_s": 3.2293083959025806,
+      "cost_usd": 12.529485,
+      "cost_per_1k_tickets_usd": 7.015389137737961,
+      "input_tokens": 3036805,
+      "output_tokens": 227938
+    },
+    {
+      "config": "gpt-4o-2024-08-06 zeroshot",
+      "n_tickets": 1785,
+      "wall_clock_s": 2765.8934636909944,
+      "wall_clock_per_ticket_s": 1.5495201477260472,
+      "cost_usd": 2.3905025,
+      "cost_per_1k_tickets_usd": 1.339217086834734,
+      "input_tokens": 641397,
+      "output_tokens": 78701
+    },
+    {
+      "config": "gpt-4o-2024-08-06 fewshot",
+      "n_tickets": 1786,
+      "wall_clock_s": 4356.384405532994,
+      "wall_clock_per_ticket_s": 2.439184997498877,
+      "cost_usd": 4.260405,
+      "cost_per_1k_tickets_usd": 2.3854451287793954,
+      "input_tokens": 1382146,
+      "output_tokens": 80504
+    },
+    {
+      "config": "llama3.1:8b (local) zeroshot",
+      "n_tickets": 1786,
+      "wall_clock_s": 2775.402162741,
+      "wall_clock_per_ticket_s": 1.5539765748829788,
+      "cost_usd": 0.0,
+      "cost_per_1k_tickets_usd": 0.0,
+      "input_tokens": 849661,
+      "output_tokens": 96065
+    },
+    {
+      "config": "llama3.1:8b (local) fewshot",
+      "n_tickets": 1778,
+      "wall_clock_s": 6885.4496236849955,
+      "wall_clock_per_ticket_s": 3.872581340655228,
+      "cost_usd": 0.0,
+      "cost_per_1k_tickets_usd": 0.0,
+      "input_tokens": 1580384,
+      "output_tokens": 100022
+    }
+  ],
+  "transformer_pretraining": [
+    {
+      "config": "roberta-base",
+      "phase": "Stage-1 SO pretraining (single run, not per-LOPO-fold)",
+      "wall_clock_s": 11535.487,
+      "n_parameters": 124647170,
+      "n_parameters_trainable": null,
+      "is_lora": false
+    },
+    {
+      "config": "distilbert-base",
+      "phase": "Stage-1 SO pretraining (single run, not per-LOPO-fold)",
+      "wall_clock_s": 5946.133,
+      "n_parameters": 66955010,
+      "n_parameters_trainable": null,
+      "is_lora": false
+    },
+    {
+      "config": "modernbert-base",
+      "phase": "Stage-1 SO pretraining (single run, not per-LOPO-fold)",
+      "wall_clock_s": 17987.641,
+      "n_parameters": 149606402,
+      "n_parameters_trainable": null,
+      "is_lora": false
+    },
+    {
+      "config": "qwen2.5-1.5b+lora",
+      "phase": "Stage-1 SO pretraining (single run, not per-LOPO-fold)",
+      "wall_clock_s": 59714.483,
+      "n_parameters": 1548078592,
+      "n_parameters_trainable": 4361216,
+      "is_lora": true
+    }
+  ],
+  "decoder_lora_lopo": [
+    {
+      "config": "qwen2.5-1.5b+lora (cold-start)",
+      "phase": "Full 10-fold LOPO fine-tuning from public checkpoint (no Stage-1 pretraining)",
+      "wall_clock_s": 9662.964,
+      "n_parameters_total": 1548078592,
+      "n_parameters_trainable": 4361216
+    },
+    {
+      "config": "qwen2.5-1.5b+lora (pretrained)",
+      "phase": "Full 10-fold LOPO fine-tuning from Stage-1 SO-pretrained checkpoint",
+      "wall_clock_s": 9664.995,
+      "n_parameters_total": 1548078592,
+      "n_parameters_trainable": 4361216
+    }
+  ],
+  "bert_base": {
+    "config": "bert-base",
+    "attempts": [
+      {
+        "dir": "bert_baseline_0308_1555",
+        "result": "CUDA OOM"
+      },
+      {
+        "dir": "bert_baseline_0308_1558",
+        "result": "CUDA OOM"
+      },
+      {
+        "dir": "bert_baseline_0308_2027",
+        "result": "CUDA OOM"
+      }
+    ],
+    "n_successful_runs": 0,
+    "gpu_capacity": "11.69 GiB",
+    "note": "The batch_size=32 sweep never completed a successful run across 3 attempts -- same GPU that successfully trained RoBERTa-base and DistilBERT-base at batch_size=32. A separate, successful bert-base-uncased Stage-1 run does exist at batch_size=16 (gcp_results/bert_very_conservative_0308_2027, F1=0.9045/AUC=0.9634); BERT was excluded from Stage 2/LOPO because RoBERTa scored higher on Stage 1, not because no BERT checkpoint was available."
+  },
+  "traditional_ml": {
+    "config": "SVM + GradientBoosting (combined, TF-IDF features)",
+    "total_wall_clock_s": 208.856,
+    "phases": {
+      "svm_grid_search_s": 10.584,
+      "gb_grid_search_s": 115.814,
+      "five_fold_cv_s": 23.338,
+      "lopo_10fold_s": 53.989
+    },
+    "note": "Grid search, holdout fit, 5-fold CV, and 10-fold LOPO for both models combined -- CPU-only, no GPU required."
+  },
+  "caveats": [
+    "RoBERTa/DistilBERT timings are for the single Stage-1 SO-pretraining run each model was fine-tuned from, not per-LOPO-fold fine-tuning time -- that was never logged as a separate span, so per-fold RoBERTa training cost cannot be reconstructed from existing artifacts.",
+    "BERT-base has zero successful runs (3/3 attempts hit CUDA OOM on an 11.69 GiB GPU), so it has no LOPO results and cannot appear in the model-family significance tests or an apples-to-apples overhead row.",
+    "Qwen2.5-1.5B+LoRA now has both a Stage-1 SO-pretraining run (in transformer_pretraining, ~16.6h) and two full 10-fold LOPO fine-tuning spans (in decoder_lora_lopo: cold-start from the public checkpoint, and from the Stage-1-pretrained checkpoint) -- unlike RoBERTa/DistilBERT/ModernBERT, whose LOPO fine-tuning time was never logged separately, so the Qwen LOPO wall-clock figures are not apples-to-apples with the 'single Stage-1 run only' rows for the encoder models.",
+    "Only 4,361,216 of Qwen2.5-1.5B's 1,548,078,592 parameters (0.28%) are trainable under LoRA, in both the Stage-1 pretraining run and the LOPO fine-tuning runs -- vs. 100% trainable for RoBERTa/DistilBERT/ModernBERT's full fine-tuning.",
+    "LLM baseline wall-clock times include exponential-backoff retry delays and are affected by shared-account rate limits (see llm_clients.py); they reflect this run's conditions, not a hard per-ticket API floor."
+  ]
+}

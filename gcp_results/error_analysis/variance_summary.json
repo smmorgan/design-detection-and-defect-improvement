@@ -1,0 +1,80 @@
+{
+  "n_projects": 10,
+  "n_models": 13,
+  "kendalls_w_f1": 0.6974717590102205,
+  "kendalls_w_f1_p": 7.754170136872589e-14,
+  "kendalls_w_auc": 0.6426752734445043,
+  "kendalls_w_auc_p": 1.4475268323525174e-12,
+  "spearman_roberta_best_vs_mean_llm_f1": 0.8909090909090909,
+  "spearman_roberta_best_vs_mean_llm_f1_p": 0.0005421442248338668,
+  "worst_project_per_model": {
+    "roberta_best": "SERVER",
+    "roberta_baseline": "DM",
+    "modernbert": "SERVER",
+    "qwen_lora_pretrained": "SERVER",
+    "qwen_lora_cold": "SERVER",
+    "svm": "SERVER",
+    "gradient_boosting": "SERVER",
+    "claude_zeroshot": "SERVER",
+    "claude_fewshot": "SERVER",
+    "gpt4o_zeroshot": "DM",
+    "gpt4o_fewshot": "SERVER",
+    "llama_zeroshot": "DM",
+    "llama_fewshot": "DM"
+  },
+  "per_project_f1_range": {
+    "roberta_best": [
+      0.449,
+      0.8108
+    ],
+    "roberta_baseline": [
+      0.5862,
+      0.8333
+    ],
+    "modernbert": [
+      0.4828,
+      0.7759
+    ],
+    "qwen_lora_pretrained": [
+      0.4444,
+      0.6772
+    ],
+    "qwen_lora_cold": [
+      0.4,
+      0.6349
+    ],
+    "svm": [
+      0.4,
+      0.7924528301886793
+    ],
+    "gradient_boosting": [
+      0.2318840579710145,
+      0.7678571428571429
+    ],
+    "claude_zeroshot": [
+      0.49504950495049505,
+      0.7766990291262136
+    ],
+    "claude_fewshot": [
+      0.5102040816326531,
+      0.803921568627451
+    ],
+    "gpt4o_zeroshot": [
+      0.5323741007194245,
+      0.7659574468085106
+    ],
+    "gpt4o_fewshot": [
+      0.5263157894736842,
+      0.7910447761194029
+    ],
+    "llama_zeroshot": [
+      0.49572649572649574,
+      0.7433628318584071
+    ],
+    "llama_fewshot": [
+      0.4727272727272727,
+      0.7215189873417721
+    ]
+  },
+  "caveat": "n=10 projects: correlations are exploratory, uncorrected, and low-powered."
+}

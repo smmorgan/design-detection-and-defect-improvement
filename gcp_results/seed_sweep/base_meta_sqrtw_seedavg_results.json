@@ -1,0 +1,109 @@
+{
+  "method": "Seed-averaged LOPO (5 seeds: [42, 43, 44, 45, 46])",
+  "source_config": {
+    "lr": 1e-05,
+    "epochs": 5,
+    "patience": 2,
+    "batch_size": 16,
+    "max_length": 512,
+    "dropout": 0.1,
+    "weight_decay": 0.01,
+    "freeze_layers": 0,
+    "manual_weight": 1.0,
+    "aug_max": 0,
+    "pseudo_weight": null,
+    "lora": false,
+    "lora_r": null,
+    "lora_alpha": null,
+    "lora_dropout": null,
+    "gradient_checkpointing": false,
+    "seed": 42,
+    "class_weighting": "sqrt",
+    "threshold": "tuned",
+    "val_selection": "balance"
+  },
+  "pretrained_model": "gcp_results/roberta_conservative_0309_0738",
+  "per_project": [
+    {
+      "project": "CONFSERVER",
+      "f1": 0.79708,
+      "auc": 0.95678,
+      "accuracy": 0.87598,
+      "precision": 0.8746,
+      "recall": 0.74
+    },
+    {
+      "project": "DM",
+      "f1": 0.5965199999999999,
+      "auc": 0.8160999999999999,
+      "accuracy": 0.73702,
+      "precision": 0.5041,
+      "recall": 0.7447
+    },
+    {
+      "project": "DNN",
+      "f1": 0.7788200000000001,
+      "auc": 0.95922,
+      "accuracy": 0.9,
+      "precision": 0.87138,
+      "recall": 0.7200199999999999
+    },
+    {
+      "project": "FAB",
+      "f1": 0.7028000000000001,
+      "auc": 0.8866800000000001,
+      "accuracy": 0.76406,
+      "precision": 0.55942,
+      "recall": 0.94998
+    },
+    {
+      "project": "JRASERVER",
+      "f1": 0.7372599999999999,
+      "auc": 0.9298399999999999,
+      "accuracy": 0.81422,
+      "precision": 0.6334,
+      "recall": 0.8961600000000001
+    },
+    {
+      "project": "MESOS",
+      "f1": 0.8073599999999999,
+      "auc": 0.9526,
+      "accuracy": 0.85878,
+      "precision": 0.70088,
+      "recall": 0.95272
+    },
+    {
+      "project": "MULE",
+      "f1": 0.7792600000000001,
+      "auc": 0.9299,
+      "accuracy": 0.84174,
+      "precision": 0.68662,
+      "recall": 0.9035799999999998
+    },
+    {
+      "project": "NEXUS",
+      "f1": 0.8032,
+      "auc": 0.9598000000000001,
+      "accuracy": 0.8765000000000001,
+      "precision": 0.74602,
+      "recall": 0.8846
+    },
+    {
+      "project": "SERVER",
+      "f1": 0.5595,
+      "auc": 0.82918,
+      "accuracy": 0.8506,
+      "precision": 0.6514999999999999,
+      "recall": 0.50624
+    },
+    {
+      "project": "TIMOB",
+      "f1": 0.7039799999999999,
+      "auc": 0.9136600000000001,
+      "accuracy": 0.7978,
+      "precision": 0.55498,
+      "recall": 0.9644600000000001
+    }
+  ],
+  "mean_f1": 0.7266
+}

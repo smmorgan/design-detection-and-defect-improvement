@@ -17,6 +17,7 @@ import copy
 import json
 import logging
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -33,8 +34,14 @@ from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
     get_linear_schedule_with_warmup,
+    set_seed,
 )
 from torch.optim import AdamW
+
+try:
+    from peft import LoraConfig, TaskType, get_peft_model
+except ImportError:
+    LoraConfig = TaskType = get_peft_model = None
 
 logging.basicConfig(
     level=logging.INFO,
@@ -49,6 +56,8 @@ TAWOS_MANUAL     = './output/all_manually_labelled.csv'
 D_LABELS_PATH    = './output/new_d_labels_review.csv'
 D_LABELS_SVR     = './output/server_new_d_labels_review.csv'
 N_LABELS_PATH    = './output/new_n_labels.csv'
+LLM_D_LABELS_PATH = './output/llm_d_labels.csv'
+LLM_N_LABELS_PATH = './output/llm_n_labels.csv'
 TAWOS_UNLABELLED_PATTERN  = './output/tawos_labeled_{project}.csv'
 TAWOS_UNLABELLED_PROJECTS = [
     'CONFSERVER', 'DM', 'DNN', 'FAB', 'JRASERVER',
@@ -140,6 +149,14 @@ def train_and_evaluate(
     device, fold_name,
     freeze_layers=0,
     train_sample_weights=None,
+    use_lora=False,
+    lora_r=16,
+    lora_alpha=32,
+    lora_dropout=0.05,
+    batch_size=BATCH_SIZE,
+    gradient_checkpointing=False,
+    class_weighting='sqrt',
+    tune_threshold=True,
 ):
     """Train a fresh model from pretrained weights, return test metrics."""
 
@@ -155,20 +172,84 @@ def train_and_evaluate(
         model_config.dropout = DROPOUT
     if hasattr(model_config, 'attention_dropout'):
         model_config.attention_dropout = DROPOUT
+    # Decoder models (Qwen/Llama/Gemma) pool the logit off the last
+    # non-pad token and raise ValueError for batch_size != 1 if the config
+    # has no pad_token_id -- the tokenizer usually defines one (often ==
+    # eos) but AutoConfig doesn't pick it up automatically.
+    if getattr(model_config, 'pad_token_id', None) is None and tokenizer.pad_token_id is not None:
+        model_config.pad_token_id = tokenizer.pad_token_id
+    # ModernBERT self-enables torch.compile (reference_compile=None ->
+    # is_triton_available()) by default. With per-batch dynamic padding,
+    # this recompiles/re-autotunes for every new sequence-length shape,
+    # which blew the 12GB budget well before steady-state runtime memory
+    # was even reached -- disable it, LOPO folds are too small to benefit
+    # from compilation anyway.
+    if hasattr(model_config, 'reference_compile'):
+        model_config.reference_compile = False
 
-    model = AutoModelForSequenceClassification.from_pretrained(
-        pretrained_path, config=model_config,
-    )
-    model.to(device)
+    if use_lora:
+        if LoraConfig is None:
+            raise ImportError("peft is required for --lora (pip install peft)")
+        model = AutoModelForSequenceClassification.from_pretrained(
+            pretrained_path, config=model_config, torch_dtype=torch.bfloat16,
+        )
+        model.to(device)
+        peft_config = LoraConfig(
+            task_type=TaskType.SEQ_CLS,
+            r=lora_r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
+            target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        )
+        model = get_peft_model(model, peft_config)
+        model.print_trainable_parameters()
+    else:
+        model = AutoModelForSequenceClassification.from_pretrained(
+            pretrained_path, config=model_config,
+        )
+        model.to(device)
 
-    # Freeze bottom N transformer layers + embeddings
-    if freeze_layers > 0:
-        # Freeze embeddings
-        for param in model.roberta.embeddings.parameters():
+    if gradient_checkpointing:
+        # Trades ~20-30% step time for a large activation-memory cut, letting
+        # ModernBERT (no KV-cache reuse to fall back on like decoder models)
+        # run LOPO at the same batch_size as RoBERTa's best config instead of
+        # a memory-constrained smaller one -- keeps the model-family
+        # comparison apples-to-apples on batch_size.
+        model.gradient_checkpointing_enable()
+        if hasattr(model.config, 'use_cache'):
+            model.config.use_cache = False
+        if use_lora:
+            # With LoRA, only the adapter weights require grad -- the input
+            # embeddings don't. Reentrant-autograd checkpointing needs at
+            # least one requires_grad=True tensor flowing into a checkpointed
+            # block or it silently returns None gradients for everything
+            # inside it (confirmed via a Qwen2.5+LoRA smoke test: this call
+            # is what turns a train_loss that never moves back into real
+            # updates). enable_input_require_grads() hooks the embedding
+            # output to force this.
+            model.enable_input_require_grads()
+
+    # Freeze bottom N transformer layers + embeddings. Layer-list location
+    # varies by architecture (BERT/RoBERTa: base.encoder.layer, DistilBERT:
+    # base.transformer.layer, ModernBERT: base.layers directly), so look it
+    # up generically off model.base_model instead of assuming RoBERTa.
+    # Skipped under LoRA -- the adapter wrapping already handles which
+    # parameters are trainable.
+    if freeze_layers > 0 and not use_lora:
+        base = model.base_model
+        for param in base.embeddings.parameters():
             param.requires_grad = False
-        # Freeze bottom N encoder layers
-        for i in range(min(freeze_layers, len(model.roberta.encoder.layer))):
-            for param in model.roberta.encoder.layer[i].parameters():
+        if hasattr(base, 'encoder') and hasattr(base.encoder, 'layer'):
+            encoder_layers = base.encoder.layer
+        elif hasattr(base, 'transformer') and hasattr(base.transformer, 'layer'):
+            encoder_layers = base.transformer.layer
+        elif hasattr(base, 'layers'):
+            encoder_layers = base.layers
+        else:
+            raise AttributeError(
+                f"Don't know where to find transformer layers on {type(base).__name__} "
+                "for freeze_layers -- add a case above for this architecture."
+            )
+        for i in range(min(freeze_layers, len(encoder_layers))):
+            for param in encoder_layers[i].parameters():
                 param.requires_grad = False
         trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
         total_params = sum(p.numel() for p in model.parameters())
@@ -178,12 +259,14 @@ def train_and_evaluate(
             f"({trainable/total_params*100:.1f}%)"
         )
 
-    # Class weights (square-root of inverse frequency — softer than full inverse)
+    # Class weights: inverse frequency, or its square root (softer) by default
     n_pos = sum(train_labels)
     n_neg = len(train_labels) - n_pos
     total = len(train_labels)
-    w_neg = np.sqrt(total / (2.0 * n_neg))
-    w_pos = np.sqrt(total / (2.0 * n_pos))
+    w_neg = total / (2.0 * n_neg)
+    w_pos = total / (2.0 * n_pos)
+    if class_weighting == 'sqrt':
+        w_neg, w_pos = np.sqrt(w_neg), np.sqrt(w_pos)
     class_weights = torch.tensor([w_neg, w_pos], dtype=torch.float).to(device)
     # Use reduction='none' when we have per-sample weights, so we can apply them
     use_sample_weights = train_sample_weights is not None
@@ -198,9 +281,9 @@ def train_and_evaluate(
     val_ds   = TextDataset(val_texts,   val_labels,   tokenizer, MAX_LENGTH)
     test_ds  = TextDataset(test_texts,  test_labels,  tokenizer, MAX_LENGTH)
 
-    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True)
-    val_loader   = DataLoader(val_ds,   batch_size=BATCH_SIZE, shuffle=False)
-    test_loader  = DataLoader(test_ds,  batch_size=BATCH_SIZE, shuffle=False)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
+    val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False)
+    test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False)
 
     # Optimizer + scheduler (only trainable params)
     trainable_params = [p for p in model.parameters() if p.requires_grad]
@@ -214,6 +297,7 @@ def train_and_evaluate(
     best_f1 = 0
     best_state = None
     no_improve = 0
+    train_t0 = time.monotonic()
 
     for epoch in range(1, EPOCHS + 1):
         # ── Train ──
@@ -226,7 +310,10 @@ def train_and_evaluate(
 
             optimizer.zero_grad()
             out = model(input_ids=ids, attention_mask=mask)
-            loss = loss_fn(out.logits, labs)
+            # bf16 logits (LoRA models load in torch.bfloat16) vs. the fp32
+            # class-weight tensor raise a dtype mismatch in F.cross_entropy --
+            # upcast for the loss only, standard mixed-precision practice.
+            loss = loss_fn(out.logits.float(), labs)
             if use_sample_weights:
                 sw = batch['sample_weight'].to(device)
                 loss = (loss * sw).mean()
@@ -256,21 +343,33 @@ def train_and_evaluate(
                 logger.info(f"  [{fold_name}] Early stopping at epoch {epoch}")
                 break
 
+    # Includes per-epoch validation passes -- this is the fold's full fine-tuning cost.
+    train_wall_s = time.monotonic() - train_t0
+
     # Restore best model
     if best_state is not None:
         model.load_state_dict(best_state)
 
-    # Tune threshold on validation set, apply to test
-    val_probs, val_labels = _get_probs(model, val_loader, device)
-    opt_threshold, opt_val_f1 = _find_optimal_threshold(val_probs, val_labels)
-    logger.info(
-        f"  [{fold_name}] Optimal threshold: {opt_threshold:.2f} "
-        f"(val F1 @ 0.50={f1_score(val_labels, [1 if p>=0.5 else 0 for p in val_probs], zero_division=0):.4f} "
-        f"→ val F1 @ {opt_threshold:.2f}={opt_val_f1:.4f})"
-    )
+    # Tune threshold on validation set, apply to test (or keep 0.5 if disabled)
+    opt_threshold = 0.5
+    if tune_threshold:
+        val_probs, val_labels = _get_probs(model, val_loader, device)
+        opt_threshold, opt_val_f1 = _find_optimal_threshold(val_probs, val_labels)
+        logger.info(
+            f"  [{fold_name}] Optimal threshold: {opt_threshold:.2f} "
+            f"(val F1 @ 0.50={f1_score(val_labels, [1 if p>=0.5 else 0 for p in val_probs], zero_division=0):.4f} "
+            f"→ val F1 @ {opt_threshold:.2f}={opt_val_f1:.4f})"
+        )
 
-    test_metrics = _evaluate(model, test_loader, device, threshold=opt_threshold)
+    infer_t0 = time.monotonic()
+    test_metrics = _evaluate(model, test_loader, device, threshold=opt_threshold,
+                             return_probs=True)
+    infer_wall_s = time.monotonic() - infer_t0
     test_metrics['threshold'] = round(opt_threshold, 4)
+    test_metrics['epochs_run'] = epoch
+    test_metrics['train_wall_clock_s'] = round(train_wall_s, 3)
+    test_metrics['test_inference_wall_clock_s'] = round(infer_wall_s, 3)
+    test_metrics['test_inference_s_per_ticket'] = round(infer_wall_s / max(1, test_metrics['n']), 5)
 
     # Free GPU memory
     del model
@@ -306,9 +405,21 @@ def _find_optimal_threshold(probs, labels, steps=100):
     return float(best_t), float(best_f1)
 
 
-def _evaluate(model, loader, device, threshold=0.5):
-    """Run inference and return metrics dict."""
+def _evaluate(model, loader, device, threshold=0.5, return_probs=False):
+    """Run inference and return metrics dict (plus raw 'probs' if return_probs)."""
     all_probs, all_labels = _get_probs(model, loader, device)
+    metrics = _metrics_from_probs(all_probs, all_labels, threshold)
+    if return_probs:
+        metrics['probs'] = all_probs
+    return metrics
+
+
+def _metrics_from_probs(all_probs, all_labels, threshold=0.5):
+    """Compute the fold metrics dict from stored probabilities.
+
+    Split out of _evaluate so --threshold pooled can re-score a fold after the
+    fact, once the pooled threshold is known, without re-running inference.
+    """
     all_preds = [1 if p >= threshold else 0 for p in all_probs]
 
     acc  = accuracy_score(all_labels, all_preds)
@@ -322,7 +433,7 @@ def _evaluate(model, loader, device, threshold=0.5):
     cm   = confusion_matrix(all_labels, all_preds, labels=[0, 1])
     tn, fp, fn, tp = cm.ravel()
 
-    return {
+    metrics = {
         'accuracy': round(acc, 4), 'precision': round(prec, 4),
         'recall': round(rec, 4), 'f1': round(f1, 4), 'auc': round(auc, 4),
         'tp': int(tp), 'tn': int(tn), 'fp': int(fp), 'fn': int(fn),
@@ -330,6 +441,7 @@ def _evaluate(model, loader, device, threshold=0.5):
         'n_design': int(sum(all_labels)),
         'n_nondesign': int(len(all_labels) - sum(all_labels)),
     }
+    return metrics
 
 
 # ── Stage 2 pseudo-labelling ─────────────────────────────────────────────────
@@ -435,7 +547,12 @@ def main():
     parser.add_argument('--out', default='gcp_results/lopo_results.json')
     parser.add_argument('--batch_size', type=int, default=BATCH_SIZE)
     parser.add_argument('--augment', action='store_true',
-                        help='Add heuristic D and N labels to training data')
+                        help='Add augmentation D and N labels to training data (source set by --aug_source)')
+    parser.add_argument('--aug_source', default='heuristic', choices=['heuristic', 'llm', 'both'],
+                        help='Augmentation label source: keyword heuristic (default), '
+                             'LLM labeler (llm_label_tickets.py --role labeler output), or both '
+                             '(each source capped at aug_max/2 to avoid scale mismatch between '
+                             'heuristic point scores and LLM confidence)')
     parser.add_argument('--freeze_layers', type=int, default=0,
                         help='Freeze bottom N transformer layers + embeddings (0=none)')
     parser.add_argument('--manual_weight', type=float, default=1.0,
@@ -458,10 +575,37 @@ def main():
     parser.add_argument('--metadata', action='store_true',
                         help='Prepend issue metadata (issue_type, priority) to text input. '
                              'Format: [issue_type] X [priority] Y [SEP] text')
+    parser.add_argument('--lora', action='store_true',
+                        help='Fine-tune with LoRA adapters instead of full fine-tuning '
+                             '(required for decoder models like Qwen2.5 that don\'t fit '
+                             'full fp32 fine-tuning on this GPU)')
+    parser.add_argument('--lora_r', type=int, default=16)
+    parser.add_argument('--lora_alpha', type=int, default=32)
+    parser.add_argument('--lora_dropout', type=float, default=0.05)
+    parser.add_argument('--gradient_checkpointing', action='store_true',
+                        help='Trade compute for activation memory to allow a larger '
+                             'batch_size on memory-constrained models (e.g. ModernBERT)')
+    parser.add_argument('--seed', type=int, default=RANDOM_SEED,
+                        help='Seeds python/numpy/torch RNGs. Run several seeds to '
+                             'measure run-to-run variance -- GPU kernels are not '
+                             'deterministic, so one seed does not pin the result.')
+    parser.add_argument('--class_weighting', default='sqrt', choices=['sqrt', 'inverse'],
+                        help='sqrt of inverse-frequency class weights (SqrtW configs) '
+                             'or plain inverse frequency (original Baseline / Base+Meta)')
+    parser.add_argument('--threshold', default='tuned', choices=['tuned', 'fixed', 'pooled'],
+                        help='tuned: pick the F1-maximising threshold on the val project '
+                             '(~177 tickets -- a noisy optimum); fixed: use 0.5 (original '
+                             'Baseline / Base+Meta); pooled: tune on the other folds\' '
+                             'out-of-fold predictions (~1.6k tickets, far more stable). '
+                             'pooled never sees the held-out project\'s labels and costs '
+                             'no extra training.')
+    parser.add_argument('--val_selection', default='balance', choices=['balance', 'smallest'],
+                        help='Validation project per fold: most class-balanced, or '
+                             'smallest (the rule the original Baseline run used)')
     args = parser.parse_args()
 
-    torch.manual_seed(RANDOM_SEED)
-    np.random.seed(RANDOM_SEED)
+    set_seed(args.seed)
+    logger.info(f"Seed: {args.seed}")
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info(f"Device: {device}")
@@ -483,42 +627,81 @@ def main():
             f"{df['priority'].notna().sum()} priorities matched"
         )
 
-    # Load heuristic augmentation data if requested
+    # Load augmentation data if requested. --aug_source selects the keyword
+    # heuristic (LABELLING_METHODOLOGY.md), the LLM labeler (llm_label_tickets.py
+    # --role labeler), or both -- each source capped independently at aug_max
+    # so combining sources doesn't let one source's scoring scale dominate.
     aug_d = pd.DataFrame()
     aug_n = pd.DataFrame()
     if args.augment:
-        # D labels — sort by score (highest confidence first)
+        per_source_max = args.aug_max // 2 if (args.aug_source == 'both' and args.aug_max > 0) else args.aug_max
+
         d_parts = []
-        if Path(D_LABELS_PATH).exists():
-            d_df = pd.read_csv(D_LABELS_PATH)
-            d_df['text'] = d_df['summary'].fillna('') + ' [SEP] ' + d_df['description'].fillna('')
-            d_df['label'] = 'design'
-            d_parts.append(d_df[['project', 'issue_key', 'issue_type', 'text', 'label', 'score']])
-        if Path(D_LABELS_SVR).exists():
-            d_df = pd.read_csv(D_LABELS_SVR)
-            d_df['project'] = 'SERVER'
-            d_df['text'] = d_df['summary'].fillna('') + ' [SEP] ' + d_df['description'].fillna('')
-            d_df['label'] = 'design'
-            if 'score' not in d_df.columns:
-                d_df['score'] = 5  # minimum threshold score
-            d_parts.append(d_df[['project', 'issue_key', 'issue_type', 'text', 'label', 'score']])
+        n_parts = []
+
+        if args.aug_source in ('heuristic', 'both'):
+            # D labels — sort by score (highest confidence first)
+            heur_d_parts = []
+            if Path(D_LABELS_PATH).exists():
+                d_df = pd.read_csv(D_LABELS_PATH)
+                d_df['text'] = d_df['summary'].fillna('') + ' [SEP] ' + d_df['description'].fillna('')
+                d_df['label'] = 'design'
+                heur_d_parts.append(d_df[['project', 'issue_key', 'issue_type', 'text', 'label', 'score']])
+            if Path(D_LABELS_SVR).exists():
+                d_df = pd.read_csv(D_LABELS_SVR)
+                d_df['project'] = 'SERVER'
+                d_df['text'] = d_df['summary'].fillna('') + ' [SEP] ' + d_df['description'].fillna('')
+                d_df['label'] = 'design'
+                if 'score' not in d_df.columns:
+                    d_df['score'] = 5  # minimum threshold score
+                heur_d_parts.append(d_df[['project', 'issue_key', 'issue_type', 'text', 'label', 'score']])
+            if heur_d_parts:
+                heur_d = pd.concat(heur_d_parts, ignore_index=True).sort_values('score', ascending=False)
+                if per_source_max > 0:
+                    heur_d = heur_d.head(per_source_max)
+                logger.info(f"Heuristic augmentation D labels: {len(heur_d)}")
+                d_parts.append(heur_d)
+
+            # N labels — sort by confidence_tier (1=highest confidence first)
+            if Path(N_LABELS_PATH).exists():
+                n_df = pd.read_csv(N_LABELS_PATH)
+                n_df['text'] = n_df['summary'].fillna('') + ' [SEP] ' + n_df['description'].fillna('')
+                n_df['label'] = 'non-design'
+                n_df = n_df.sort_values('confidence_tier', ascending=True)
+                if per_source_max > 0:
+                    n_df = n_df.head(per_source_max)
+                logger.info(f"Heuristic augmentation N labels: {len(n_df)}")
+                n_parts.append(n_df[['project', 'issue_key', 'issue_type', 'text', 'label']])
+
+        if args.aug_source in ('llm', 'both'):
+            # LLM labels from llm_label_tickets.py --role labeler. Schema:
+            # project, issue_key, issue_type, summary, description, label, score (0-1 confidence).
+            if Path(LLM_D_LABELS_PATH).exists():
+                llm_d = pd.read_csv(LLM_D_LABELS_PATH)
+                llm_d = llm_d[llm_d['label'] == 'design'].copy()
+                llm_d['text'] = llm_d['summary'].fillna('') + ' [SEP] ' + llm_d['description'].fillna('')
+                llm_d = llm_d.sort_values('score', ascending=False)
+                if per_source_max > 0:
+                    llm_d = llm_d.head(per_source_max)
+                logger.info(f"LLM augmentation D labels: {len(llm_d)}")
+                d_parts.append(llm_d[['project', 'issue_key', 'issue_type', 'text', 'label', 'score']])
+
+            if Path(LLM_N_LABELS_PATH).exists():
+                llm_n = pd.read_csv(LLM_N_LABELS_PATH)
+                llm_n = llm_n[llm_n['label'] == 'non-design'].copy()
+                llm_n['text'] = llm_n['summary'].fillna('') + ' [SEP] ' + llm_n['description'].fillna('')
+                llm_n = llm_n.sort_values('score', ascending=False)
+                if per_source_max > 0:
+                    llm_n = llm_n.head(per_source_max)
+                logger.info(f"LLM augmentation N labels: {len(llm_n)}")
+                n_parts.append(llm_n[['project', 'issue_key', 'issue_type', 'text', 'label']])
+
         if d_parts:
             aug_d = pd.concat(d_parts, ignore_index=True)
-            aug_d = aug_d.sort_values('score', ascending=False)
-            if args.aug_max > 0:
-                aug_d = aug_d.head(args.aug_max)
-            logger.info(f"Augmentation D labels: {len(aug_d)}")
-
-        # N labels — sort by confidence_tier (1=highest confidence first)
-        if Path(N_LABELS_PATH).exists():
-            n_df = pd.read_csv(N_LABELS_PATH)
-            n_df['text'] = n_df['summary'].fillna('') + ' [SEP] ' + n_df['description'].fillna('')
-            n_df['label'] = 'non-design'
-            n_df = n_df.sort_values('confidence_tier', ascending=True)
-            if args.aug_max > 0:
-                n_df = n_df.head(args.aug_max)
-            aug_n = n_df[['project', 'issue_key', 'issue_type', 'text', 'label']]
-            logger.info(f"Augmentation N labels: {len(aug_n)}")
+            logger.info(f"Total augmentation D labels ({args.aug_source}): {len(aug_d)}")
+        if n_parts:
+            aug_n = pd.concat(n_parts, ignore_index=True)
+            logger.info(f"Total augmentation N labels ({args.aug_source}): {len(aug_n)}")
 
         # Add priority from lookup for augmentation data
         if args.metadata and priority_lookup:
@@ -529,6 +712,12 @@ def main():
 
     # Load tokenizer once (shared across folds)
     tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model)
+    if args.lora:
+        # Convention for decoder-only models under LoRA; the pooling logic
+        # in transformers' GenericForSequenceClassification handles either
+        # padding side correctly, but left-padding is the standard for
+        # decoder generation/classification workflows.
+        tokenizer.padding_side = 'left'
 
     # Stage 2: pseudo-label unlabelled TAWOS data (once, before folds)
     pseudo_df = pd.DataFrame()
@@ -560,6 +749,8 @@ def main():
             logger.info(f"  Design: {n_d}, Non-design: {n_n}")
 
     results = []
+    prediction_rows = []
+    fold_probs = {}   # project -> (test probs, test labels), for --threshold pooled
 
     for held_out in projects:
         logger.info(f"\n{'='*60}")
@@ -580,7 +771,10 @@ def main():
             sub = df[df['project'] == p]
             ratio = (sub['label'] == 'design').mean()
             return abs(ratio - 0.5)  # closer to 0 = more balanced
-        val_project = min(remaining_projects, key=class_balance)
+        if args.val_selection == 'smallest':
+            val_project = min(remaining_projects, key=lambda p: len(df[df['project'] == p]))
+        else:
+            val_project = min(remaining_projects, key=class_balance)
         val_df   = train_df[train_df['project'] == val_project]
         train_df = train_df[train_df['project'] != val_project]
 
@@ -683,8 +877,33 @@ def main():
             device, held_out,
             freeze_layers=args.freeze_layers,
             train_sample_weights=train_sample_weights,
+            use_lora=args.lora,
+            lora_r=args.lora_r,
+            lora_alpha=args.lora_alpha,
+            lora_dropout=args.lora_dropout,
+            batch_size=args.batch_size,
+            gradient_checkpointing=args.gradient_checkpointing,
+            class_weighting=args.class_weighting,
+            tune_threshold=args.threshold == 'tuned',
+            # 'pooled' scores at 0.5 here and is re-scored after the fold loop,
+            # once every fold's out-of-fold probabilities are available.
         )
         metrics['project'] = held_out
+        # Per-ticket predictions for qualitative error analysis (R1.3/R2.6);
+        # test_df row order matches the unshuffled test DataLoader.
+        test_probs = metrics.pop('probs')
+        fold_probs[held_out] = (test_probs, test_labels)
+        for (_, row), prob, true_label in zip(test_df.iterrows(), test_probs, test_labels):
+            prediction_rows.append({
+                'project': held_out,
+                'issue_key': row['issue_key'],
+                'issue_type': row.get('issue_type'),
+                'label': true_label,
+                'prob_design': round(prob, 6),
+                'threshold': None,   # filled in below (pooled needs all folds first)
+                'pred': None,
+                'val_project': val_project,
+            })
         results.append(metrics)
 
         logger.info(
@@ -692,6 +911,40 @@ def main():
             f"Acc={metrics['accuracy']:.4f}  Prec={metrics['precision']:.4f}  "
             f"Rec={metrics['recall']:.4f}  Threshold={metrics.get('threshold', 0.5):.2f}"
         )
+
+    # ── Pooled threshold (second pass) ───────────────────────────────────────
+    # Tuning per fold on a single ~177-ticket validation project is a noisy
+    # optimum: the chosen threshold swings widely between otherwise identical
+    # runs, and that swing lands directly on test F1. Pooling the other folds'
+    # out-of-fold predictions tunes on ~1.6k tickets instead. The held-out
+    # project is excluded from its own pool, so no test label informs its
+    # threshold -- though the pooled probabilities do come from models that
+    # trained on the held-out project, which is why this is a stability fix
+    # and not a clean-room nested CV.
+    if args.threshold == 'pooled':
+        for m in results:
+            k = m['project']
+            pool_probs, pool_labels = [], []
+            for other, (probs_o, labels_o) in fold_probs.items():
+                if other != k:
+                    pool_probs.extend(probs_o)
+                    pool_labels.extend(labels_o)
+            t, pool_f1 = _find_optimal_threshold(pool_probs, pool_labels)
+            probs_k, labels_k = fold_probs[k]
+            m.update(_metrics_from_probs(probs_k, labels_k, t))
+            m['threshold'] = round(t, 4)
+            logger.info(
+                f"  [{k}] Pooled threshold: {t:.2f} "
+                f"(tuned on {len(pool_labels)} tickets from 9 projects, "
+                f"pooled F1={pool_f1:.4f}) -> test F1={m['f1']:.4f}"
+            )
+
+    # Thresholds are final only now -- fill in the per-ticket predictions.
+    thresholds = {m['project']: m.get('threshold', 0.5) for m in results}
+    for row in prediction_rows:
+        t = thresholds[row['project']]
+        row['threshold'] = t
+        row['pred'] = int(row['prob_design'] >= t)
 
     # ── Summary ──────────────────────────────────────────────────────────────
     print(f"\n{'='*70}")
@@ -749,12 +1002,21 @@ def main():
         'n_total_samples': len(df),
         'hyperparameters': {
             'lr': LR, 'epochs': EPOCHS, 'patience': PATIENCE,
-            'batch_size': BATCH_SIZE, 'max_length': MAX_LENGTH,
+            'batch_size': args.batch_size, 'max_length': MAX_LENGTH,
             'dropout': DROPOUT, 'weight_decay': WEIGHT_DECAY,
             'freeze_layers': args.freeze_layers,
             'manual_weight': args.manual_weight,
             'aug_max': args.aug_max,
             'pseudo_weight': args.pseudo_weight if args.pseudo_label else None,
+            'lora': args.lora,
+            'lora_r': args.lora_r if args.lora else None,
+            'lora_alpha': args.lora_alpha if args.lora else None,
+            'lora_dropout': args.lora_dropout if args.lora else None,
+            'gradient_checkpointing': args.gradient_checkpointing,
+            'seed': args.seed,
+            'class_weighting': args.class_weighting,
+            'threshold': args.threshold,
+            'val_selection': args.val_selection,
         },
         'per_project': results,
         'mean_f1': round(float(np.mean(f1s)), 4),
@@ -764,9 +1026,17 @@ def main():
         'mean_accuracy': round(float(np.mean(accs)), 4),
         'std_accuracy': round(float(np.std(accs)), 4),
     }
+    summary['total_train_wall_clock_s'] = round(sum(r['train_wall_clock_s'] for r in results), 3)
+    summary['total_test_inference_wall_clock_s'] = round(
+        sum(r['test_inference_wall_clock_s'] for r in results), 3)
+    summary['device'] = torch.cuda.get_device_name(0) if device.type == 'cuda' else 'cpu'
     with open(out_path, 'w') as f:
         json.dump(summary, f, indent=2)
     print(f"\nResults saved to {out_path}")
+
+    pred_path = out_path.with_name(out_path.stem + '_predictions.csv')
+    pd.DataFrame(prediction_rows).to_csv(pred_path, index=False)
+    print(f"Per-ticket predictions saved to {pred_path}")
 
 
 if __name__ == '__main__':

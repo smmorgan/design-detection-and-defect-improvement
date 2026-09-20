@@ -217,3 +217,7 @@ models/
 gcp_results/bert_*/
 gcp_results/roberta_*/
 gcp_results/distilbert_*/
+# Model checkpoints (hundreds of MB to GBs) -- keep out of git
+*.safetensors
+gcp_results/*_standard_*/
+gcp_results/roberta_conservative_*/

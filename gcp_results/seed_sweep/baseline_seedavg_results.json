@@ -1,0 +1,109 @@
+{
+  "method": "Seed-averaged LOPO (5 seeds: [42, 43, 44, 45, 46])",
+  "source_config": {
+    "lr": 1e-05,
+    "epochs": 5,
+    "patience": 2,
+    "batch_size": 16,
+    "max_length": 512,
+    "dropout": 0.1,
+    "weight_decay": 0.01,
+    "freeze_layers": 0,
+    "manual_weight": 1.0,
+    "aug_max": 0,
+    "pseudo_weight": null,
+    "lora": false,
+    "lora_r": null,
+    "lora_alpha": null,
+    "lora_dropout": null,
+    "gradient_checkpointing": false,
+    "seed": 42,
+    "class_weighting": "inverse",
+    "threshold": "fixed",
+    "val_selection": "smallest"
+  },
+  "pretrained_model": "gcp_results/roberta_conservative_0309_0738",
+  "per_project": [
+    {
+      "project": "CONFSERVER",
+      "f1": 0.82324,
+      "auc": 0.94206,
+      "accuracy": 0.8816,
+      "precision": 0.8207800000000001,
+      "recall": 0.8266600000000001
+    },
+    {
+      "project": "DM",
+      "f1": 0.57738,
+      "auc": 0.7944399999999999,
+      "accuracy": 0.73148,
+      "precision": 0.50252,
+      "recall": 0.69788
+    },
+    {
+      "project": "DNN",
+      "f1": 0.76644,
+      "auc": 0.9214800000000001,
+      "accuracy": 0.88554,
+      "precision": 0.7838999999999999,
+      "recall": 0.75554
+    },
+    {
+      "project": "FAB",
+      "f1": 0.6890600000000001,
+      "auc": 0.8576600000000001,
+      "accuracy": 0.77082,
+      "precision": 0.57558,
+      "recall": 0.86538
+    },
+    {
+      "project": "JRASERVER",
+      "f1": 0.7247,
+      "auc": 0.91204,
+      "accuracy": 0.8131,
+      "precision": 0.62418,
+      "recall": 0.8653799999999998
+    },
+    {
+      "project": "MESOS",
+      "f1": 0.7575200000000001,
+      "auc": 0.9240600000000001,
+      "accuracy": 0.8113199999999999,
+      "precision": 0.63768,
+      "recall": 0.9381999999999999
+    },
+    {
+      "project": "MULE",
+      "f1": 0.68662,
+      "auc": 0.8881399999999999,
+      "accuracy": 0.74176,
+      "precision": 0.5524,
+      "recall": 0.9143000000000001
+    },
+    {
+      "project": "NEXUS",
+      "f1": 0.76082,
+      "auc": 0.9308799999999999,
+      "accuracy": 0.8404400000000001,
+      "precision": 0.66494,
+      "recall": 0.8923000000000002
+    },
+    {
+      "project": "SERVER",
+      "f1": 0.5054,
+      "auc": 0.8442999999999999,
+      "accuracy": 0.8358000000000001,
+      "precision": 0.62306,
+      "recall": 0.43126
+    },
+    {
+      "project": "TIMOB",
+      "f1": 0.67398,
+      "auc": 0.92012,
+      "accuracy": 0.7735,
+      "precision": 0.53174,
+      "recall": 0.9333199999999999
+    }
+  ],
+  "mean_f1": 0.6965
+}

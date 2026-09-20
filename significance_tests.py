@@ -8,8 +8,11 @@ confidence intervals for the mean difference.
 
 Usage:
     python significance_tests.py
+    python significance_tests.py --seed_avg   # model-family tests on seed-averaged
+                                               # per-fold F1 (aggregate_seed_sweep.py)
 """
 
+import argparse
 import json
 from pathlib import Path
 from itertools import combinations
@@ -18,17 +21,21 @@ import numpy as np
 from scipy import stats
 
 
-def load_results(filepath):
-    """Load LOPO results and extract per-project F1 and AUC scores."""
+def load_results(filepath, keys=None):
+    """Load LOPO results and extract per-project F1 and AUC scores.
+
+    `keys` navigates to a nested per_project list, e.g. keys=("lopo", "svm")
+    for traditional_models_results.json where results sit under data["lopo"]["svm"]["per_project"].
+    """
     with open(filepath) as f:
         data = json.load(f)
-    projects = [p["project"] for p in data["per_project"]]
-    f1_scores = [p["f1"] for p in data["per_project"]]
-    auc_scores = [p["auc"] for p in data["per_project"]]
+    for k in (keys or ()):
+        data = data[k]
+    per_project = sorted(data["per_project"], key=lambda p: p["project"])
     return {
-        "projects": projects,
-        "f1": np.array(f1_scores),
-        "auc": np.array(auc_scores),
+        "projects": [p["project"] for p in per_project],
+        "f1": np.array([p["f1"] for p in per_project]),
+        "auc": np.array([p["auc"] for p in per_project]),
     }
 
 
@@ -80,6 +87,19 @@ def compare_pair(name_a, res_a, name_b, res_b, metric="f1"):
     }
 
 
+def holm_adjust(p_values):
+    """Holm-Bonferroni step-down adjusted p-values (same order as input)."""
+    p = np.asarray(p_values, dtype=float)
+    m = len(p)
+    order = np.argsort(p)
+    adjusted = np.empty(m)
+    running_max = 0.0
+    for rank, idx in enumerate(order):
+        running_max = max(running_max, (m - rank) * p[idx])
+        adjusted[idx] = min(1.0, running_max)
+    return adjusted
+
+
 def interpret_effect(d):
     """Interpret Cohen's d magnitude."""
     d_abs = abs(d)
@@ -93,8 +113,105 @@ def interpret_effect(d):
         return "large"
 
 
+def run_model_family_comparisons(results_dir, seed_avg=False):
+    """Compare RoBERTa (best LOPO config) against SVM, GB, and the LLM baselines.
+
+    Answers R1#4 ("statistical tests ... between BERTs and classical MLs") and
+    extends it to the LLM baseline added for R1#1/R2#3. Kept separate from the
+    augmentation-ablation comparisons above since these are different models,
+    not different configs of the same model.
+
+    With seed_avg, the fine-tuned models use per-fold F1 averaged over the
+    multi-seed sweep, since a single run's per-fold F1 carries GPU training
+    noise large enough to flip these comparisons.
+    """
+    trad_path = Path("traditional_ml/results/traditional_models_results.json")
+
+    configs = {
+        "roberta_best": (results_dir / "lopo_metadata_baseline_sqrtw_results.json", None),
+        "modernbert": (results_dir / "lopo_modernbert_results.json", None),
+        "qwen25_1.5b_lora": (results_dir / "lopo_qwen25_1.5b_lora_results.json", None),
+        "qwen25_1.5b_lora_pretrained": (results_dir / "lopo_qwen25_1.5b_lora_pretrained_results.json", None),
+        "svm": (trad_path, ("lopo", "svm")),
+        "gradient_boosting": (trad_path, ("lopo", "gradient_boosting")),
+        "llm_zeroshot_claude": (results_dir / "llm_zeroshot_anthropic_results.json", None),
+        "llm_fewshot_claude": (results_dir / "llm_fewshot_anthropic_results.json", None),
+        "llm_zeroshot_gpt4o": (results_dir / "llm_zeroshot_openai_results.json", None),
+        "llm_fewshot_gpt4o": (results_dir / "llm_fewshot_openai_results.json", None),
+        "llm_zeroshot_local": (results_dir / "llm_zeroshot_local_results.json", None),
+        "llm_fewshot_local": (results_dir / "llm_fewshot_local_results.json", None),
+    }
+    if seed_avg:
+        sweep_dir = results_dir / "seed_sweep"
+        configs["roberta_best"] = (sweep_dir / "base_meta_sqrtw_seedavg_results.json", None)
+        configs["modernbert"] = (sweep_dir / "modernbert_meta_sqrtw_seedavg_results.json", None)
+
+    loaded = {}
+    for name, (path, keys) in configs.items():
+        if path.exists():
+            loaded[name] = load_results(path, keys)
+            print(f"Loaded {name}: mean F1={loaded[name]['f1'].mean():.4f}, "
+                  f"mean AUC={loaded[name]['auc'].mean():.4f}")
+        else:
+            print(f"WARNING: {path} not found, skipping {name}")
+
+    if "roberta_best" not in loaded:
+        print("roberta_best missing -- skipping model-family comparisons")
+        return
+
+    print(f"\n{'='*80}")
+    print("MODEL-FAMILY SIGNIFICANCE TESTS (Wilcoxon signed-rank, two-sided)")
+    print(f"{'='*80}\n")
+
+    comparisons = [("roberta_best", other) for other in
+                   ["modernbert", "qwen25_1.5b_lora", "qwen25_1.5b_lora_pretrained", "svm", "gradient_boosting", "llm_zeroshot_claude", "llm_fewshot_claude",
+                    "llm_zeroshot_gpt4o", "llm_fewshot_gpt4o",
+                    "llm_zeroshot_local", "llm_fewshot_local"]
+                   if other in loaded]
+
+    all_results = []
+    for metric in ["f1", "auc"]:
+        print(f"\n--- {metric.upper()} ---\n")
+        metric_results = []
+        for name_a, name_b in comparisons:
+            res_a, res_b = loaded[name_a], loaded[name_b]
+            if res_a["projects"] != res_b["projects"]:
+                print(f"SKIPPING {name_a} vs {name_b}: project sets don't match "
+                      f"({res_a['projects']} vs {res_b['projects']})")
+                continue
+            metric_results.append(compare_pair(name_a, res_a, name_b, res_b, metric))
+        # Holm correction across this metric's family of comparisons
+        for result, p_holm in zip(metric_results,
+                                  holm_adjust([r["p_value"] for r in metric_results])):
+            result["p_holm"] = float(p_holm)
+            result["significant_holm_005"] = bool(p_holm < 0.05)
+            effect = interpret_effect(result["cohens_d"])
+            sig = "**" if result["significant_001"] else ("*" if result["significant_005"] else "")
+            print(f"{result['comparison']:<35} diff={result['mean_diff']:+.4f} "
+                  f"d={result['cohens_d']:+.3f} ({effect}) p={result['p_value']:.4f} "
+                  f"p_holm={p_holm:.4f} {sig}")
+        all_results.extend(metric_results)
+
+    suffix = "_seedavg" if seed_avg else ""
+    out_path = results_dir / f"significance_tests_model_family{suffix}.json"
+    with open(out_path, "w") as f:
+        json.dump({"method": "Wilcoxon signed-rank (model family), Holm-corrected per metric",
+                   "seed_averaged": seed_avg,
+                   "roberta_source": str(configs["roberta_best"][0]),
+                   "comparisons": all_results}, f, indent=2)
+    print(f"\nModel-family results saved to {out_path}")
+
+
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--seed_avg', action='store_true',
+                        help='Only run model-family tests, using seed-averaged per-fold '
+                             'F1 for the fine-tuned models (run aggregate_seed_sweep.py first)')
+    args = parser.parse_args()
     results_dir = Path("gcp_results")
+    if args.seed_avg:
+        run_model_family_comparisons(results_dir, seed_avg=True)
+        return
 
     # Define all configurations to compare
     configs = {
@@ -175,6 +292,8 @@ def main():
     with open(out_path, "w") as f:
         json.dump(output, f, indent=2)
     print(f"\nResults saved to {out_path}")
+
+    run_model_family_comparisons(results_dir)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,1510 @@
+%==============================================================================
+% Designing Software-Intensive Enterprise Systems:
+% A Critical Review of Eight Systems Traditions and a Research Agenda
+% for Measuring Design Work
+%
+% Target venue: Systems (MDPI), Review article
+%
+% NOTE ON CLASS FILE. This draft uses the standard `article' class so that it
+% compiles anywhere without the MDPI template installed. To convert for
+% submission, download the Systems LaTeX template from
+% https://www.mdpi.com/authors/latex and move the frontmatter into the
+% \Title / \Author / \abstract / \keyword macros of mdpi.cls. The section
+% order below already matches MDPI's expected layout, including the required
+% back matter.
+%==============================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds}
+\usepackage{setspace}
+\usepackage{lineno}
+
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
+
+\newcommand{\rq}[1]{\textbf{RA#1}}
+
+\title{\bfseries Designing Software-Intensive Enterprise Systems:\\
+A Critical Review of Eight Systems Traditions and a\\
+Research Agenda for Measuring Design Work}
+
+\author{
+Steven M. Morgan\thanks{Corresponding author: \url{smorgan@binghamton.edu}}\\
+\small Department of Systems Science and Industrial Engineering\\
+\small Binghamton University, State University of New York, Binghamton, NY 13902, USA
+\and
+Jeff Daniels\\
+\small Graduate School of Technology\\
+\small University of Maryland Global Campus, Adelphi, MD 20783, USA
+}
+
+\date{}
+
+\begin{document}
+
+\onehalfspacing
+\linenumbers
+
+\maketitle
+
+%==============================================================================
+\begin{abstract}
+\noindent
+Software-intensive enterprise systems are designed by one community and
+evaluated by another. Eight distinct traditions---systems of systems (SoS),
+enterprise architecture (EA), enterprise systems engineering (ESE), complex
+adaptive systems (CAS), design thinking, systems thinking, systems science, and
+system dynamics---each offer an account of how such systems should be conceived,
+bounded, and improved, while the software engineering community independently
+measures the artifacts those designs produce. This article reviews the eight
+traditions as a single comparative landscape rather than as separate
+literatures, and asks a question that none of them answers on its own: how would
+we know, from evidence rather than from assertion, whether design work improved
+a system? We find three failure modes that recur across all eight traditions.
+First, a \emph{boundary blind spot}: every tradition acknowledges that emergent
+behavior concentrates where constituent systems and the humans operating them
+meet, and every tradition then delegates that region to some other discipline.
+Second, a \emph{measurement deficit}: proposals to quantify design value depend
+almost entirely on expert elicitation---stakeholder scoring, retrospective case
+narration, participatory model building---which does not scale, cannot be
+replicated, and is not independent of the designers being evaluated. Third,
+\emph{evidentiary asymmetry}: the traditions are supported overwhelmingly by
+successful case narratives, with no comparable corpus of negative results,
+leaving effect sizes unknown. We argue that these are one problem, not three:
+the field lacks an observational instrument for design activity. We then set out
+a five-part research agenda that treats the operational record of software
+projects---issue trackers, commit histories, and design discussions---as the
+missing instrument, and specify what each tradition would need to commit to for
+its claims to become falsifiable. The agenda is illustrated with the emerging
+practice of design mining, the automated classification of design-related
+discussion in engineering artifacts, and we discuss the construct-validity
+conditions under which such measurements could legitimately stand in for design
+work.
+\end{abstract}
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} systems of systems; enterprise architecture;
+enterprise systems engineering; complex adaptive systems; systems thinking;
+system dynamics; design thinking; socio-technical systems; software
+architecture; design mining; research agenda
+\vspace{1em}
+
+%==============================================================================
+\section{Introduction}
+%==============================================================================
+
+There is a persistent gap between how information technology systems are
+designed and how they are implemented. The gap does not typically present as
+minor deviation. Critical requirements are misconstrued entirely, and users are
+left to sustain workarounds that quietly become the operational system. This is
+not a niche observation. The Standish Group's CHAOS report, drawing on roughly
+5{,}000 software projects annually, found that between 2010 and 2015 only 36\%
+to 41\% of software projects were judged successful, with approximately 20\%
+classified as outright failures and the remainder challenged~\citep{standish2015}.
+Worldwide IT spending was projected to exceed \$5 trillion in
+2024~\citep{gartner2024}. A recent synthesis of three decades of project success
+surveys confirms that the definitional instability of ``success'' has itself
+been a barrier to cumulative knowledge~\citep{loureiro2024}, and practitioner
+surveys continue to report that more than a third of information systems
+projects only partially succeed or fail outright~\citep{pereira2021}. By
+contrast, engineering projects with physical constraints---mining, power
+generation, renewables---report markedly higher success rates on the same
+on-time, on-budget, in-scope criteria.
+
+The disciplines responsible for closing this gap have not been idle. Over five
+decades, at least eight identifiable traditions have developed accounts of how
+complex socio-technical systems should be conceived, decomposed, bounded, and
+improved: systems of systems (SoS) architecture, enterprise architecture (EA),
+enterprise systems engineering (ESE), complex adaptive systems (CAS), design
+thinking, systems thinking, systems science, and system dynamics. Each has
+produced frameworks, standards, professional bodies, and case evidence. Each
+explicitly acknowledges that designing systems not constrained by the physical
+world is harder than designing those that are, and that the difficulty is
+largely human in origin.
+
+What these traditions have not produced is a shared, external way of telling
+whether their prescriptions work. Enterprise architecture, the tradition with
+the most direct claim on industrial practice, offers the clearest illustration:
+after decades of adoption, it remains difficult to articulate how EA creates
+value~\citep{gong2019,saintlouis2017}, and the serious attempts to quantify the
+value of architectural decisions have relied on stakeholder
+scoring~\citep{moore2003} or qualitative workshop
+consensus~\citep{nord2014}---instruments that require the continuous
+participation of the very people whose work is being evaluated.
+
+Meanwhile, an entirely separate research community has spent the same period
+building quantitative instruments over the operational residue of software
+work. Defect prediction, effort estimation, issue classification, and
+architecture-degradation detection all operate on version control histories,
+issue trackers, and developer discussion at a scale of hundreds of thousands of
+records~\citep{aleti2013,tawosi2022,zangari2023,herold2020}. This community
+measures prolifically but seldom asks the design-theoretic question: it predicts
+that defects will occur without asking whether an architectural decision caused
+them.
+
+The two communities are addressing the same underlying phenomenon from opposite
+ends and are not meeting in the middle. This article is about that gap.
+
+\subsection{Contribution and structure}
+
+This is a critical review with a constructive aim. We make four contributions.
+
+\begin{enumerate}
+\item \textbf{A comparative landscape.} We review eight systems design
+traditions against a common analytical frame---unit of analysis, treatment of
+human agency, stance toward emergence, evidence base, and measurement
+instrument---rather than reviewing each in its own terms
+(Sections~\ref{sec:foundations}--\ref{sec:pm}). To our knowledge these eight
+literatures have not previously been placed side by side on a measurement
+criterion.
+
+\item \textbf{Three cross-cutting failure modes.} We identify and evidence a
+boundary blind spot, a measurement deficit, and an evidentiary asymmetry that
+appear in all eight traditions, and argue they are surface expressions of a
+single missing capability (Section~\ref{sec:synthesis}).
+
+\item \textbf{A diagnosis.} We argue the field lacks an observational instrument
+for design activity---something that can detect design work in progress, at
+scale, without the cooperation of the designers---and we specify what such an
+instrument would have to satisfy (Section~\ref{sec:gap}).
+
+\item \textbf{A five-part research agenda.} We set out concrete, falsifiable
+research directions that would convert each tradition's central claim into a
+testable proposition, and identify what each tradition must commit to in
+exchange (Section~\ref{sec:agenda}).
+\end{enumerate}
+
+Section~\ref{sec:method} states the scope and method of the review and is
+explicit about what kind of review this is and is not.
+Section~\ref{sec:threats} discusses the limitations of the review itself, and
+Section~\ref{sec:conclusions} concludes.
+
+%==============================================================================
+\section{Scope and Review Method}
+\label{sec:method}
+%==============================================================================
+
+This is a \emph{critical narrative review} in the sense used in the systems
+literature: an argued synthesis organized around a thesis, not an exhaustive
+enumeration organized around a search protocol. We state this plainly because
+the distinction bears on how the findings should be read.
+
+\subsection{What was reviewed}
+
+The corpus was assembled around the question \emph{how does each tradition
+justify the claim that its form of design improves system outcomes?} Sources
+were drawn from four pools:
+
+\begin{itemize}
+\item \textbf{Defining and standardizing sources} for each tradition---the
+ISO/IEC/IEEE 21839 definition of systems of systems~\citep{iso21839}, Maier's
+architecting principles~\citep{maier1998}, Holland on complex adaptive
+systems~\citep{holland1992}, Klir on systems science~\citep{klir2001}, Forrester
+on system dynamics~\citep{forrester2009}, the SEBoK treatment of enterprise
+systems engineering~\citep{sebok_ese2024}, and the Zachman and TOGAF
+frameworks~\citep{zachman_nd,bente2012}.
+
+\item \textbf{Existing systematic reviews and surveys within each tradition},
+which were used as coverage proxies rather than re-executed: Saint-Louis et
+al.'s review of 174 EA papers~\citep{saintlouis2017}, Gong and Janssen's review
+of EA value creation~\citep{gong2019}, Nielsen et al.'s survey of SoS modeling
+techniques~\citep{nielsen2015}, Arnold and Wade's survey of systems thinking
+definitions~\citep{arnold2015}, Lapalme et al.'s grand-challenges
+synthesis~\citep{lapalme2016}, and Aleti et al.'s systematic review of 188
+software architecture optimization papers~\citep{aleti2013}.
+
+\item \textbf{Application and case papers} that report the traditions in use,
+selected to span domains---healthcare and telecommunications~\citep{kotze2016},
+defense and national security~\citep{morgan2023}, business process
+management~\citep{fleischmann2016}, health promotion~\citep{vanbeurden2011}, and
+commercial product organizations~\citep{dunne2018,monat2020}.
+
+\item \textbf{Computational software-engineering work} that measures the
+artifacts of design at scale, included specifically to test whether the
+measurement deficit identified in the systems traditions is also present
+there~\citep{aleti2013,mahadi2021,tawosi2022,zangari2023,kleebaum2021,sharma2021,dhaouadi2023}.
+\end{itemize}
+
+\subsection{What this review is not}
+
+We did not execute a registered search protocol with reproducible strings,
+database-by-database yields, or PRISMA-style inclusion counts. Readers should
+therefore treat the coverage claims as \emph{argued} rather than
+\emph{exhaustive}. Where we assert that a tradition does not address a question,
+that assertion is grounded in the defining sources and in the existing
+systematic reviews of that tradition, both of which are cited at the point of
+claim; it is not grounded in a negative search result. Section~\ref{sec:threats}
+returns to what this costs the argument.
+
+\subsection{The comparative frame}
+
+Each tradition is examined against five questions, chosen because they are the
+minimum needed to compare traditions that do not share vocabulary:
+
+\begin{enumerate}
+\item \textbf{Unit of analysis.} What object does the tradition take as the
+system to be designed?
+\item \textbf{Human agency.} Are people modeled as components, as stakeholders,
+as designers, or not at all?
+\item \textbf{Stance toward emergence.} Does the tradition treat emergent
+behavior as controllable, as mitigable, or as irreducible?
+\item \textbf{Evidence base.} What kind of evidence supports the tradition's
+central claim?
+\item \textbf{Measurement instrument.} What, concretely, would one measure to
+falsify the tradition's claim?
+\end{enumerate}
+
+Table~\ref{tab:landscape} in Section~\ref{sec:synthesis} presents the completed
+frame.
+
+%==============================================================================
+\section{Foundations: Complex Systems, Enterprises, and Organizations}
+\label{sec:foundations}
+%==============================================================================
+
+Before comparing traditions it is necessary to fix three terms that they use
+differently, because much of the apparent disagreement between them is
+definitional.
+
+\textbf{Complex systems} exhibit emergent and at times chaotic properties and
+resist characterization because of the number of interacting properties that
+govern their behavior~\citep{siddique2024}. Critically, complex systems exist
+independently of human-defined constructs; a system does not become complex
+because we named it so.
+
+\textbf{Enterprise systems} are socio-technical systems designed and created to
+serve a purpose for an organization~\citep{xu2016}. An organization may be an
+enterprise system or may comprise several. An enterprise system may or may not
+also be a complex system, depending on whether it exhibits emergent or chaotic
+behavior. This conditional relationship matters: much of the systems design
+literature implicitly assumes that enterprise systems are complex systems and
+imports the attendant epistemic humility, while much of the practitioner
+literature implicitly assumes they are merely complicated and imports the
+attendant confidence that sufficient analysis will yield a correct design.
+
+\textbf{Enterprises} can be distinguished from \textbf{organizations}, though
+the two are frequently conflated. Organizations are well-defined structures
+describing relationships between individuals and groups. Enterprises may be
+self-organizing, may lack a single point of control, and therefore may not be
+organizations at all. The decisive difference is teleological: enterprises exist
+to create value, whereas an organization need not
+~\citep{sebok_ese2024,kotze2016}. A tradition that takes the organization as its
+unit of analysis and a tradition that takes the enterprise as its unit will
+disagree about scope even when they agree about method.
+
+With these distinctions in place, the recurring structure of the field becomes
+visible. Systems of systems, enterprise architecture, enterprise systems
+engineering, systems thinking, and design thinking all attempt to capture the
+intent of a system and to shape it so that it performs well. All acknowledge a
+distinctly human element. All can point to successful case studies. All can also
+point---though they rarely do in print---to attempts that were not productive.
+The sections that follow take each in turn.
+
+%==============================================================================
+\section{Systems of Systems}
+\label{sec:sos}
+%==============================================================================
+
+ISO/IEC/IEEE 21839 defines a system of systems as a ``set of systems or system
+elements that interact to provide a unique capability that none of the
+constituent systems can accomplish on its own,'' where a constituent system is
+``an independent system that forms part of a system of systems''~\citep{iso21839}.
+
+Maier's foundational treatment deliberately declines to build a taxonomy,
+arguing that any proposed classification is rife with ambiguity and conflict and
+that specific examples expose subtleties the categories cannot
+hold~\citep{maier1998}. In place of taxonomy, Maier offers architecting
+principles: focus on communications, policy control, interfaces, and
+cooperation. The prescription that follows is consequential---in environments
+requiring many distinct groups to collaborate, the appropriate move is to
+encourage cooperative effort, because cooperation reduces dependency among
+constituent parts.
+
+This is in explicit contrast to building a monolith: a large, complicated system
+whose parts provide marginal standalone utility yet are required for the whole
+to function. Most components of an automobile are useless in isolation; a
+radiator cools an engine and does little else. The internet is the canonical
+positive example, built on standards for communication, interfaces, cooperation,
+and policy, with Maier's principles visible at each layer and preserved as
+higher layers were built on the base technical layers.
+
+Two limitations recur. First, the modeling literature has concentrated on
+engineered rather than socio-technical systems. Nielsen et al. surveyed the
+modeling techniques in use and enumerated the academic and professional bodies
+advancing the field, and while they acknowledge that modeling socio-technical
+systems is an important problem, they explicitly leave the engineering of those
+requirements to other publications~\citep{nielsen2015}. The acknowledgment
+without the treatment is the pattern this review returns to repeatedly.
+
+Second, where socio-technical constraints are engaged, the result tends to be
+descriptive rather than predictive. Fleischmann et al. combine SoS with
+Subject-Oriented Business Process Management (SBPM), using SoS to determine
+which parts of a business process can be treated as independent systems and
+invoking Maier's criteria to establish that a process fragment may be a
+constituent system capable of operating and managing itself~\citep{fleischmann2016}.
+SBPM treats messages within a business process as encapsulation, which maps
+cleanly onto the SoS notion of an interface, and it explicitly permits variation
+driven by local law, IT implementation, or market dynamics. The resulting
+Pattern-Based Engineering framework does consider socio-technical systems and
+their constraints. What it does not provide is any account of how the model
+would improve decision making under uncertain dynamics, or how it would
+translate into a simulation. Its conclusion is a statement about swappability:
+the framework identifies which aspects of similar systems could be exchanged.
+
+The interoperability consequences are vivid in the defense domain. Morgan and
+Wightman describe U.S. military systems designed thirty to fifty years ago that
+were never intended to communicate seamlessly across service branches or with
+supply chain partners~\citep{morgan2023}. Battle management systems were built
+to serve individual branches, and even within a single branch they comprise
+multiple lower-level environments that do not share data. ``System integration''
+in practice reduces to an operations analyst physically turning to a different
+monitor. The fragmentation extends past the battlespace into the defense supply
+chain, where original equipment manufacturers and their tiered suppliers operate
+with divergent data models, inconsistent part numbering between engineering and
+enterprise resource planning systems, and no common digital thread linking
+product lifecycle to field operations. Their proposed remedy---treating the
+defense enterprise as the sum of all its parts, with standardized data threads
+enabling an extended Observe--Orient--Decide--Act loop spanning both campaigns
+and supply chain---is an architectural claim about boundaries.
+
+\paragraph{Assessment.} SoS is tightly coupled to systems engineering and
+enterprise architecture: an enterprise architecture is in effect built from an
+SoS design, and systems engineering is used to design, build, and measure the
+effectiveness of the result. The tradition's characteristic gap is a lack of
+emphasis on the human-centric aspects of system design, and specifically on what
+happens when humans interact at the boundaries between constituent systems.
+Constituent systems may be operationally independent, but mission effectiveness
+requires architectural coordination precisely at the boundaries---which is the
+region the tradition's own frameworks leave least specified.
+
+%==============================================================================
+\section{Enterprise Architecture}
+\label{sec:ea}
+%==============================================================================
+
+Enterprise architecture describes organizational and business systems, technical
+systems, their boundaries, and their interactions, and produces artifacts such
+as roadmaps and models to support the design and sustainability of those
+systems. It is nonetheless difficult to articulate clearly how EA creates
+value~\citep{gong2019,saintlouis2017}. There are more than 77 distinct EA
+frameworks, largely describing similar things in different
+vocabularies~\citep{bente2012}.
+
+\subsection{A field without a definition}
+
+Saint-Louis et al. conducted a systematic literature review of 174 papers
+seeking a consensus definition of EA and concluded that EA is better understood
+as a community with definitions that vary by need than as a field with a settled
+object of study~\citep{saintlouis2017}. They encourage the community to clarify
+EA's intent, and note that consensus is needed. For a review concerned with
+measurement this is a structural finding, not a terminological quibble: a field
+without an agreed object of study cannot accumulate evidence about whether
+acting on that object helps.
+
+\subsection{Value creation and its myths}
+
+EA is not in itself a value creator; its function is to create more effective
+pathways for a business to develop value. Gong and Janssen argue that EA's value
+is realized through stakeholder alignment and through risk assessment preceding
+enterprise initiatives, and their systematic review spans communications,
+knowledge management, transformation, and strategic and political
+implications~\citep{gong2019}. They conclude by naming four myths:
+
+\begin{itemize}
+\item that EA creates value;
+\item that all aspects of the enterprise can be captured;
+\item that the architectural vision should not be constrained by path
+dependence;
+\item that complexity can be reduced.
+\end{itemize}
+
+Each of these myths reappears in the other traditions reviewed here, which
+suggests they are properties of the design problem rather than pathologies of EA.
+
+Attempts to put numbers on architectural value are instructive. Moore et al.
+sought to quantify architecture effort using qualitative measures such as
+stakeholder quality~\citep{moore2003}; Nord et al. reviewed several approaches
+to capturing design quality and impact metrics, all of which involved
+qualitative scoring~\citep{nord2014}. Both approaches require direct and
+sustained involvement from individuals to capture the information consistently.
+This is the measurement deficit in its purest form: the only available instrument
+is the practitioner's own judgment, elicited at the practitioner's own cost.
+
+\subsection{Schools of thought and framework structure}
+
+Lapalme distinguishes three schools of EA thought~\citep{lapalme2012}. The
+\emph{Enterprise IT} perspective emphasizes the technical stack and seeks
+business alignment. The second treats the enterprise as a socio-technical
+system, encompassing technology, structure, policy, and other non-technical
+determinants of behavior. The third considers an extended enterprise heavily
+influenced by its environment, and focuses on creating an innovative, adaptive,
+learning organization in a manner closely related to Senge's organizational
+learning construct~\citep{senge2018}. The schools are not merely different
+emphases; they imply different units of analysis and therefore different
+evidence.
+
+The operational purpose of EA is to verify that systems developed within an
+organization align with higher-level organizational aspirations. This matters
+most in large organizations with many departments and business units: when
+individual units are given similar resources and objectives without guidance
+from a coordinating function, duplication and redundancy are inevitable, and it
+is genuinely difficult to determine when redundancy is beneficial and when it is
+merely duplicative spending~\citep{dunne2018}. EA attempts to guide this through
+policy---steering away from duplication where it does not serve the enterprise,
+while preserving autonomy where units need it. Pattern-based engineering
+(Section~\ref{sec:sos}) offers related guidance for how geographically or
+operationally distinct departments can interact. SoS architecture is frequently
+invoked by EA efforts, but there remains a lack of clarity about how to
+integrate the technical and the social
+constructs~\citep{lapalme2012,nielsen2015}.
+
+The Zachman Framework organizes EA as a matrix of interrogatives and
+perspectives, on the premise that the combined interrogatives, perspectives, and
+their instantiations constitute an enterprise architecture. It does consider
+social aspects of systems design, and its rows are explicitly \emph{not} an
+organizational hierarchy---they are different interpretations, which may be
+influenced by higher- or lower-level roles~\citep{zachman_nd}. Despite the
+conceptual cleanliness, Zachman and others acknowledge gaps in what the model can
+support~\citep{lapalme2016}.
+
+TOGAF is broadly recognized as complementary, extending past the point where
+Zachman applies. It provides tooling and describes the enterprise architect's
+responsibilities in a relatable, non-linear way, and it is cyclical---loosely
+derived from the waterfall software development lifecycle, which has clear gate
+phases from project inception to go-live. In contrast to Zachman, TOGAF accepts
+that personas and deliverables vary by context: an engineer may not need a
+process specification when a use case description would serve. Both nonetheless
+designate certain artifacts as necessary for deriving an architecture.
+
+Architectures are driven by vision and business need, which are then derived
+into the technical systems that make them practical; balancing change against
+governance and vision is well accepted. The difficulties lie in how rigorously
+the steps are followed. Implementation problems arise when emphasis falls on
+artifacts and process rather than on effective delivery~\citep{bente2012}.
+
+\subsection{Grand challenges and paths forward}
+
+Lapalme et al. identify three grand challenges for EA: increased complexity and
+uncertainty; new realities; and evolving enterprise
+architecture~\citep{lapalme2016}. These converge on the pace of change in modern
+business and the expectation that an IT organization will keep step with it.
+Increasing emphasis on social factors, combined with the pace of change,
+produces greater uncertainty. The same authors identify frameworks better
+positioned to handle uncertainty and complexity, systems thinking among them
+(Section~\ref{sec:st}).
+
+The operational environment in which a technical system runs materially
+constrains its architecture; path dependence limits the utopian desired
+state~\citep{gong2019}. The more complex the environment and the more integrated
+the system, the harder it is for stakeholders to understand the intended
+solution. Two countermeasures are proposed. \emph{System co-evolution} defines
+the system as the system is developed. \emph{Increasing the involvement of
+architecture in the problem space}---pushing the intended designed system and
+its interfaces into problem framing rather than solution specification---is
+argued to address the shortcomings of earlier techniques~\citep{cole2006}.
+
+Rhodes, Ross, and Nightingale recognize that working in an SoS requires analysis
+of many attributes affecting the creation and change of socio-technical
+systems~\citep{rhodes2009}. As in other frameworks, context must be weighed
+rather than any single aspect; myopic focus on one aspect produces a challenged
+system. Policy, strategy, knowledge, product, external factors, and technology
+must all be assessed for their impact on the whole. Their central observation is
+that the ``to-be'' design is usually far from the ``as-is,'' and their remedy is
+an epoch-based approach in which the system is gradually defined and
+intermediate states are analyzed during development. Defining epochs as points
+in time at which the system changes provides a means of soliciting feedback on
+implementation progress, and this genuinely fills part of the space between
+proposed utopia and current gap.
+
+\paragraph{Assessment.} The epoch-based approach nonetheless illustrates the
+tradition's limit. The factors used to define the epochs may be orthogonal to
+what is actually intended; laying out intermediate steps improves implementation
+but remains bounded by what human cognition can hold. The approach does not
+account for emergent behavior---it acknowledges that emergence exists.
+
+%==============================================================================
+\section{Enterprise Systems Engineering}
+\label{sec:ese}
+%==============================================================================
+
+Enterprise systems engineering combines traditional systems engineering with
+strategic management practice to align system development and design with
+desired business outcomes. Where systems engineering focuses on developing a
+specific product and the supporting structures that enable it, ESE treats the
+organization itself as a system and holds that the system must produce
+value~\citep{kotze2016}. Producing or enhancing that value, and designing the
+enterprise to do so, is ESE's primary responsibility.
+
+The relationship between ESE and EA is contested and depends on organizational
+context. Kotze and Smuts argue that ESE \emph{contains} EA, adding the shaping
+of organizational vision and the definition of value outcomes~\citep{kotze2016}.
+TOGAF makes structurally similar arguments on behalf of EA, with less emphasis
+on strategic management practice. The substantive point beneath the demarcation
+dispute is uncontroversial: if a system is being designed and implemented,
+business goals and constraints must be considered for the system to be of value.
+
+Kotze and Smuts review two cases in which information technology systems were
+designed to improve operations---a South African healthcare system and a
+telecommunications system---applying ESE to shape program outcomes. They claim
+success and offer lessons learned from each case, and those lessons re-emphasize
+the merits of ESE.
+
+\paragraph{Assessment.} This is the evidentiary asymmetry in miniature. Two
+cases, selected by the proponents, analyzed retrospectively by the proponents,
+yielding lessons that confirm the approach. Nothing in the study design could
+have produced a disconfirming result. We are not suggesting the cases are
+misreported; we are observing that the tradition has no mechanism by which a
+case could count against it, and therefore no way to estimate how large its
+effect is or under what conditions it disappears.
+
+%==============================================================================
+\section{Complex Adaptive Systems}
+\label{sec:cas}
+%==============================================================================
+
+Complex adaptive systems are characterized by three properties: evolution,
+aggregate behavior, and anticipation~\citep{holland1992}. CAS can be understood
+as systems that have no clear governing rules yet act toward common goals. The
+immune system is the accessible example: it is effective at reducing threats to
+the body, yet is not understood well enough to be fully recreated or repaired
+unconditionally, and it adapts in anticipation of future threats. Comparable
+complexity exists in supply chains and many other domains, and CAS is an attempt
+to group and describe systems of this kind.
+
+CAS has no single governing rule set and no clear representative equations.
+There are equations that can simulate complex and emergent behavior---partial
+differential equations, cellular automata, models of bird
+migration~\citep{stevens2021}---but no generic rules for deriving such elegant
+descriptions for an arbitrary CAS. Modeling and simulation has attempted to fill
+the gap, and known limitations remain in what those models can do.
+
+The tradition has been taken up in management development as a means of
+understanding organizational maturation, on the premise that an organization is
+not subject only to the constraints and boundaries it explicitly
+adheres to~\citep{luoma2006}. Management development is conflicted by divergent
+directions and implementations: what a manager seeks to accomplish may conflict
+with the direction they have been given, and that conflict creates inherent
+inefficiency. Luoma's Four Arenas are descriptive states developed using CAS as
+a framework, and the argument is that the four states help acknowledge
+complexity and the need for better techniques in management development.
+
+CAS relates closely to the study of complexity and its interpretations---both
+Holland and Luoma acknowledge this---and it heavily influenced Cynefin, a
+sense-making framework for complexity~\citep{kurtz2003} that has since been
+applied in domains as distant from software as health
+promotion~\citep{vanbeurden2011}.
+
+\paragraph{Assessment.} CAS is the one tradition in this review that is
+epistemically honest about emergence: it treats emergent behavior as
+irreducible rather than as controllable or mitigable. That honesty is purchased
+at the cost of prescriptive power. CAS explains why enterprise design is hard;
+it does not tell a practitioner what to do on Monday, and it offers no
+measurement instrument of its own.
+
+%==============================================================================
+\section{Design Thinking}
+\label{sec:dt}
+%==============================================================================
+
+Design thinking addresses some of the social constructs that systems engineering
+and EA underserve, though it is arguably an implementation process rather than a
+theory of systems. It begins by understanding and empathizing with a problem;
+once the challenge is understood, brainstorming generates candidate solutions; a
+solution is selected, prototyped, and tested~\citep{dam2024}. One can argue that
+the customer-focused mindset mitigates the concerns raised
+above~\citep{dunne2018}. Design thinking places particular emphasis on the
+development of a solution. Its roots trace to industrial design in the 1920s,
+and it has taken hold within agile development methodologies because it
+encourages iterative improvement.
+
+Its relationship to systems thinking is unsettled---the two have been
+characterized as identical, distinct, integrated, and interactive. The clearest
+delineation is that systems thinking emphasizes the relationships and boundaries
+of a system while design thinking emphasizes cognitive
+solutions~\citep{greene2017}. The origins differ and both have been applied
+successfully.
+
+Design thinking has been broadly adopted and its success rate has been
+challenged. Organizations designed for efficiency do not create the space needed
+to empathize toward optimal solutions; their purpose is to convert raw materials
+into refined output. Design thinking is only loosely accepted as a process and
+contends with cultural norms in such organizations.
+
+The method has shown promise in think tank and laboratory settings that are not
+graded strictly on output and are encouraged to innovate. This produces a
+paradox. Organizations strive to be innovative, but without autonomy they do not
+thrive; businesses must be efficient to survive, and efficiency is often
+achieved through strict process adherence. The paradox can be overcome, but
+environment and leadership must align and act promptly. Where executive
+leadership creates the appropriate culture, design thinking can
+thrive~\citep{dunne2018}.
+
+\paragraph{Assessment.} Design thinking's dependency on organizational culture
+is stated as a boundary condition but never operationalized. ``Leadership
+created the appropriate culture'' is not a measurable antecedent, which means
+that any failure of design thinking can be attributed post hoc to insufficient
+cultural support. This is unfalsifiable in the strict sense, and it is a
+recurring structural weakness rather than a criticism of any individual study.
+
+%==============================================================================
+\section{Systems Thinking}
+\label{sec:st}
+%==============================================================================
+
+Systems thinking adopts a causal perspective on an environment and the factors
+affecting it, encouraging a holistic and broad view and challenging myopic ones.
+It shares much with other approaches to studying systems while sustaining its
+own following. It differs from systems engineering, enterprise architecture, and
+SoS architecture in that it does not emphasize aspects of system \emph{design};
+it emphasizes understanding systems as they exist.
+
+Arnold and Wade define it as ``a set of synergistic analytic skills used to
+improve the capability of identifying and understanding systems, predicting
+their behaviors, and devising modifications to them in order to produce desired
+effects''~\citep{arnold2015}. Their survey of prevailing definitions evaluates
+each against a verification test---less a rigorous test than a set of criteria
+any accepted definition should satisfy---and their own definition combines the
+aspects surveyed, adjusted to pass that test. The result is a widely accepted
+definition reflecting the many aspects considered critical to a thorough
+understanding of a system.
+
+Senge uses \emph{The Beer Game} to introduce the problems created by not
+considering systemic behavior. A convenience store sells a certain number of
+cases each week and continues to order the same number. The distributor receives
+orders from all the stores in its region and continues to ship and receive on
+behalf of the brewery, to which it places its own orders. The brewery supplies
+distributors on the basis of consistent demand. All three actors share the same
+motive---to buy and sell beer---yet none is concerned with the problems the
+others face elsewhere in the system. A sudden surge in demand is introduced and
+participants must adjust to the new dynamics. Through the game, students learn to
+see a system as the whole of its parts and the relationships among them.
+
+Many difficulties in thinking systemically are not difficulties of capability
+but of vocabulary: people do not know how to communicate in the appropriate
+terms. One can easily describe one's response to being scalded by hot water; it
+is much harder to articulate a problem with many contributing factors. Causal
+loop analysis using reinforcing and balancing loops is a simple tool for doing
+so, and outlining relationships among stocks and flows can help build
+organizations genuinely capable of adopting and designing effective systems.
+Senge's fuller argument holds that alongside systems thinking one must
+continually develop personal mastery, adapt mental models, build shared vision,
+and practice team learning, and that organizations applying these principles can
+excel in challenging circumstances~\citep{senge2018}.
+
+Monat, Amissah, and Gannon apply systems thinking to business problems across a
+range of contexts, though their perspective is retrospective~\citep{monat2020}.
+They provide a robust literature base for the claim that systems thinking is not
+well adopted in industry and present examples illustrating failures that
+followed from not adopting systems thinking methodologies, often in conjunction
+with overemphasis on products. Soft Systems Methodology, Hard Systems
+Methodology, and Critical Systems Methodology are reviewed to contextualize how
+systems thinking is applied, yet a clear means of adopting them within an
+organization remains absent. They identify common failure modes in which systems
+thinking would have yielded a more complete solution, and recommend steps for
+advancing systems thinking in business model application. They explicitly call
+out the need to design a \emph{user experience system}: developing the support
+structures surrounding a product can matter as much as the product itself, and a
+product superior in isolation will not sustain success without them.
+
+Applying systems thinking to business models differs from modeling business or
+technical systems. Monat et al. support their findings with a broad reference
+base and refer specifically to Sterman for depth on modeling; they include
+causal loop analyses of the systems they review, a tool Sterman uses to develop
+models of business dynamics.
+
+\paragraph{Assessment.} Systems thinking provides a robust framework for
+understanding problems that are not strictly technical, and it allows for
+emergent behavior at system boundaries much as Maier does. But Monat et al.
+argue these factors are more likely within the control of the system designer,
+and that emergent properties can be mitigated through appropriate controls. This
+review takes the opposing position: boundaries between socio-technical systems
+are precisely where emergent behavior resists management, and the breadth of
+methodologies addressing them does not clearly support the claim that such
+behavior can be controlled.
+
+%==============================================================================
+\section{Systems Science}
+\label{sec:ss}
+%==============================================================================
+
+Systems science comprises three primary elements: inter- and
+transdisciplinarity, theories of systems, and systems approaches. Within it lies
+a desire to define a system clearly~\citep{hieronymi2013}. Klir defines a system
+as things and their relationships to other things---an accepted definition at
+the highest level of abstraction---and network science, used to visualize and
+study relationships among things within a system, is a subfield of systems
+science~\citep{klir2001,hieronymi2013}.
+
+Klir further argues that for a field to be a science there must be an agreed
+object of study and a corpus of knowledge, and defines systems science as ``a
+science whose domain of inquiry consists of those properties of systems and
+associated problems that emanate from the general notion of
+systemhood''~\citep{klir2001}. Read against Saint-Louis et al.'s finding that EA
+has no consensus definition~\citep{saintlouis2017}, Klir's criterion is a
+pointed one.
+
+Systems science offers a contrast to enterprise architecture and its influencing
+fields that is not as clean as it first appears. Hieronymi argues that the many
+streams defining and exploring systems create
+inefficiencies~\citep{hieronymi2013}. EA is focused on system design; systems
+science integrates the phenomenological sciences from a mathematical
+perspective, while EA takes cognitive, social, and technological systems as
+inputs. A significant gap nonetheless persists between how a systems scientist
+would seek to understand and define a system and how an enterprise architect
+would do the same.
+
+The influencing fields are similar for both. Yet, as Klir and Hieronymi would
+argue, because the respective fields are not genuinely practicing
+transdisciplinary approaches, they have diverged in method. This is the
+underlying motivation of the present review: system design and software
+engineering, which at their core seek to solve the same kinds of problems, have
+diverged in theory and in practice, and both fields can be advanced by
+examining and closing that gap.
+
+One area that has progressed markedly is the study of dynamic and complex
+systems. Methods rooted in systems science---simulation, soft computing or
+computational intelligence, statistical analysis---have been advanced by
+complex systems research. These concepts have yet to make a meaningful impact on
+the execution of enterprise system design, which is genuinely affected by all of
+the phenomenological fields systems science integrates.
+
+%==============================================================================
+\section{System Dynamics}
+\label{sec:sd}
+%==============================================================================
+
+Like systems science, system dynamics emphasizes interdisciplinary study. It
+views the world through a causal loop lens in which problems, actions, and
+results have continuously accumulating and depleting effects. Its primary tools
+are stock and flow diagrams, causal loop analysis, differential equations, and
+computer simulation. Complex systems in system dynamics are understood as
+fifth-order, nonlinear, dynamic systems whose relationships may be
+comprehensible to humans only through simulation, and the tradition recognizes
+cyclical behavior in which gain in one aspect is loss in
+another~\citep{forrester2009}. Where systems science is grounded in cybernetics,
+general systems theory, and complexity, system dynamics emerged from
+servomechanism engineering, and it seeks to analyze the mental models reflected
+in policy so that policy can be modified to support system
+change~\citep{lane2000}. Analysis of mental models and their policy consequences
+connects to systems science without being a primary motivation there.
+
+Forrester proposes three database types for systems modeling: mental, written,
+and numerical~\citep{forrester2009}. Mental databases contain the most knowledge
+and represent the dynamic mental framing of decision making. Decision processes
+may not be written down, and if they are not written they almost certainly do
+not exist numerically. This ordering---most knowledge in the least accessible
+form---is the sharpest statement of the measurement problem anywhere in the
+literature reviewed here, and it comes from within the tradition.
+
+\subsection{Eliciting the inaccessible}
+
+Two families of technique attempt to reach the mental database.
+
+\emph{Management flight simulators} study decision processes experimentally,
+providing controlled inputs on time series steps with feedback loops, delays,
+and stochastic behavior to simulate managerial decision making. They are, in
+essence, the interactive application of system dynamics to a business, built
+from stock and flow diagrams and causal loop analysis. Model data can be
+collected via surveys and existing organizational sources, and validated against
+the same. Organizational heuristics and decision rules can be solicited and
+incorporated. Once constructed and validated, the simulator lets managers test
+the effect of policy changes~\citep{papageorgiou2008}. Poor performance in these
+environments is attributed to feedback delays, complex feedback, and evolving
+uncertainty. Researchers have also found that more accurate mental models can be
+measured using flight simulators, and that those without clear mental models
+struggle to produce effective causal loop analyses~\citep{kunc2016}.
+
+\emph{Group model building} can drive organizational change. Team participation
+in developing a system dynamics model increases buy-in and can lead individuals
+to alter their own mental models. Community-Based System Dynamics is one form,
+addressing what is viewed as the true requirement for change: collective
+conviction. A leader may develop a model leading to a policy change, but if the
+affected group does not agree, system behavior remains
+constant~\citep{hovmand2013}. Effectiveness can be measured in two ways. One
+constructs a model with a group to evaluate which change would improve it, then
+after an agreed interval asks the group to rebuild the model so that change can
+be measured. The other measures the actual decisions made under the prior and
+proposed mental models---if a change was intended to address, for example,
+chronically excessive backlogs, backlogs can be measured once the new mental
+model is adopted~\citep{kunc2016}.
+
+System dynamics has contributed to systems thinking, systems engineering,
+systems science, and design thinking, evidenced by the migration of its concepts
+into those fields. Behavioral operations is a further field attempting to
+incorporate psychology and social factors into our understanding of systems
+behavior. Within software specifically, system dynamics has been applied to
+rework uncertainty in development projects~\citep{khatun2023}, which is among
+the closest existing links between this tradition and the operational data we
+argue for in Section~\ref{sec:agenda}.
+
+\paragraph{Assessment.} System dynamics is the only tradition reviewed that
+possesses a genuine measurement apparatus with pre/post structure and a notion
+of validation. Its limitation is throughput and independence. Flight simulators
+and group model building both require participants to be convened, instrumented,
+and re-convened; both measure the model of the world rather than the world; and
+both are administered by the analyst whose intervention is under test. They are
+laboratory instruments applied to field questions.
+
+%==============================================================================
+\section{The Role of Project Management}
+\label{sec:pm}
+%==============================================================================
+
+Software projects are designed through architecture but implemented through
+project management, and the distinction carries consequences for what can be
+measured. A project is ``the achievement of a specific objective, which involves
+a series of activities and tasks which consume resources''~\citep{munns1996}. A
+project manager, by contrast, is responsible for the budget and timing of a
+project, and therefore in practice for what is delivered within that timing.
+
+Project management can succeed despite a project's failure, and vice versa. A
+project may deliver the intended outcomes while running over budget and late; it
+may finish on time and on budget without being of meaningful value to the
+client. This is a persistent source of confusion about the role. If the project
+manager is to hold time and cost within predefined bounds, they must be involved
+in deciding what is actually delivered---and those three factors can conflict.
+Resolving that conflict is generally considered the project manager's
+responsibility. The customer's desires determine purpose and objectives; a team
+creates them; the individuals on the team best understand how long each
+component will take, and each carries their own motives and perceptions of what
+is best for themselves and the team.
+
+In software development the two primary methodologies are agile and waterfall.
+Other forms exist but are generally classifiable within one of the two; more
+than twenty recognized forms of agile project management have been
+catalogued~\citep{rasnacis2017}, and a similar categorization could be performed
+for waterfall.
+
+Agile project management emphasizes self-organizing teams focused on time and
+quality~\citep{sliger2011,rasnacis2017}; waterfall emphasizes time and cost.
+These factors are frequently in tension---only so much quality can be delivered
+for a given cost within a given time frame. Agile also emphasizes team
+integration far more than waterfall implies, often prescribing daily meetings,
+whereas waterfall is phase-gate focused with milestones agreed among large
+stakeholder groups. Agile does not prescribe project-level checkpoints; it
+encourages customer interaction through work demonstrations. Waterfall places
+higher emphasis on implementing the architecture into the design, and its
+phase-gate approach aligns more tightly with architectural artifacts: a formal
+\emph{Approval to Proceed} may require completion and signoff of the
+\emph{Concept of Operations}, and a \emph{Systems Design Review} constitutes
+formal acceptance of the \emph{Systems Design Document}.
+
+\emph{This asymmetry is directly relevant to measurement.} Waterfall generates
+discrete, dated, named design artifacts; agile distributes design work across
+conversations, tickets, and demonstrations without producing an equivalent
+record. Any instrument that measures design work by counting artifacts will
+therefore systematically under-detect design in agile projects---not because
+less design occurred, but because it was recorded differently. We return to this
+in Section~\ref{sec:agenda}.
+
+With so many implementation styles, selecting a methodology is
+difficult. Rasnacis and Berzisa developed a process to survey teams and select a
+method based on quantitative indexes of those teams, aiming to account for
+internal relationships and member motivations~\citep{rasnacis2017}. Their survey
+identified relationships between team members and the number of positive choices
+associated with them, with questions built on Maslow's hierarchy of needs, which
+lends credibility to the psychological considerations of teamwork. By selecting
+a methodology from team input and tailoring the implementation, the authors
+demonstrated both buy-in and increased productivity. This is one of the few
+studies in the reviewed corpus that ties a design-adjacent intervention to a
+measured outcome.
+
+Project management factors heavily into the implemented system. Although it may
+not be the project manager's role to create the product, the techniques employed
+can hinder or enhance the team's effectiveness~\citep{munns1996}. Most remaining
+factors are what the systems architect attempts to address through design.
+Neither the project manager nor the systems architect is definitively involved
+in creating the end objective; both frequently aim to establish boundaries that
+simplify the problem being solved. Agile has demonstrated that software projects
+can be delivered more effectively under that
+methodology~\citep{sandle2020,rasnacis2017}, and the most successful projects
+tend to be limited in size and well defined. Much of the emphasis in SoS and EA
+is on large-scale systems---not because either is inapplicable to smaller
+systems, but because they were designed for large ones. Project management does
+account for individual behavior, agile particularly so; SoS and EA account for
+those factors differently, or, like Cynefin, function as sense-making frameworks
+that help clarify what an intended solution will achieve.
+
+Project and program management are sometimes used interchangeably. Program
+management is generally a scaling up: a program comprises several projects
+related through strategic objectives. Projects are thought of as having clear
+outcomes; programs are higher level and organizationally focused. Portfolios are
+generally managed as programs with common strategic value. A program manager
+delivers value realization through collective opportunities across projects; a
+project manager delivers value to the project's definition. The two are
+supported by different research bases, which is reasonable given their differing
+emphases~\citep{weaver2010}. Program management research draws on organization
+theory, product development, work design and change, and quality and
+manufacturing; project management research emphasizes innovation, performance,
+product development, and management~\citep{artto2009}.
+
+In agile methodologies, project management responsibilities are shared within
+the team, primarily between the scrum master and product owner. The scrum master
+convenes regular discussions, resolves blockers, and maintains the process. The
+product owner represents the customer, refines the backlog to establish
+priority, and defines expectations for a given capability. Depending on scale,
+an individual responsible for overall project management may still
+exist~\citep{sliger2011}.
+
+Depending on organization or project size there may also be a chief engineer,
+chief architect, or lead engineer serving as the authority on technical design.
+The chief engineer is expected to exercise expert judgment in balancing
+technical implementation against project risk, often plays a significant role in
+developing roadmaps from the design, and typically validates that the technical
+implementation meets the design and that variations are reconciled. This role
+would benefit immensely from empirical understanding of how its decisions affect
+project success---and at present has essentially no way to obtain it.
+
+%==============================================================================
+\section{Synthesis: Three Failure Modes Across Eight Traditions}
+\label{sec:synthesis}
+%==============================================================================
+
+Table~\ref{tab:landscape} places the eight traditions against the comparative
+frame introduced in Section~\ref{sec:method}. Three patterns cut across the rows.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{The eight traditions against a common comparative frame. ``Falsifiable
+claim?'' asks whether the tradition, as currently formulated, specifies a
+measurement that could disconfirm its central proposition.}
+\label{tab:landscape}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}p{1.9cm}p{2.2cm}p{2.3cm}p{2.1cm}p{2.5cm}p{1.6cm}@{}}
+\toprule
+\textbf{Tradition} & \textbf{Unit of analysis} & \textbf{Human agency} &
+\textbf{Emergence} & \textbf{Evidence base} & \textbf{Falsifiable claim?} \\
+\midrule
+Systems of systems &
+Constituent systems and interfaces &
+Operators outside the model &
+Acknowledged; delegated &
+Standards, principles, exemplar architectures &
+No \\
+
+Enterprise architecture &
+Organization and its technical estate &
+Stakeholders to be aligned &
+Acknowledged; assumed reducible &
+Frameworks (77+), SLRs, practitioner reports &
+No \\
+
+Enterprise systems engineering &
+The enterprise as value producer &
+Strategic decision makers &
+Largely unaddressed &
+Proponent-authored case studies &
+No \\
+
+Complex adaptive systems &
+Aggregate adaptive behavior &
+Agents within the system &
+Irreducible &
+Analogy, simulation, descriptive states &
+No \\
+
+Design thinking &
+The solution and its users &
+Central; empathy-driven &
+Not addressed &
+Practice reports; culture-conditioned outcomes &
+No \\
+
+Systems thinking &
+Relationships and boundaries &
+Mental models of participants &
+Claimed mitigable via controls &
+Retrospective cases; definitional surveys &
+Weakly \\
+
+Systems science &
+Systemhood as a property &
+Cognitive/social input domains &
+Object of formal study &
+Formal theory; mathematical integration &
+Weakly \\
+
+System dynamics &
+Stocks, flows, feedback, policy &
+Mental models as primary data &
+Endogenous to the model &
+Simulation; elicitation experiments &
+Yes, in lab \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Failure mode 1: the boundary blind spot}
+
+Every tradition reviewed identifies the interface between constituent systems,
+and between systems and the humans operating them, as where difficulty
+concentrates. Maier's architecting principles are entirely about boundaries:
+communications, policy control, interfaces, cooperation~\citep{maier1998}.
+Morgan and Wightman's defense analysis locates mission failure precisely at
+boundaries between branch systems and supply chain
+partners~\citep{morgan2023}. EA invokes SoS to handle boundaries but cannot
+specify how technical and social constructs integrate across
+them~\citep{lapalme2012,nielsen2015}. Systems thinking foregrounds boundaries as
+its defining concern~\citep{greene2017}.
+
+And every tradition then hands the boundary region to someone else. Nielsen et
+al. name socio-technical modeling as important and defer it to other
+publications~\citep{nielsen2015}. Fleischmann et al. build a framework that
+accommodates socio-technical constraints and conclude with a statement about
+swappability rather than about behavior~\citep{fleischmann2016}. Rhodes et al.
+acknowledge emergent behavior and proceed to a method that does not account for
+it~\citep{rhodes2009}. Gong and Janssen list ``all aspects of the enterprise can
+be captured'' as a myth~\citep{gong2019} without proposing what to do once it is
+abandoned.
+
+This is not carelessness. It reflects that the boundary region is where human
+behavior dominates and where the traditions' instruments---models, frameworks,
+reference architectures---have the least purchase. The blind spot is
+instrument-shaped.
+
+\subsection{Failure mode 2: the measurement deficit}
+
+Every instrument for assessing design value found in this review requires the
+continued, active participation of human experts. Moore et al. use stakeholder
+quality scoring~\citep{moore2003}. Nord et al. survey design quality metrics and
+find them uniformly qualitative~\citep{nord2014}. Kotze and Smuts narrate
+outcomes retrospectively~\citep{kotze2016}. Monat et al. reconstruct failures
+after the fact~\citep{monat2020}. Group model building requires convening the
+affected group twice~\citep{hovmand2013,kunc2016}. Flight simulators require
+constructing and validating a bespoke simulation per
+organization~\citep{papageorgiou2008}.
+
+Three consequences follow. First, \textbf{these instruments do not scale}: the
+cost of measurement rises linearly with the number of systems studied, which is
+why the evidence base consists of individual cases rather than populations.
+Second, \textbf{they are not replicable}: a second team eliciting from the same
+organization would produce different scores, and no study in the reviewed corpus
+reports inter-rater reliability for an architectural value judgment. Third, and
+most seriously, \textbf{they are not independent}: the people scoring the
+architecture are, in the main, the people who produced it or commissioned it.
+Forrester's own ordering---most knowledge in the mental database, least in the
+numerical~\citep{forrester2009}---explains why the field settled here, but it
+does not make the resulting evidence stronger than it is.
+
+\subsection{Failure mode 3: evidentiary asymmetry}
+
+The corpus is dominated by accounts of success. ESE is supported by two cases
+the authors describe as successful~\citep{kotze2016}. Design thinking is
+supported by settings in which it flourished, with failures attributed to
+cultural conditions~\citep{dunne2018}. Systems thinking is supported by
+retrospective reconstructions of failures that systems thinking would
+purportedly have prevented~\citep{monat2020}---a structure that cannot
+disconfirm, since the counterfactual is never run. Rasnacis and Berzisa's
+methodology-selection study~\citep{rasnacis2017} is among the few that reports a
+measured outcome against a pre-stated intervention.
+
+The absence of negative results has a specific cost: \emph{effect sizes are
+unknown}. Nothing in the reviewed literature supports a statement of the form
+``architectural investment of this magnitude, at this point in a project, is
+associated with this change in outcome.'' Practitioners are asked to invest in
+design on the strength of consensus and case narrative. That may well be
+correct. It is not established.
+
+\subsection{One problem, not three}
+
+These three failure modes have a common cause. A field that could observe design
+activity independently of the designers---at population scale, repeatably, and
+without requiring cooperation---would be able to study boundary behavior where
+it actually occurs, would not depend on elicitation, and would generate
+disconfirming as well as confirming cases as a matter of course. The three
+failure modes are what the absence of such an instrument looks like from three
+different angles.
+
+%==============================================================================
+\section{The Measurement Gap and What Would Close It}
+\label{sec:gap}
+%==============================================================================
+
+We state the diagnosis directly. \textbf{The systems design traditions lack an
+observational instrument for design work.} They possess rich theories of what
+design should be and prescriptive frameworks for how to conduct it, and they
+have no way to detect that it happened.
+
+Figure~\ref{fig:gap} summarizes the position. Two communities operate on the
+same phenomenon from opposite ends, and the agenda of
+Section~\ref{sec:agenda} is an attempt to connect them.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, minimum height=1.5cm},
+  trad/.style={box, fill=blue!6, draw=blue!45, text width=4.1cm},
+  arti/.style={box, fill=orange!8, draw=orange!55, text width=4.1cm},
+  gapbox/.style={box, fill=gray!8, draw=gray!55, dashed, text width=3.3cm},
+  ra/.style={draw=gray!60, -{Latex[length=2mm]}, thick}
+]
+
+\node[trad] (trad) at (0,0)
+  {\textbf{Systems design traditions}\\[2pt]
+   \footnotesize SoS $\cdot$ EA $\cdot$ ESE $\cdot$ CAS\\
+   \footnotesize Design thinking $\cdot$ Systems thinking\\
+   \footnotesize Systems science $\cdot$ System dynamics};
+
+\node[arti] (arti) at (10,0)
+  {\textbf{Operational software record}\\[2pt]
+   \footnotesize Issue trackers $\cdot$ commit histories\\
+   \footnotesize design discussion $\cdot$ defect records\\
+   \footnotesize $10^5$--$10^6$ timestamped artifacts};
+
+\node[gapbox] (gap) at (5,0)
+  {\textbf{The measurement}\\\textbf{gap}\\[3pt]
+   \footnotesize No instrument links\\ \footnotesize construct to artifact};
+
+\node[align=center, text width=4.1cm, font=\footnotesize\itshape] at (0,-1.7)
+  {Rich constructs.\\ No independent, scalable measurement.};
+\node[align=center, text width=4.1cm, font=\footnotesize\itshape] at (10,-1.7)
+  {Abundant measurement.\\ No design-theoretic constructs.};
+
+\draw[ra] (trad.east) -- node[above, font=\footnotesize] {what to measure} (gap.west);
+\draw[ra] (arti.west) -- node[above, font=\footnotesize] {what is observable} (gap.east);
+
+\node[align=center, font=\footnotesize, text width=11cm] at (5,-2.9)
+  {\textbf{RA1} construct validity \quad $\cdot$ \quad \textbf{RA2} outcome effects
+   \quad $\cdot$ \quad \textbf{RA3} temporal distribution\\
+   \textbf{RA4} boundary instrumentation \quad $\cdot$ \quad
+   \textbf{RA5} elicited vs.\ observed reconciliation};
+
+\draw[ra, dashed] (gap.south) -- (5,-2.5);
+
+\end{tikzpicture}
+\caption{The measurement gap. The systems design traditions supply constructs
+for what design work is and why it should matter; the operational record of
+software projects supplies observations at a scale and independence the
+traditions' elicitation-based instruments cannot reach. Neither side currently
+provides the mapping between them. The five research directions of
+Section~\ref{sec:agenda} are staged attempts to construct that mapping, with
+RA1 (construct validity) as the precondition for the remaining four.}
+\label{fig:gap}
+\end{figure}
+
+An adequate instrument would need four properties.
+
+\begin{description}
+\item[Independence.] It must observe design activity without requiring the
+designers to report on it. Any instrument mediated by self-report inherits the
+self-affirmation bias that the traditions' case literature already exhibits.
+
+\item[Scale.] It must operate over populations of projects, not exemplars.
+Effect sizes and boundary conditions cannot be estimated from case studies
+selected by proponents.
+
+\item[Temporal resolution.] It must locate design work \emph{in time}, not
+merely record that it occurred. The central disputes between agile and waterfall
+(Section~\ref{sec:pm}), and the epoch-based proposals of Rhodes et
+al.~\citep{rhodes2009}, are claims about \emph{when} design should happen. They
+cannot be tested by an instrument that only counts.
+
+\item[Construct validity.] It must measure design work rather than a correlate
+of it, and the burden of demonstrating this falls on the instrument's
+proponents, not its critics.
+\end{description}
+
+Such an instrument is closer to hand than the systems literature appears to
+recognize, because the parallel software engineering community has been building
+its raw materials for two decades. Software projects leave a dense operational
+record: issue trackers containing hundreds of thousands of tickets, version
+control histories, and threaded design discussion. The TAWOS dataset alone
+comprises over 458{,}000 issues and 1.6 million comments from 39 open source
+projects~\citep{tawosi2022}. This record satisfies independence and scale by
+construction---it is generated as a byproduct of work rather than elicited---and
+it is inherently timestamped, satisfying temporal resolution.
+
+What it does not satisfy automatically is construct validity, and that is the
+hard part. A ticket is not a design decision. The gap between the two is the
+research problem, and it is the subject of the next section.
+
+The relevant computational capability already exists in adjacent form.
+\emph{Design mining}---the automated classification of design-related
+discussion in software engineering artifacts---has been established on Stack
+Overflow data, along with the crucial finding that conclusions drawn on one
+corpus do not necessarily hold on another~\citep{mahadi2021}. Rationale
+extraction has been pursued in issue trackers and version control
+systems~\citep{kleebaum2021}, in project email archives~\citep{sharma2021}, and
+in commit messages via knowledge graphs~\citep{dhaouadi2023}. Machine learning
+has been applied to architecture degradation~\citep{herold2020} and to
+multi-level ticket classification~\citep{zangari2023}. Transformer
+architectures~\citep{devlin2019} have made the text classification component
+tractable at the scale required.
+
+Aleti et al.'s systematic review of 188 software architecture optimization
+papers marks the boundary of what has been attempted~\citep{aleti2013}. Their
+review covers optimization against quality criteria---performance, security,
+reliability---and constraints including cost and quality of service. Impacts on
+how the \emph{agents} of the system were affected by decisions such as
+prioritization were deliberately excluded. The distribution is telling: 51\% of
+the optimization work targeted embedded systems and only 26\% included
+enterprise systems, with metaheuristics and genetic algorithms dominating
+because they suit multi-objective search. The work is valuable, and excluding
+papers concerned with the interaction of the people who build and use the system
+is exactly the exclusion this review is concerned with. Optimizing the build of
+a system and optimizing for the interaction of its users are highly interrelated
+and should not be treated as discrete.
+
+Soft computing was defined by Zadeh as an attempt ``to mimic the ability of the
+human mind to effectively employ modes of reasoning that are approximate rather
+than exact''~\citep{zadeh1994}. That is a reasonable description of what an
+instrument for design work must do. The techniques exist; they have not been
+pointed at this question.
+
+%==============================================================================
+\section{A Research Agenda}
+\label{sec:agenda}
+%==============================================================================
+
+We propose five research directions. Each is stated as a falsifiable proposition
+together with the commitment the relevant tradition must make for the test to be
+meaningful.
+
+\subsection{RA1: Establish construct validity for artifact-based design detection}
+
+\textbf{Proposition.} Design-related activity can be detected in software
+engineering artifacts with agreement to expert human judgment sufficient to
+serve as a measurement instrument, and that agreement is stable across projects.
+
+\textbf{Why it is first.} Every subsequent direction depends on it. The known
+obstacle is conclusion instability: classifiers trained on one corpus do not
+necessarily transfer to another~\citep{mahadi2021}. Cross-project evaluation, not
+within-corpus accuracy, is the relevant standard, and the appropriate protocol
+is leave-one-project-out validation in which the evaluation project contributes
+nothing to training.
+
+\textbf{What must be committed.} Design mining proponents must report per-project
+performance rather than pooled averages, must report agreement with multiple
+independent annotators rather than a single labeler, and must characterize what
+the classifier attends to. Attribution analysis that reveals a model keying on
+project-specific vocabulary---container tooling, deployment platforms, plug-in
+names---is evidence \emph{against} construct validity even when aggregate
+accuracy is high, and should be reported as such.
+
+\subsection{RA2: Estimate the effect of design activity on downstream outcomes}
+
+\textbf{Proposition.} Variation in detected design activity within a project is
+associated with subsequent variation in defect rates, and the association
+survives controls for project size, team size, and activity volume.
+
+\textbf{Why it matters.} This is the claim the entire field rests on and has
+never tested at population scale. EA asserts value through stakeholder
+alignment~\citep{gong2019}; ESE asserts it through case
+narrative~\citep{kotze2016}; neither states an effect size. Defect rate is not
+the only outcome worth modeling, but it is observable in the same operational
+record as the design signal, which makes it the tractable starting point. The
+substantial defect-prediction literature provides both baselines and covariates.
+
+\textbf{What must be committed.} Proponents of architectural investment must
+name, in advance, the direction and rough magnitude of effect they expect. A
+null result must be reportable. Analyses must be pre-specified with respect to
+covariates, because the number of available controls in a repository dataset is
+large enough to support post hoc model selection toward a desired conclusion.
+
+\subsection{RA3: Test the temporal claims that separate agile from waterfall}
+
+\textbf{Proposition.} The temporal distribution of design activity across a
+project's lifecycle predicts outcome variation independently of the total volume
+of design activity.
+
+\textbf{Why it matters.} This is where the systems traditions make their
+sharpest empirical commitments and have never been adjudicated. Waterfall's
+phase-gate structure asserts that front-loaded design, formalized in a Systems
+Design Review, reduces downstream defects. Agile asserts that detailed upfront
+design decays in dynamic environments. Rhodes et al.'s epoch-based
+approach~\citep{rhodes2009} and Cole's system co-evolution~\citep{cole2006} are
+intermediate positions. All are testable given a timestamped design signal, and
+system dynamics offers the natural modeling apparatus for the feedback
+structure~\citep{forrester2009,khatun2023}.
+
+\textbf{What must be committed.} The measurement asymmetry noted in
+Section~\ref{sec:pm} must be addressed head-on: waterfall projects produce
+discrete design artifacts and agile projects do not, so any comparison must
+demonstrate that the instrument is not simply detecting documentation practice.
+This requires validating the detector separately within each methodology before
+comparing across them.
+
+\subsection{RA4: Instrument the boundary region directly}
+
+\textbf{Proposition.} Design discussion that spans organizational or system
+boundaries exhibits different characteristics---in volume, duration, resolution
+rate, or downstream defect association---than design discussion internal to a
+single constituent system.
+
+\textbf{Why it matters.} This addresses failure mode 1 directly. Every tradition
+locates difficulty at boundaries and none observes boundary behavior
+empirically. Cross-component issue links, cross-team assignment, and
+cross-repository dependencies are all recoverable from operational data, which
+makes Maier's principles~\citep{maier1998} and Morgan and Wightman's defense
+observations~\citep{morgan2023} testable rather than merely plausible.
+
+\textbf{What must be committed.} SoS and EA proponents must specify what
+observable consequence their boundary prescriptions are supposed to have. A
+principle that predicts nothing measurable about boundary-spanning work cannot
+be evaluated, and should be reclassified as heuristic guidance rather than
+architectural theory.
+
+\subsection{RA5: Reconcile elicited and observed measures}
+
+\textbf{Proposition.} Expert judgments of architectural significance, elicited by
+the established qualitative instruments, converge with artifact-derived measures
+of design activity on the same projects.
+
+\textbf{Why it matters.} This is the direction that protects against the new
+instrument simply being wrong. Stakeholder scoring~\citep{moore2003},
+qualitative design quality metrics~\citep{nord2014}, and group model
+building~\citep{hovmand2013} encode genuine expert knowledge that no classifier
+possesses. If elicited and observed measures diverge, that divergence is itself
+the finding, and locating it---systematically by project type, methodology, or
+domain---would advance both communities. Forrester's mental, written, and
+numerical databases~\citep{forrester2009} provide the framing: artifact-based
+measurement is an attempt to recover the mental database through the written
+one, and RA5 asks how much is lost in transit.
+
+\textbf{What must be committed.} The qualitative traditions must permit their
+instruments to be scored for reliability. A stakeholder scoring method whose
+inter-rater agreement is not reported cannot serve as a criterion measure for
+anything.
+
+\subsection{What the agenda does not claim}
+
+We are not proposing that computational measurement replaces the design
+traditions. A classifier does not know why an architectural decision was made,
+cannot evaluate whether it was wise, and has no access to the strategic context
+that ESE and EA are organized around. The claim is narrower and, we think,
+harder to dispute: a field that cannot observe its central phenomenon cannot
+accumulate knowledge about it, and the operational record of software work is
+the most promising available observation point. The traditions supply the
+constructs; the artifacts supply the measurements; neither is sufficient alone.
+
+%==============================================================================
+\section{Threats to the Validity of This Review}
+\label{sec:threats}
+%==============================================================================
+
+\textbf{Selection.} The review is narrative rather than systematic
+(Section~\ref{sec:method}). Sources were selected to illuminate a measurement
+thesis, and a different frame would surface different sources. In particular, a
+reader who believes the traditions' value is primarily generative---that
+frameworks are useful for structuring thought regardless of whether their
+effects can be measured---will find the selection unsympathetic. We think that
+position is defensible and that it should be stated as a position rather than
+assumed.
+
+\textbf{Negative claims from positive evidence.} Where we assert that a
+tradition does not address a question, the support is the defining sources and
+the tradition's own systematic reviews, not a systematic absence search. These
+assertions are therefore rebuttable by counterexample, and we would regard
+well-aimed counterexamples as the most useful response this article could
+provoke.
+
+\textbf{Coverage boundaries.} Several adjacent literatures are represented
+thinly or not at all: sociotechnical systems theory in the STS tradition,
+organizational information processing theory, real options approaches to
+architectural investment, and the technical debt literature, which addresses a
+closely related measurement problem from within software engineering. Each could
+strengthen or complicate the argument.
+
+\textbf{Domain generality.} The agenda in Section~\ref{sec:agenda} is specified
+for software-intensive systems, because those systems produce the operational
+record the agenda depends on. Whether the same approach extends to enterprise
+systems without a dense digital work record---and much of the enterprise
+architecture literature concerns exactly those---is open. We would expect the
+instrument to degrade gracefully rather than transfer cleanly.
+
+\textbf{Author position.} The authors are actively pursuing the computational
+direction advocated in Section~\ref{sec:agenda}. Readers should weigh the
+diagnosis accordingly. We have tried to state the construct validity problem
+(RA1) at full strength for exactly this reason: it is the point on which our own
+program is most vulnerable.
+
+%==============================================================================
+\section{Conclusions}
+\label{sec:conclusions}
+%==============================================================================
+
+Eight traditions have developed accounts of how software-intensive enterprise
+systems should be designed. They differ in vocabulary, unit of analysis, and
+intellectual lineage, and reviewing them side by side on a common frame shows
+they converge on the same three limitations. They locate difficulty at
+socio-technical boundaries and then delegate those boundaries elsewhere. They
+depend on measurement instruments that require expert elicitation and therefore
+do not scale, do not replicate, and are not independent of the designers under
+evaluation. They are supported by a literature of successes with no comparable
+record of failures, leaving effect sizes unknown after five decades.
+
+We have argued that these are three views of one absence: there is no
+observational instrument for design activity. We have specified four properties
+such an instrument would need---independence, scale, temporal resolution, and
+construct validity---and argued that the operational record of software
+projects satisfies the first three by construction while making the fourth the
+central research problem.
+
+The five-part agenda in Section~\ref{sec:agenda} sets out what would have to be
+demonstrated, and, equally important, what each tradition would have to commit
+to in exchange. Those commitments are not trivial. They require proponents to
+state expected effect sizes in advance, to report per-project rather than pooled
+results, to permit null findings, to score their qualitative instruments for
+reliability, and to specify observable consequences for prescriptions that
+currently have none. A tradition unwilling to make such commitments is not
+thereby refuted, but it should be understood as offering heuristic guidance
+rather than empirical knowledge, and it should say so.
+
+The divergence between systems design and software engineering analytics is not
+inevitable. Both communities are addressing the same phenomenon: how deliberate
+design effort changes the behavior of a complex socio-technical system. One has
+the constructs and no measurements; the other has the measurements and no
+constructs. Closing that gap is the contribution this article is arguing for.
+
+%==============================================================================
+% MDPI-required back matter
+%==============================================================================
+
+\section*{Abbreviations}
+\begin{tabular}{@{}ll@{}}
+CAS   & Complex Adaptive Systems \\
+EA    & Enterprise Architecture \\
+ESE   & Enterprise Systems Engineering \\
+IT    & Information Technology \\
+OODA  & Observe--Orient--Decide--Act \\
+SBPM  & Subject-Oriented Business Process Management \\
+SD    & System Dynamics \\
+SoS   & System of Systems \\
+TOGAF & The Open Group Architecture Framework \\
+\end{tabular}
+
+\vspace{1em}
+\noindent\textbf{Author Contributions:} Conceptualization, S.M.M.; methodology,
+S.M.M.; investigation, S.M.M.; writing---original draft preparation, S.M.M.;
+writing---review and editing, S.M.M. and J.D.; supervision, J.D. All authors
+have read and agreed to the published version of the manuscript.
+
+\noindent\textbf{Funding:} This research received no external funding.
+
+\noindent\textbf{Data Availability Statement:} No new data were created or
+analyzed in this study. Data sharing is not applicable to this article.
+
+\noindent\textbf{Conflicts of Interest:} The authors declare no conflict of
+interest.
+
+%==============================================================================
+\bibliographystyle{unsrtnat}
+\bibliography{chapter2_refs}
+%==============================================================================
+
+\end{document}

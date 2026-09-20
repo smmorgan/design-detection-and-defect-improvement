@@ -5,6 +5,7 @@
 torch>=2.0.0
 transformers>=4.35.0
 tokenizers>=0.15.0
+peft>=0.20.0  # LoRA fine-tuning for decoder-model baselines (e.g. Qwen2.5)
 
 # Data processing
 pandas>=2.0.0

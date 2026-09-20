@@ -16,6 +16,7 @@ Author: Based on methodology from Steven Morgan's dissertation
 """
 
 import os
+import copy
 import json
 import logging
 import argparse
@@ -45,6 +46,11 @@ from transformers import (
 )
 
 from tqdm import tqdm
+
+try:
+    from peft import LoraConfig, TaskType, get_peft_model
+except ImportError:
+    LoraConfig = TaskType = get_peft_model = None
 
 # TAWOS database connectivity
 try:
@@ -591,12 +597,26 @@ class DesignMiningTrainer:
     4. Dense layer with Softmax for final classification
     """
     
-    def __init__(self, config: Config):
+    def __init__(
+        self,
+        config: Config,
+        use_lora: bool = False,
+        lora_r: int = 16,
+        lora_alpha: int = 32,
+        lora_dropout: float = 0.05,
+        gradient_checkpointing: bool = False,
+    ):
         self.config = config
         self.device = config.DEVICE
-        
+        self.use_lora = use_lora
+
         # Initialize tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(config.MODEL_NAME)
+        if use_lora:
+            # Convention for decoder-only models under LoRA; matches eval_lopo.py.
+            self.tokenizer.padding_side = 'left'
+            if self.tokenizer.pad_token is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
 
         # Initialize model with configuration
         model_config = AutoConfig.from_pretrained(
@@ -613,13 +633,45 @@ class DesignMiningTrainer:
             model_config.dropout = config.DROPOUT_RATE
         if hasattr(model_config, 'attention_dropout'):
             model_config.attention_dropout = config.DROPOUT_RATE
+        # Decoder models (Qwen/Llama/Gemma) pool the logit off the last
+        # non-pad token and raise ValueError for batch_size != 1 if the
+        # config has no pad_token_id.
+        if getattr(model_config, 'pad_token_id', None) is None and self.tokenizer.pad_token_id is not None:
+            model_config.pad_token_id = self.tokenizer.pad_token_id
 
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            config.MODEL_NAME,
-            config=model_config
-        )
-        self.model.to(self.device)
-        
+        if use_lora:
+            if LoraConfig is None:
+                raise ImportError("peft is required for --lora (pip install peft)")
+            self.model = AutoModelForSequenceClassification.from_pretrained(
+                config.MODEL_NAME, config=model_config, torch_dtype=torch.bfloat16,
+            )
+            self.model.to(self.device)
+            peft_config = LoraConfig(
+                task_type=TaskType.SEQ_CLS,
+                r=lora_r, lora_alpha=lora_alpha, lora_dropout=lora_dropout,
+                target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+            )
+            self.model = get_peft_model(self.model, peft_config)
+            self.model.print_trainable_parameters()
+        else:
+            self.model = AutoModelForSequenceClassification.from_pretrained(
+                config.MODEL_NAME,
+                config=model_config
+            )
+            self.model.to(self.device)
+
+        if gradient_checkpointing:
+            self.model.gradient_checkpointing_enable()
+            if hasattr(self.model.config, 'use_cache'):
+                self.model.config.use_cache = False
+            if use_lora:
+                # Reentrant-autograd checkpointing needs a requires_grad=True
+                # tensor flowing into each checkpointed block, which the raw
+                # (non-trainable) input embeddings don't provide under LoRA --
+                # without this, gradients silently come back None. See the
+                # matching comment in eval_lopo.py's train_and_evaluate().
+                self.model.enable_input_require_grads()
+
         # Metrics calculator
         self.metrics_calc = MetricsCalculator()
 
@@ -711,7 +763,10 @@ class DesignMiningTrainer:
             # Use class-weighted loss when available (Stage 3),
             # otherwise fall back to the model's default loss.
             if self._loss_fn is not None:
-                loss = self._loss_fn(outputs.logits, labels)
+                # bf16 logits (LoRA models load in torch.bfloat16) vs. the
+                # fp32 class-weight tensor raise a dtype mismatch in
+                # F.cross_entropy -- upcast for the loss only.
+                loss = self._loss_fn(outputs.logits.float(), labels)
             else:
                 loss = outputs.loss
             total_loss += loss.item()
@@ -748,9 +803,11 @@ class DesignMiningTrainer:
                 total_loss += outputs.loss.item()
                 
                 # Get predictions and probabilities (Softmax output)
-                probs = torch.softmax(outputs.logits, dim=1)
+                # .numpy() has no bf16 support (LoRA models load in
+                # torch.bfloat16), so upcast before leaving torch.
+                probs = torch.softmax(outputs.logits.float(), dim=1)
                 preds = torch.argmax(probs, dim=1)
-                
+
                 all_preds.extend(preds.cpu().numpy())
                 all_labels.extend(labels.cpu().numpy())
                 all_probs.extend(probs[:, 1].cpu().numpy())  # Probability of 'design' class
@@ -841,7 +898,11 @@ class DesignMiningTrainer:
             # Save best model (based on F1 as per dissertation goal)
             if val_metrics['f1_score'] > best_f1:
                 best_f1 = val_metrics['f1_score']
-                best_model_state = self.model.state_dict().copy()
+                # dict.copy() is shallow -- the tensor values are the same
+                # storage the optimizer keeps mutating in place, so this
+                # silently drifted to just being the last epoch's weights.
+                # Needs a real deepcopy to actually snapshot the best epoch.
+                best_model_state = copy.deepcopy(self.model.state_dict())
                 epochs_without_improvement = 0
                 logger.info(f"New best F1 score: {best_f1:.4f}")
             else:
@@ -899,9 +960,9 @@ class DesignMiningTrainer:
                     attention_mask=attention_mask
                 )
                 
-                probs = torch.softmax(outputs.logits, dim=1)
+                probs = torch.softmax(outputs.logits.float(), dim=1)
                 preds = torch.argmax(probs, dim=1)
-                
+
                 predictions.extend(preds.cpu().numpy().tolist())
                 confidences.extend(probs.max(dim=1).values.cpu().numpy().tolist())
         
@@ -910,7 +971,16 @@ class DesignMiningTrainer:
     def save_model(self, path: str):
         """Save model and tokenizer."""
         os.makedirs(path, exist_ok=True)
-        self.model.save_pretrained(path)
+        if self.use_lora:
+            # PeftModel.save_pretrained() writes only the adapter deltas, not
+            # a standalone checkpoint -- but eval_lopo.py's --lora path loads
+            # pretrained_path as a full base model and wraps it with a *new*
+            # LoRA adapter for Stage 2, so Stage 1's output has to already be
+            # a merged, self-contained model for that loading code to work.
+            merged = self.model.merge_and_unload()
+            merged.save_pretrained(path)
+        else:
+            self.model.save_pretrained(path)
         self.tokenizer.save_pretrained(path)
         
         # Save training history
@@ -1843,6 +1913,20 @@ def main():
         help='Skip Stage 2 TAWOS pseudo-labeling entirely. Stage 3 will train only on '
              '--manually_labelled_dir data. Requires --manually_labelled_dir to be set.'
     )
+    parser.add_argument(
+        '--lora', action='store_true',
+        help='Fine-tune with LoRA adapters instead of full fine-tuning '
+             '(required for decoder models like Qwen2.5 that don\'t fit '
+             'full fp32 fine-tuning on this GPU)'
+    )
+    parser.add_argument('--lora_r', type=int, default=16)
+    parser.add_argument('--lora_alpha', type=int, default=32)
+    parser.add_argument('--lora_dropout', type=float, default=0.05)
+    parser.add_argument(
+        '--gradient_checkpointing', action='store_true',
+        help='Trade compute for activation memory to allow a larger batch_size '
+             'on memory-constrained models'
+    )
 
     args = parser.parse_args()
 
@@ -2098,7 +2182,14 @@ def main():
 
             # Initialize trainer
             logger.info("\nInitializing BERT model...")
-            trainer = DesignMiningTrainer(config)
+            trainer = DesignMiningTrainer(
+                config,
+                use_lora=args.lora,
+                lora_r=args.lora_r,
+                lora_alpha=args.lora_alpha,
+                lora_dropout=args.lora_dropout,
+                gradient_checkpointing=args.gradient_checkpointing,
+            )
 
             # Create data loaders
             logger.info("Creating data loaders...")
@@ -2139,6 +2230,11 @@ def main():
                 'num_epochs': config.NUM_EPOCHS,
                 'dropout_rate': config.DROPOUT_RATE,
                 'random_seed': config.RANDOM_SEED,
+                'lora': args.lora,
+                'lora_r': args.lora_r if args.lora else None,
+                'lora_alpha': args.lora_alpha if args.lora else None,
+                'lora_dropout': args.lora_dropout if args.lora else None,
+                'gradient_checkpointing': args.gradient_checkpointing,
 
                 # Data statistics
                 'data_source': args.stackoverflow_path,
@@ -2151,9 +2247,16 @@ def main():
                 'auto_generated_removed': preprocessor.stats['auto_generated_removed'] if not args.no_preprocess else 0,
                 'short_texts_removed': preprocessor.stats['short_texts_removed'] if not args.no_preprocess else 0,
 
-                # Best validation metrics (from training history)
-                'best_val_epoch': len(history['val_metrics']),
-                'best_val': history['val_metrics'][-1] if history['val_metrics'] else {},
+                # Best validation metrics (from training history) -- the epoch
+                # with the highest F1, not simply the last epoch run.
+                'best_val_epoch': (
+                    max(range(len(history['val_metrics'])), key=lambda i: history['val_metrics'][i]['f1_score']) + 1
+                    if history['val_metrics'] else 0
+                ),
+                'best_val': (
+                    max(history['val_metrics'], key=lambda m: m['f1_score'])
+                    if history['val_metrics'] else {}
+                ),
 
                 # Final test metrics
                 'test': test_metrics if test_metrics else {},

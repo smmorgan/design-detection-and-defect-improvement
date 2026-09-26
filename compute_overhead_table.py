@@ -150,6 +150,65 @@ def decoder_lora_lopo_overhead():
     return runs
 
 
+GCP_G2_STANDARD_4_USD_PER_HR = 0.7068  # on-demand, us-central1, 1x NVIDIA L4 (retrieved 2026-09)
+
+
+def batch32_gcp_overhead():
+    """batch_size=32 Stage-1 runs for all three encoder families, run
+    sequentially on a single rented GCP g2-standard-4 instance (1x NVIDIA
+    L4, 24 GiB) after batch_size=32 hit CUDA OOM on the local 11.69 GiB GPU
+    used for every other run in this study (see bert_failure_summary).
+
+    No training.log was captured on that instance, so wall-clock is
+    reconstructed from each run's start timestamp: jobs ran back-to-back
+    (bert -> roberta -> distilbert), confirmed by the author, so the gap
+    between consecutive start timestamps is that run's true wall-clock.
+    distilbert-base's own end time was never recorded (it was last in the
+    sequence), so its wall-clock/cost is *estimated* by scaling roberta's
+    measured batch_size=32 wall-clock by the local batch_size=16
+    distilbert/roberta wall-clock ratio -- flagged via `is_estimated`.
+    """
+    configs = [
+        ("bert-base-uncased", RESULTS_DIR / "full_batch32_bert_base_0309_2327" / "run_20260309_232709.json",
+         RESULTS_DIR / "bert_very_conservative_0308_2027" / "training.log"),
+        ("roberta-base", RESULTS_DIR / "full_batch32_roberta_base_0310_0416" / "run_20260310_041603.json",
+         RESULTS_DIR / "roberta_conservative_0309_0738" / "training.log"),
+        ("distilbert-base-uncased", RESULTS_DIR / "full_batch32_distilbert_base_0310_0645" / "run_20260310_064548.json",
+         RESULTS_DIR / "distilbert_standard_0309_0738" / "training.log"),
+    ]
+    loaded = []
+    for name, run_path, local_log_path in configs:
+        if not run_path.exists():
+            return None
+        d = json.load(open(run_path))
+        local_bs16_s = training_log_span(local_log_path) if local_log_path.exists() else None
+        loaded.append((name, datetime.fromisoformat(d["timestamp"]), d, local_bs16_s))
+
+    runs = []
+    for i, (name, start_ts, d, local_bs16_s) in enumerate(loaded):
+        is_estimated = False
+        if i + 1 < len(loaded):
+            wall_s = (loaded[i + 1][1] - start_ts).total_seconds()
+        else:
+            prev_name, _, _, prev_local_bs16_s = loaded[i - 1]
+            prev_wall_s = runs[i - 1]["wall_clock_s"]
+            wall_s = prev_wall_s * (local_bs16_s / prev_local_bs16_s)
+            is_estimated = True
+        cost_usd = (wall_s / 3600) * GCP_G2_STANDARD_4_USD_PER_HR
+        runs.append({
+            "config": name,
+            "hardware": "GCP g2-standard-4 (1x NVIDIA L4, 24 GiB, rented)",
+            "batch_size": 32,
+            "wall_clock_s": wall_s,
+            "cost_usd": cost_usd,
+            "is_estimated": is_estimated,
+            "local_batch_size_16_wall_clock_s": local_bs16_s,
+            "test_f1": d["test"]["f1_score"],
+            "test_auc": d["test"]["auc"],
+        })
+    return runs
+
+
 def bert_failure_summary():
     dirs = sorted(RESULTS_DIR.glob("bert_baseline_*"))
     attempts = []
@@ -255,6 +314,7 @@ def main():
         "transformer_pretraining": transformer_pretraining_overhead(),
         "decoder_lora_lopo": decoder_lora_lopo_overhead(),
         "bert_base": bert_failure_summary(),
+        "batch32_gcp_reproduction": batch32_gcp_overhead(),
         "traditional_ml": traditional_ml_overhead(),
         "caveats": [
             "RoBERTa/DistilBERT timings are for the single Stage-1 SO-pretraining "
@@ -278,6 +338,14 @@ def main():
             "LLM baseline wall-clock times include exponential-backoff retry delays "
             "and are affected by shared-account rate limits (see llm_clients.py); "
             "they reflect this run's conditions, not a hard per-ticket API floor.",
+            "batch_size=32 Stage-1 runs for all three encoder families succeeded on a "
+            "rented GCP g2-standard-4 instance (1x NVIDIA L4, 24 GiB) after failing "
+            "with CUDA OOM on the local 11.69 GiB GPU (see bert_base above); their "
+            "test F1/AUC is statistically indistinguishable from the local "
+            "batch_size=16 configuration actually used throughout the paper, so the "
+            "added cloud cost buys no measurable accuracy improvement. "
+            "distilbert-base's batch_size=32 wall-clock/cost is an estimate (see "
+            "batch32_gcp_overhead docstring), not a direct measurement.",
         ],
     }
 
@@ -321,6 +389,16 @@ def main():
     print(f"Attempts: {len(b['attempts'])}, successful: {b['n_successful_runs']}, "
           f"GPU capacity: {b['gpu_capacity']}")
     print(b["note"])
+
+    if overhead["batch32_gcp_reproduction"]:
+        print(f"\n{'='*90}")
+        print(f"BATCH_SIZE=32 REPRODUCED ON GCP (${GCP_G2_STANDARD_4_USD_PER_HR:.4f}/hr, g2-standard-4, 1x L4)")
+        print(f"{'='*90}")
+        for r in overhead["batch32_gcp_reproduction"]:
+            hrs = r["wall_clock_s"] / 3600
+            flag = " [ESTIMATED]" if r["is_estimated"] else ""
+            print(f"{r['config']:<26} {hrs:>6.2f}h  ${r['cost_usd']:>5.2f}  "
+                  f"F1={r['test_f1']:.4f}  AUC={r['test_auc']:.4f}{flag}")
 
     print(f"\n{'='*90}")
     print("TRADITIONAL ML (SVM + GradientBoosting, CPU)")

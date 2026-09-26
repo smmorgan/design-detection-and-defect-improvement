@@ -1,0 +1,93 @@
+{
+  "mode": "full",
+  "model_name": "bert-base-uncased",
+  "max_length": 512,
+  "batch_size": 32,
+  "learning_rate": 2e-05,
+  "num_epochs": 3,
+  "dropout_rate": 0.1,
+  "random_seed": 42,
+  "data_source": "./data/data/train_data/raw/combined.csv",
+  "initial_samples": 200000,
+  "final_samples": 200000,
+  "train_samples": 140000,
+  "val_samples": 30000,
+  "test_samples": 30000,
+  "duplicates_removed": 0,
+  "auto_generated_removed": 0,
+  "short_texts_removed": 0,
+  "best_val_epoch": 3,
+  "best_val": {
+    "accuracy": 0.9032,
+    "precision": 0.9105906313645621,
+    "recall": 0.8942,
+    "f1_score": 0.9023208879919273,
+    "auc": 0.9632542133333333,
+    "true_positives": 13413,
+    "true_negatives": 13683,
+    "false_positives": 1317,
+    "false_negatives": 1587
+  },
+  "test": {
+    "accuracy": 0.906,
+    "precision": 0.9094943518020441,
+    "recall": 0.9017333333333334,
+    "f1_score": 0.9055972147830744,
+    "auc": 0.9645694466666666,
+    "true_positives": 13526,
+    "true_negatives": 13654,
+    "false_positives": 1346,
+    "false_negatives": 1474
+  },
+  "output_dir": "./output_bert_base",
+  "device": "cuda",
+  "run_id": "20260309_232709",
+  "timestamp": "2026-03-09T23:27:09.755407",
+  "full_history": {
+    "train_loss": [
+      0.3030942360639572,
+      0.2180259385042957,
+      0.167224870821195
+    ],
+    "val_loss": [
+      0.26333154976240863,
+      0.2509720667477832,
+      0.2698670682717742
+    ],
+    "val_metrics_per_epoch": [
+      {
+        "accuracy": 0.8966333333333333,
+        "precision": 0.8848069335748011,
+        "recall": 0.912,
+        "f1_score": 0.8981976954138078,
+        "auc": 0.9600401666666667,
+        "true_positives": 13680,
+        "true_negatives": 13219,
+        "false_positives": 1781,
+        "false_negatives": 1320
+      },
+      {
+        "accuracy": 0.9055,
+        "precision": 0.9044484340714143,
+        "recall": 0.9068,
+        "f1_score": 0.9056226905023469,
+        "auc": 0.9645991777777778,
+        "true_positives": 13602,
+        "true_negatives": 13563,
+        "false_positives": 1437,
+        "false_negatives": 1398
+      },
+      {
+        "accuracy": 0.9032,
+        "precision": 0.9105906313645621,
+        "recall": 0.8942,
+        "f1_score": 0.9023208879919273,
+        "auc": 0.9632542133333333,
+        "true_positives": 13413,
+        "true_negatives": 13683,
+        "false_positives": 1317,
+        "false_negatives": 1587
+      }
+    ]
+  }
+}

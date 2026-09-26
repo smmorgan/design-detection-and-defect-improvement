@@ -1,0 +1,69 @@
+project,issue_key,issue_type,summary,mine,peer
+FAB,FAB-18230,Task,"Investigate (and clean up/refactor, if necessary) orderer start sequence after removing system channel",design,non-design
+DNN,DNN-10723,Improvement,SI: Messaging Dispatch: Pass Portal Admin's Display Name along with email address,non-design,design
+MULE,MULE-14661,Enhancement Request,Archetype not using connector name in the generated packages,non-design,design
+MULE,MULE-14656,Story,Implement IBM MQ Connector - Phase 1,non-design,design
+NEXUS,NEXUS-24912,Improvement,Nexus 2 init.d chkconfig settings,non-design,design
+NEXUS,NEXUS-25491,Bug,Admin - Change Repository Blob Store task spawns threads which are not named contextually,non-design,design
+CONFSERVER,CONFSERVER-60297,Suggestion,Edits for Moffitt Intranet Page,non-design,design
+SERVER,SERVER-51452,Task,"""TenantMigrationConflict should store a shared_ptr to the TenantMigrationAccessBlocker""",non-design,design
+JRASERVER,JRASERVER-71687,Suggestion,Cannot view the full name for attachment in description column,non-design,design
+MESOS,MESOS-10030,Improvement,"Better error message than ""unknown container""",non-design,design
+TIMOB,TIMOB-28077,Improvement,iOS14: Expose new error type in Bonjure Service and update doc to align with Local n/w privacy restrictions,non-design,design
+DNN,DNN-7847,Task,DCC - Move cache from repository classes to managers classes,design,non-design
+SERVER,SERVER-51653,New Feature,"""Ban uses of unstable command parameters with apiStrict: true""",non-design,design
+SERVER,SERVER-51660,Task,"""Propagate resharding fields through the enqueued metadata combination algorithm""",non-design,design
+MULE,MULE-14817,Task,Salesforce Connector Review - Phase 1,design,non-design
+TIMOB,TIMOB-28071,Improvement,iOS: Use new build system in module build,non-design,design
+MULE,MULE-11788,Task,Spike on OAuth support for SDK,design,non-design
+DM,DM-27143,Story,Update document builds to use GitHub Actions / current build template,non-design,design
+NEXUS,NEXUS-24858,Improvement,Allow `Repair - Reconcile component database from blob store` task for NuGet,non-design,design
+NEXUS,NEXUS-24851,Improvement,Document All Expected Response Codes for REST API,non-design,design
+FAB,FAB-18187,Story,Back-porting Go Modules to 1.x,non-design,design
+SERVER,SERVER-51775,Improvement,"""Failpoint to disable periodic uptime reporter thread should instead just disable uptime reporting""",non-design,design
+CONFSERVER,CONFSERVER-60295,Suggestion,Better to add grid type of field in Jira instead of using third party plugins like idalko grid editor,non-design,design
+MESOS,MESOS-10168,Task,Add secrets support to the CSI volume managers,non-design,design
+FAB,FAB-18227,Sub-task,Kubernetes - Perform Join By Snapshot With Large Payload Using CouchDB,non-design,design
+DNN,DNN-10724,Improvement,Prompt: Mis-Alignment of Close icon on Scroll bar,non-design,design
+FAB,FAB-18268,Task,Add SetPolicies() to easily replace multiple policies in an existing configuration in bulk,design,non-design
+FAB,FAB-18243,Story,Provide metrics around HSM operations.,non-design,design
+FAB,FAB-18178,Documentation,Documentation for Channel Participation API,non-design,design
+DM,DM-27129,Story,Migrate GenericCamera CSC to SALOBJ 6,non-design,design
+TIMOB,TIMOB-28087,New Feature,"Android: Add ""NoTitleBar"" and ""Fullscreen"" themes which derive from custom app theme",non-design,design
+DNN,DNN-10827,Improvement,Add type of copy for COPY-MODULE command in promt,non-design,design
+SERVER,SERVER-51764,Task,"""Refine test cases to ensure write error retries behave as intended""",non-design,design
+SERVER,SERVER-51716,Bug,"""Make computed_projections.js more robust""",design,non-design
+TIMOB,TIMOB-28072,Improvement,iOS: Drop Xcode 9 and Xcode 10 support,non-design,design
+FAB,FAB-18217,Sub-task,Kubernetes - Perform Snapshot Generation With Medium Payload Using LevelDB,non-design,design
+JRASERVER,JRASERVER-71619,Suggestion,"Allow the creation of a ""Defined"" or ""Ready for Development"" column outside the sprint.",non-design,design
+DNN,DNN-10731,Improvement,"Verified Registration: In case of loosing the verification email, we need to implement a workaround to resend the verification mail again",non-design,design
+DM,DM-27206,Story,Prepare Simulated LSST Solar System Observations for MPC integration test.,non-design,design
+JRASERVER,JRASERVER-71685,Bug,Security improvements to the Velocity Uberspector,design,non-design
+JRASERVER,JRASERVER-71591,Suggestion,Bring back issue count and refresh on top of screen in issue navigator,non-design,design
+DM,DM-27146,Story,Write an lsp-deploy guide for bootcamp,non-design,design
+DM,DM-27188,Improvement,Update cp_pipe pipeline definitions to match standards,non-design,design
+JRASERVER,JRASERVER-71724,Suggestion,Add JIT information to SAML document,non-design,design
+FAB,FAB-18092,Story,Add example for individual Orderer value updates,non-design,design
+SERVER,SERVER-51493,Task,"""Revisit how config.transactions cloner for resharding blocks thread waiting for outstanding prepared transaction to resolve""",design,non-design
+DM,DM-27220,Story,Roll out robosimon to stable,non-design,design
+DNN,DNN-10742,Improvement,Display of long page name is incorrect while selecting page name from dropdown field(s),non-design,design
+FAB,FAB-17891,Story,Channel participation REST API - misc.,design,non-design
+TIMOB,TIMOB-28167,Bug,Android: ListViewItem does not activate ripple effect from child views,non-design,design
+NEXUS,NEXUS-25528,Improvement,Artifacthub Metadata for helm repositories,non-design,design
+NEXUS,NEXUS-25035,Improvement,audited remoteconnectionstatusevent does not include repository status,non-design,design
+JRASERVER,JRASERVER-71669,Suggestion,It is difficult to identify and correct errors.,non-design,design
+TIMOB,TIMOB-28029,Improvement,CLI: Add booted status to the info output for Android emulators and iOS simulators,non-design,design
+JRASERVER,JRASERVER-71707,Suggestion,Expansion of available emojis,non-design,design
+DNN,DNN-10744,Improvement,Issue with display of page with long name in Search of it,non-design,design
+JRASERVER,JRASERVER-71650,Suggestion,Add the ability to remove/hide the Avatar for Toolkit Plugin for Jira,non-design,design
+FAB,FAB-16102,Task,TLS support for HSM in Fabric,design,non-design
+SERVER,SERVER-51776,Improvement,"""Map setup_multiversion_mongodb.py args to evergreen build variants""",non-design,design
+FAB,FAB-14296,Task,Remove metadata provider interface,design,non-design
+CONFSERVER,CONFSERVER-60309,Suggestion,Return the Space status information when performing a GET request to /api/space resource,non-design,design
+NEXUS,NEXUS-25110,Improvement,if repository assets are downloaded by a web browser in the UI then set cache headers which tell the browser to not cache the response,non-design,design
+DNN,DNN-10834,Improvement,Setting the Description and Keywords fields within Site Settings appears to change the Description and Keywords fields on every page,non-design,design
+DM,DM-27117,Improvement,Add dummy pipeline to ap_verify testing,non-design,design
+DM,DM-27173,Improvement,Add doc field to obs.base.FilterDefinition,non-design,design
+NEXUS,NEXUS-25303,Improvement,Custom firewall messages for Maven,non-design,design
+JRASERVER,JRASERVER-71686,Suggestion,add applicable issue types filter to custom fields list,non-design,design
+JRASERVER,JRASERVER-71586,Suggestion,Regarding perforamcne issues,non-design,design

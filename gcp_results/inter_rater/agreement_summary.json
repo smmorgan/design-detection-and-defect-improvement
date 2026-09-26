@@ -1,0 +1,155 @@
+{
+  "n": 250,
+  "raw_agreement": 0.728,
+  "cohens_kappa": 0.4358,
+  "pabak": 0.456,
+  "mine_design_prevalence": 0.276,
+  "peer_design_prevalence": 0.46,
+  "confusion_matrix_labels": [
+    "design",
+    "non-design"
+  ],
+  "confusion_matrix_rows_mine_cols_peer": [
+    [
+      58,
+      11
+    ],
+    [
+      57,
+      124
+    ]
+  ],
+  "mcnemar_b_mine_design_peer_nondesign": 11,
+  "mcnemar_c_mine_nondesign_peer_design": 57,
+  "mcnemar_exact_p": 1.2750032374450517e-08,
+  "per_project": {
+    "CONFSERVER": {
+      "n": 29.0,
+      "agreement": 0.8966,
+      "mine_design_rate": 0.3103,
+      "peer_design_rate": 0.4138
+    },
+    "DM": {
+      "n": 30.0,
+      "agreement": 0.7333,
+      "mine_design_rate": 0.4,
+      "peer_design_rate": 0.6667
+    },
+    "DNN": {
+      "n": 23.0,
+      "agreement": 0.6522,
+      "mine_design_rate": 0.1304,
+      "peer_design_rate": 0.3913
+    },
+    "FAB": {
+      "n": 30.0,
+      "agreement": 0.6333,
+      "mine_design_rate": 0.2667,
+      "peer_design_rate": 0.3
+    },
+    "JRASERVER": {
+      "n": 23.0,
+      "agreement": 0.5652,
+      "mine_design_rate": 0.1739,
+      "peer_design_rate": 0.5217
+    },
+    "MESOS": {
+      "n": 22.0,
+      "agreement": 0.9091,
+      "mine_design_rate": 0.2727,
+      "peer_design_rate": 0.3636
+    },
+    "MULE": {
+      "n": 18.0,
+      "agreement": 0.7778,
+      "mine_design_rate": 0.3333,
+      "peer_design_rate": 0.3333
+    },
+    "NEXUS": {
+      "n": 23.0,
+      "agreement": 0.6522,
+      "mine_design_rate": 0.2609,
+      "peer_design_rate": 0.6087
+    },
+    "SERVER": {
+      "n": 28.0,
+      "agreement": 0.7143,
+      "mine_design_rate": 0.2857,
+      "peer_design_rate": 0.4286
+    },
+    "TIMOB": {
+      "n": 24.0,
+      "agreement": 0.75,
+      "mine_design_rate": 0.2917,
+      "peer_design_rate": 0.5417
+    }
+  },
+  "per_issue_type": {
+    "Bug": {
+      "n": 91.0,
+      "disagreement_rate": 0.044,
+      "mine_design_rate": 0.022,
+      "peer_design_rate": 0.022
+    },
+    "Documentation": {
+      "n": 1.0,
+      "disagreement_rate": 1.0,
+      "mine_design_rate": 0.0,
+      "peer_design_rate": 1.0
+    },
+    "Enhancement Request": {
+      "n": 4.0,
+      "disagreement_rate": 0.25,
+      "mine_design_rate": 0.75,
+      "peer_design_rate": 1.0
+    },
+    "Epic": {
+      "n": 5.0,
+      "disagreement_rate": 0.0,
+      "mine_design_rate": 1.0,
+      "peer_design_rate": 1.0
+    },
+    "Improvement": {
+      "n": 38.0,
+      "disagreement_rate": 0.6316,
+      "mine_design_rate": 0.3684,
+      "peer_design_rate": 1.0
+    },
+    "New Feature": {
+      "n": 10.0,
+      "disagreement_rate": 0.2,
+      "mine_design_rate": 0.8,
+      "peer_design_rate": 1.0
+    },
+    "Story": {
+      "n": 32.0,
+      "disagreement_rate": 0.3125,
+      "mine_design_rate": 0.4062,
+      "peer_design_rate": 0.6562
+    },
+    "Sub-task": {
+      "n": 2.0,
+      "disagreement_rate": 1.0,
+      "mine_design_rate": 0.0,
+      "peer_design_rate": 1.0
+    },
+    "Suggestion": {
+      "n": 24.0,
+      "disagreement_rate": 0.5,
+      "mine_design_rate": 0.5,
+      "peer_design_rate": 1.0
+    },
+    "Task": {
+      "n": 42.0,
+      "disagreement_rate": 0.2857,
+      "mine_design_rate": 0.2619,
+      "peer_design_rate": 0.1667
+    },
+    "Technical task": {
+      "n": 1.0,
+      "disagreement_rate": 0.0,
+      "mine_design_rate": 1.0,
+      "peer_design_rate": 1.0
+    }
+  }
+}

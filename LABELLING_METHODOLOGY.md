@@ -8,7 +8,7 @@ Labels were applied to two sources:
 1. **Project TSV files** — nine manually-curated TAWOS project exports (CONFSERVER, DM, DNN, FAB, JRASERVER, MESOS, MULE, NEXUS, TIMOB)
 2. **TAWOS MySQL database** — seventeen additional projects fetched directly (JRACLOUD, CONFCLOUD, BAM, CWD, EVG, XD, IS, STL, JSWSERVER, JSWCLOUD, FE, JAVA, TISTUD, INDY, APSTUD, COMPASS, MDL)
 
-Manual review of ~100 sampled results yielded ~95% agreement, with 5 disagreements.
+Manual review of 100 sampled results yielded 96% agreement, with 4 disagreements.
 
 ---
 

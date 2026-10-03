@@ -1,0 +1,554 @@
+2026-09-28 08:31:53,093 - INFO - Panel: 18251 rows (458 project-component series) -> 4185 after dropping NA lag/control rows
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+2026-09-28 08:32:00,277 - INFO - Running 200-permutation null for H1 (this is slow with 209 series)...
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: invalid value encountered in multiply
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: invalid value encountered in multiply
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+2026-09-28 08:41:05,787 - INFO - Running blocked-time CV MAE for M0/M1/M2...
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/genmod/generalized_linear_model.py:1488: SpecificationWarning: cov_type not fully supported with var_weights
+  glm_results = GLMResults(
+
+H1 (M0 vs M1) LR stat=22.105, df=4, p=0.0002
+H2 (M1 vs M2) LR stat=2.950, df=2, p=0.2288
+
+M1 design_ratio_lag coefficients:
+design_ratio_lag1   -0.273684
+design_ratio_lag2   -0.203158
+design_ratio_lag3    0.019377
+design_ratio_lag4    0.099442
+dtype: float64
+M0 alpha=0.6698  M1 alpha=0.6661  M2 alpha=0.6653
+H1 permutation null (200 reps): observed LR stat=22.105, permutation p=0.0050
+M0: MAE=nan  folds_used=0  folds_dropped_nonconverged=17  folds_skipped_thin_training=11
+M1: MAE=nan  folds_used=0  folds_dropped_nonconverged=17  folds_skipped_thin_training=11
+M2: MAE=nan  folds_used=0  folds_dropped_nonconverged=17  folds_skipped_thin_training=11
+
+=== H3 (reverse: bug_count -> design_ratio), project_component FE ===
+                   Generalized Linear Model Regression Results                    
+==================================================================================
+Dep. Variable:     design_ratio_corrected   No. Observations:                11305
+Model:                                GLM   Df Residuals:                    10842
+Model Family:                    Binomial   Df Model:                          462
+Link Function:                      Logit   Scale:                          1.0000
+Method:                              IRLS   Log-Likelihood:                -52011.
+Date:                    Mon, 28 Sep 2026   Deviance:                       35072.
+Time:                            08:42:21   Pearson chi2:                 3.75e+04
+No. Iterations:                        25   Pseudo R-squ. (CS):             0.9425
+Covariance Type:                  cluster                                         
+========================================================================================================================================================================
+                                                                                                           coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Intercept                                                                                               -3.7915      0.149    -25.372      0.000      -4.084      -3.499
+C(project_component)[T.CONFSERVER::Apps - Team Calendar]                                                 1.3265      0.049     26.941      0.000       1.230       1.423
+C(project_component)[T.CONFSERVER::Content - Attachments]                                                0.2963      0.204      1.449      0.147      -0.104       0.697
+C(project_component)[T.CONFSERVER::Content - Blogs]                                                    -23.1523      0.878    -26.378      0.000     -24.873     -21.432
+C(project_component)[T.CONFSERVER::Content - Blueprints / Templates]                                     1.4120      0.220      6.411      0.000       0.980       1.844
+C(project_component)[T.CONFSERVER::Content - Edit Files / Companion]                                     1.1806      0.251      4.699      0.000       0.688       1.673
+C(project_component)[T.CONFSERVER::Content - File Previews]                                            -23.2096      1.083    -21.431      0.000     -25.332     -21.087
+C(project_component)[T.CONFSERVER::Content - History]                                                    1.3831      0.210      6.589      0.000       0.972       1.795
+C(project_component)[T.CONFSERVER::Content - Inline Comments]                                            1.1149      0.069     16.108      0.000       0.979       1.251
+C(project_component)[T.CONFSERVER::Content - Labels]                                                     1.3518      0.182      7.433      0.000       0.995       1.708
+C(project_component)[T.CONFSERVER::Content - Linking]                                                    1.2227      0.203      6.031      0.000       0.825       1.620
+C(project_component)[T.CONFSERVER::Content - Page]                                                       0.3159      0.138      2.296      0.022       0.046       0.586
+C(project_component)[T.CONFSERVER::Content - Restrictions]                                               1.2305      0.176      6.978      0.000       0.885       1.576
+C(project_component)[T.CONFSERVER::Content - Sharing]                                                    1.1113      0.064     17.451      0.000       0.986       1.236
+C(project_component)[T.CONFSERVER::Core - Content REST APIs]                                             2.7122      0.097     27.990      0.000       2.522       2.902
+C(project_component)[T.CONFSERVER::Core - Email]                                                         1.1944      0.152      7.836      0.000       0.896       1.493
+C(project_component)[T.CONFSERVER::Core - Macros Platform]                                               1.4426      0.077     18.768      0.000       1.292       1.593
+C(project_component)[T.CONFSERVER::Core - OSGi Plugins Platform]                                         2.1747      0.075     28.829      0.000       2.027       2.323
+C(project_component)[T.CONFSERVER::Core - Workbox]                                                       1.7949      0.072     25.068      0.000       1.655       1.935
+C(project_component)[T.CONFSERVER::Data Center - Core]                                                   0.8332      0.103      8.056      0.000       0.630       1.036
+C(project_component)[T.CONFSERVER::Data Center - Deployments]                                            2.5934      0.075     34.670      0.000       2.447       2.740
+C(project_component)[T.CONFSERVER::Documentation - All]                                                  1.2489      0.116     10.746      0.000       1.021       1.477
+C(project_component)[T.CONFSERVER::Editor - Attachment]                                                  0.7072      0.201      3.514      0.000       0.313       1.102
+C(project_component)[T.CONFSERVER::Editor - Collaborative editing]                                       1.6253      0.085     19.057      0.000       1.458       1.792
+C(project_component)[T.CONFSERVER::Editor - Core]                                                        0.8554      0.108      7.952      0.000       0.645       1.066
+C(project_component)[T.CONFSERVER::Editor - Drafts]                                                    -23.5138      1.063    -22.114      0.000     -25.598     -21.430
+C(project_component)[T.CONFSERVER::Editor - Front end - Page / Comment]                                -23.4615      1.058    -22.181      0.000     -25.535     -21.388
+C(project_component)[T.CONFSERVER::Editor - Page / Comment Editor]                                       0.0002      0.219      0.001      0.999      -0.428       0.429
+C(project_component)[T.CONFSERVER::Editor - Synchrony]                                                   1.7089      0.094     18.213      0.000       1.525       1.893
+C(project_component)[T.CONFSERVER::Integrations - JIRA]                                                  0.5906      0.154      3.840      0.000       0.289       0.892
+C(project_component)[T.CONFSERVER::Integrations - Office Connector]                                      1.9271      0.105     18.365      0.000       1.721       2.133
+C(project_component)[T.CONFSERVER::Macros - Attachments]                                                 0.5913      0.061      9.758      0.000       0.473       0.710
+C(project_component)[T.CONFSERVER::Macros - Gadgets]                                                     1.4011      0.052     26.806      0.000       1.299       1.504
+C(project_component)[T.CONFSERVER::Macros - JIRA Macros]                                                -1.3534      0.063    -21.446      0.000      -1.477      -1.230
+C(project_component)[T.CONFSERVER::Macros - Multimedia]                                                -23.3246      1.042    -22.389      0.000     -25.367     -21.283
+C(project_component)[T.CONFSERVER::Macros - Other Macros]                                                0.3054      0.086      3.571      0.000       0.138       0.473
+C(project_component)[T.CONFSERVER::Macros - Page Properties]                                            -0.1651      0.055     -3.007      0.003      -0.273      -0.057
+C(project_component)[T.CONFSERVER::Macros - Search]                                                      1.8495      0.059     31.276      0.000       1.734       1.965
+C(project_component)[T.CONFSERVER::Macros - Table of Contents]                                         -23.2684      1.037    -22.437      0.000     -25.301     -21.236
+C(project_component)[T.CONFSERVER::Mobile]                                                               1.9752      0.076     25.911      0.000       1.826       2.125
+C(project_component)[T.CONFSERVER::Navigation - Dashboard]                                               0.3849      0.148      2.608      0.009       0.096       0.674
+C(project_component)[T.CONFSERVER::Navigation - Sidebar]                                               -23.5303      1.063    -22.135      0.000     -25.614     -21.447
+C(project_component)[T.CONFSERVER::Page - Export / Import]                                               0.4282      0.115      3.720      0.000       0.203       0.654
+C(project_component)[T.CONFSERVER::Platform - Application Links]                                         1.5630      0.058     26.771      0.000       1.449       1.677
+C(project_component)[T.CONFSERVER::Search - Core]                                                        0.7554      0.117      6.471      0.000       0.527       0.984
+C(project_component)[T.CONFSERVER::Search - Indexing]                                                    0.1515      0.059      2.575      0.010       0.036       0.267
+C(project_component)[T.CONFSERVER::Server - Administration]                                              1.2786      0.149      8.557      0.000       0.986       1.571
+C(project_component)[T.CONFSERVER::Server - Authentication]                                              1.3643      0.084     16.231      0.000       1.200       1.529
+C(project_component)[T.CONFSERVER::Server - EAP]                                                         1.2086      0.095     12.777      0.000       1.023       1.394
+C(project_component)[T.CONFSERVER::Server - Installer / Setup]                                           0.8603      0.146      5.878      0.000       0.573       1.147
+C(project_component)[T.CONFSERVER::Server - Mail Archiving]                                              2.4039      0.066     36.318      0.000       2.274       2.534
+C(project_component)[T.CONFSERVER::Server - Performance]                                               -23.8740      1.106    -21.578      0.000     -26.043     -21.705
+C(project_component)[T.CONFSERVER::Server - Platform]                                                    1.2800      0.215      5.954      0.000       0.859       1.701
+C(project_component)[T.CONFSERVER::Server - Plugin  Development]                                         1.6400      0.078     21.065      0.000       1.487       1.793
+C(project_component)[T.CONFSERVER::Server - Source Distribution]                                         0.9968      0.081     12.340      0.000       0.838       1.155
+C(project_component)[T.CONFSERVER::Server - Upgrade Manager]                                             1.1099      0.111     10.008      0.000       0.893       1.327
+C(project_component)[T.CONFSERVER::Site - Backup / Import]                                               0.3983      0.149      2.679      0.007       0.107       0.690
+C(project_component)[T.CONFSERVER::Space - Export / Import]                                              0.3939      0.168      2.344      0.019       0.065       0.723
+C(project_component)[T.CONFSERVER::Space - Personal Space]                                               0.6339      0.134      4.737      0.000       0.372       0.896
+C(project_component)[T.CONFSERVER::System Administration - Troubleshooting and Support Tools (ATST)]     2.1169      0.091     23.264      0.000       1.939       2.295
+C(project_component)[T.CONFSERVER::Themes / Theming]                                                    -0.4238      0.088     -4.806      0.000      -0.597      -0.251
+C(project_component)[T.CONFSERVER::Translations]                                                         0.5080      0.060      8.509      0.000       0.391       0.625
+C(project_component)[T.CONFSERVER::Unclassified]                                                         2.0026      0.310      6.456      0.000       1.395       2.611
+C(project_component)[T.CONFSERVER::Universal Plugin Manager / Manage apps]                               1.3587      0.053     25.802      0.000       1.255       1.462
+C(project_component)[T.CONFSERVER::User - Global / Space Permissions]                                    1.8908      0.164     11.549      0.000       1.570       2.212
+C(project_component)[T.CONFSERVER::User - Management]                                                    0.8711      0.212      4.107      0.000       0.455       1.287
+C(project_component)[T.CONFSERVER::User - Mentions]                                                     -0.1067      0.155     -0.688      0.491      -0.410       0.197
+C(project_component)[T.CONFSERVER::User - Profile]                                                       0.9512      0.093     10.233      0.000       0.769       1.133
+C(project_component)[T.CONFSERVER::Web Interface - AUI]                                                  0.5334      0.127      4.201      0.000       0.285       0.782
+C(project_component)[T.CONFSERVER::Web Interface - Keyboard Navigation]                                 -0.3653      0.058     -6.315      0.000      -0.479      -0.252
+C(project_component)[T.DM::Continuous Integration]                                                       1.3897      0.062     22.585      0.000       1.269       1.510
+C(project_component)[T.DM::Developer Infrastructure]                                                     3.3797      0.067     50.487      0.000       3.248       3.511
+C(project_component)[T.DM::Firefly]                                                                      2.4942      0.077     32.231      0.000       2.343       2.646
+C(project_component)[T.DM::IRSA]                                                                         5.0130      0.085     58.748      0.000       4.846       5.180
+C(project_component)[T.DM::Qserv]                                                                        3.7558      0.063     59.771      0.000       3.633       3.879
+C(project_component)[T.DM::SUIT]                                                                         3.5898      0.083     43.253      0.000       3.427       3.752
+C(project_component)[T.DM::Stack Documentation and UX]                                                   4.4744      0.068     65.420      0.000       4.340       4.608
+C(project_component)[T.DM::Unclassified]                                                                 3.6654      0.037     98.136      0.000       3.592       3.739
+C(project_component)[T.DM::afw]                                                                          2.4977      0.063     39.338      0.000       2.373       2.622
+C(project_component)[T.DM::ap_verify]                                                                    3.1081      0.098     31.876      0.000       2.917       3.299
+C(project_component)[T.DM::astshim]                                                                      2.3355      0.112     20.926      0.000       2.117       2.554
+C(project_component)[T.DM::ctrl_iip]                                                                     2.1114      0.113     18.632      0.000       1.889       2.333
+C(project_component)[T.DM::daf_butler]                                                                   4.6494      0.053     88.490      0.000       4.546       4.752
+C(project_component)[T.DM::daf_persistence]                                                              2.6620      0.067     39.557      0.000       2.530       2.794
+C(project_component)[T.DM::ip_diffim]                                                                    2.9222      0.066     44.293      0.000       2.793       3.051
+C(project_component)[T.DM::ip_isr]                                                                       1.2675      0.058     22.020      0.000       1.155       1.380
+C(project_component)[T.DM::jointcal]                                                                     2.5774      0.086     29.950      0.000       2.409       2.746
+C(project_component)[T.DM::lsstsw]                                                                       1.7942      0.081     22.110      0.000       1.635       1.953
+C(project_component)[T.DM::meas_algorithms]                                                              1.9921      0.067     29.816      0.000       1.861       2.123
+C(project_component)[T.DM::meas_astrom]                                                                  2.1294      0.081     26.414      0.000       1.971       2.287
+C(project_component)[T.DM::meas_base]                                                                    3.0654      0.082     37.237      0.000       2.904       3.227
+C(project_component)[T.DM::obs_base]                                                                     2.9544      0.058     50.909      0.000       2.841       3.068
+C(project_component)[T.DM::obs_decam]                                                                    2.3915      0.068     35.184      0.000       2.258       2.525
+C(project_component)[T.DM::obs_lsst]                                                                     1.9416      0.106     18.277      0.000       1.733       2.150
+C(project_component)[T.DM::obs_subaru]                                                                   1.9426      0.067     29.001      0.000       1.811       2.074
+C(project_component)[T.DM::pex_config]                                                                   2.4539      0.067     36.425      0.000       2.322       2.586
+C(project_component)[T.DM::pipe_base]                                                                    3.0000      0.065     46.465      0.000       2.873       3.127
+C(project_component)[T.DM::pipe_drivers]                                                                 1.4289      0.093     15.320      0.000       1.246       1.612
+C(project_component)[T.DM::pipe_tasks]                                                                   1.9290      0.064     29.997      0.000       1.803       2.055
+C(project_component)[T.DM::sconsUtils]                                                                   2.4339      0.079     30.939      0.000       2.280       2.588
+C(project_component)[T.DM::stack release]                                                                0.8872      0.086     10.317      0.000       0.719       1.056
+C(project_component)[T.DM::ts_auxiliary_telescope]                                                       3.5261      0.110     32.154      0.000       3.311       3.741
+C(project_component)[T.DM::ts_main_telescope]                                                            3.2301      0.105     30.748      0.000       3.024       3.436
+C(project_component)[T.DM::ts_middleware]                                                                2.9013      0.056     51.714      0.000       2.791       3.011
+C(project_component)[T.DM::validate_drp]                                                                 1.1190      0.094     11.912      0.000       0.935       1.303
+C(project_component)[T.DNN::Admin - Event Viewer]                                                        1.2998      0.077     16.973      0.000       1.150       1.450
+C(project_component)[T.DNN::Admin - Extensions]                                                          0.9317      0.073     12.790      0.000       0.789       1.074
+C(project_component)[T.DNN::Admin - File Manager]                                                        0.3021      0.075      4.018      0.000       0.155       0.449
+C(project_component)[T.DNN::Admin - Languages]                                                          -0.6866      0.067    -10.316      0.000      -0.817      -0.556
+C(project_component)[T.DNN::Admin - Newsletters]                                                         0.5207      0.084      6.187      0.000       0.356       0.686
+C(project_component)[T.DNN::Admin - Pages]                                                              -0.2969      0.058     -5.157      0.000      -0.410      -0.184
+C(project_component)[T.DNN::Admin - Recycle Bin]                                                        -0.0056      0.068     -0.083      0.934      -0.138       0.127
+C(project_component)[T.DNN::Admin - Search Engine SiteMap]                                               1.2211      0.073     16.782      0.000       1.079       1.364
+C(project_component)[T.DNN::Admin - Security Roles]                                                     -0.0815      0.077     -1.059      0.290      -0.232       0.069
+C(project_component)[T.DNN::Admin - Site Settings]                                                      -0.2320      0.065     -3.567      0.000      -0.360      -0.105
+C(project_component)[T.DNN::Admin - Skins]                                                               0.7967      0.069     11.511      0.000       0.661       0.932
+C(project_component)[T.DNN::Admin - Taxonomy]                                                            1.3717      0.080     17.105      0.000       1.215       1.529
+C(project_component)[T.DNN::Admin - User Accounts]                                                      -0.6691      0.063    -10.668      0.000      -0.792      -0.546
+C(project_component)[T.DNN::Admin / Host Functions]                                                      0.5621      0.086      6.569      0.000       0.394       0.730
+C(project_component)[T.DNN::CKEditor]                                                                  -22.8971      1.084    -21.118      0.000     -25.022     -20.772
+C(project_component)[T.DNN::Client Resources]                                                            1.9908      0.080     25.017      0.000       1.835       2.147
+C(project_component)[T.DNN::Control Panel]                                                               0.9642      0.095     10.200      0.000       0.779       1.149
+C(project_component)[T.DNN::Control Panel - Ribbon Bar]                                                  0.0597      0.093      0.642      0.521      -0.123       0.242
+C(project_component)[T.DNN::Core API]                                                                    2.6061      0.077     33.750      0.000       2.455       2.757
+C(project_component)[T.DNN::Core Modules]                                                                0.8841      0.084     10.583      0.000       0.720       1.048
+C(project_component)[T.DNN::DDR Menu]                                                                    1.3319      0.076     17.523      0.000       1.183       1.481
+C(project_component)[T.DNN::Data Access (DAL)]                                                           0.5718      0.070      8.171      0.000       0.435       0.709
+C(project_component)[T.DNN::Dynamic Content Creator]                                                     4.3278      0.163     26.477      0.000       4.007       4.648
+C(project_component)[T.DNN::End User Functions]                                                          1.4079      0.083     16.950      0.000       1.245       1.571
+C(project_component)[T.DNN::File Manager]                                                                0.5374      0.089      6.070      0.000       0.364       0.711
+C(project_component)[T.DNN::Friendly / Standard URLs]                                                    0.2876      0.075      3.854      0.000       0.141       0.434
+C(project_component)[T.DNN::General]                                                                    -0.4754      0.068     -6.964      0.000      -0.609      -0.342
+C(project_component)[T.DNN::HTML Editor]                                                                -0.0753      0.073     -1.038      0.299      -0.217       0.067
+C(project_component)[T.DNN::HTML Module - Core]                                                          1.0722      0.077     13.958      0.000       0.922       1.223
+C(project_component)[T.DNN::Host - Extensions]                                                           0.1403      0.074      1.890      0.059      -0.005       0.286
+C(project_component)[T.DNN::Host - File Manager]                                                         0.2438      0.084      2.890      0.004       0.078       0.409
+C(project_component)[T.DNN::Host - Host Settings]                                                      -23.0279      1.080    -21.322      0.000     -25.145     -20.911
+C(project_component)[T.DNN::Host - Lists]                                                                1.1461      0.072     15.828      0.000       1.004       1.288
+C(project_component)[T.DNN::Host - SQL]                                                                  0.5990      0.083      7.193      0.000       0.436       0.762
+C(project_component)[T.DNN::Host - Schedule]                                                             0.7415      0.074     10.085      0.000       0.597       0.886
+C(project_component)[T.DNN::Host - Site Management]                                                     -1.5185      0.070    -21.627      0.000      -1.656      -1.381
+C(project_component)[T.DNN::Host - SuperUser Accounts]                                                 -22.9817      1.082    -21.241      0.000     -25.102     -20.861
+C(project_component)[T.DNN::ImageHandler]                                                                1.0689      0.090     11.895      0.000       0.893       1.245
+C(project_component)[T.DNN::Import / Export]                                                             1.1888      0.109     10.912      0.000       0.975       1.402
+C(project_component)[T.DNN::Installation]                                                               -1.5006      0.078    -19.212      0.000      -1.654      -1.347
+C(project_component)[T.DNN::Installation / Upgrade]                                                     -0.0998      0.075     -1.322      0.186      -0.248       0.048
+C(project_component)[T.DNN::Journal]                                                                     0.3072      0.077      3.964      0.000       0.155       0.459
+C(project_component)[T.DNN::Localization - Content]                                                     -0.2252      0.063     -3.563      0.000      -0.349      -0.101
+C(project_component)[T.DNN::Localization - Language Packs]                                               0.1505      0.064      2.340      0.019       0.024       0.277
+C(project_component)[T.DNN::Localization - Static]                                                       0.1278      0.085      1.505      0.132      -0.039       0.294
+C(project_component)[T.DNN::Localization / ML]                                                           1.0628      0.083     12.762      0.000       0.900       1.226
+C(project_component)[T.DNN::Login/Registration]                                                          0.2076      0.068      3.047      0.002       0.074       0.341
+C(project_component)[T.DNN::Login/Registration - Password Reset]                                       -23.0006      1.081    -21.287      0.000     -25.118     -20.883
+C(project_component)[T.DNN::MVC]                                                                         1.8146      0.109     16.603      0.000       1.600       2.029
+C(project_component)[T.DNN::Member Directory]                                                          -23.0222      1.080    -21.308      0.000     -25.140     -20.905
+C(project_component)[T.DNN::Messaging]                                                                   0.8935      0.071     12.498      0.000       0.753       1.034
+C(project_component)[T.DNN::Mobile]                                                                      0.6960      0.091      7.649      0.000       0.518       0.874
+C(project_component)[T.DNN::Modules - Core]                                                              1.2715      0.075     16.865      0.000       1.124       1.419
+C(project_component)[T.DNN::Modules - Third party]                                                       1.2761      0.071     18.035      0.000       1.137       1.415
+C(project_component)[T.DNN::Notifications]                                                               1.8300      0.081     22.464      0.000       1.670       1.990
+C(project_component)[T.DNN::Pages]                                                                      -1.1137      0.095    -11.728      0.000      -1.300      -0.928
+C(project_component)[T.DNN::Performance]                                                                 0.8953      0.077     11.689      0.000       0.745       1.045
+C(project_component)[T.DNN::PersonaBar]                                                                 -0.7716      0.089     -8.630      0.000      -0.947      -0.596
+C(project_component)[T.DNN::Providers]                                                                   2.0326      0.082     24.920      0.000       1.873       2.192
+C(project_component)[T.DNN::Release Packaging]                                                         -22.9905      1.081    -21.265      0.000     -25.109     -20.871
+C(project_component)[T.DNN::SSL]                                                                       -23.0186      1.081    -21.297      0.000     -25.137     -20.900
+C(project_component)[T.DNN::Search]                                                                      1.1383      0.072     15.762      0.000       0.997       1.280
+C(project_component)[T.DNN::Security & Permissions]                                                      1.4364      0.078     18.495      0.000       1.284       1.589
+C(project_component)[T.DNN::Services Framework]                                                          2.4680      0.080     30.679      0.000       2.310       2.626
+C(project_component)[T.DNN::Skinning]                                                                    1.2032      0.083     14.450      0.000       1.040       1.366
+C(project_component)[T.DNN::Skins - DotNetNuke]                                                          1.1389      0.079     14.460      0.000       0.985       1.293
+C(project_component)[T.DNN::Skins - Third party]                                                       -23.0134      1.081    -21.288      0.000     -25.132     -20.895
+C(project_component)[T.DNN::Social Groups]                                                               0.9959      0.078     12.735      0.000       0.843       1.149
+C(project_component)[T.DNN::Telerik]                                                                     1.5936      0.088     18.125      0.000       1.421       1.766
+C(project_component)[T.DNN::Templates]                                                                   1.6154      0.077     21.081      0.000       1.465       1.766
+C(project_component)[T.DNN::UI / Usability]                                                              0.0062      0.071      0.087      0.931      -0.134       0.146
+C(project_component)[T.DNN::URL ReWriter]                                                                0.6297      0.078      8.084      0.000       0.477       0.782
+C(project_component)[T.DNN::Unclassified]                                                                1.4582      0.021     68.604      0.000       1.417       1.500
+C(project_component)[T.DNN::Upgrade]                                                                   -22.9846      1.081    -21.263      0.000     -25.103     -20.866
+C(project_component)[T.DNN::User Profile]                                                                0.5942      0.074      8.027      0.000       0.449       0.739
+C(project_component)[T.DNN::dam]                                                                         1.4209      0.115     12.402      0.000       1.196       1.645
+C(project_component)[T.DNN::jQuery]                                                                      1.9457      0.080     24.467      0.000       1.790       2.102
+C(project_component)[T.FAB::Unclassified]                                                                0.4844      0.049      9.929      0.000       0.389       0.580
+C(project_component)[T.FAB::fabric-build]                                                               -0.6089      0.084     -7.281      0.000      -0.773      -0.445
+C(project_component)[T.FAB::fabric-ci]                                                                   0.0142      0.103      0.138      0.890      -0.187       0.215
+C(project_component)[T.FAB::fabric-common]                                                               2.6083      0.104     25.036      0.000       2.404       2.813
+C(project_component)[T.FAB::fabric-crypto]                                                               3.8280      0.087     44.202      0.000       3.658       3.998
+C(project_component)[T.FAB::fabric-docs]                                                                 0.7876      0.075     10.531      0.000       0.641       0.934
+C(project_component)[T.FAB::fabric-gossip]                                                               1.0899      0.076     14.345      0.000       0.941       1.239
+C(project_component)[T.FAB::fabric-ledger]                                                               1.7611      0.070     25.171      0.000       1.624       1.898
+C(project_component)[T.FAB::fabric-orderer]                                                              0.4917      0.065      7.551      0.000       0.364       0.619
+C(project_component)[T.FAB::fabric-peer]                                                                 2.0639      0.059     35.048      0.000       1.948       2.179
+C(project_component)[T.FAB::fabric-quality]                                                             -0.7800      0.058    -13.334      0.000      -0.895      -0.665
+C(project_component)[T.FAB::fabric-samples]                                                             -3.0993      0.081    -38.383      0.000      -3.258      -2.941
+C(project_component)[T.FAB::fabric-tools]                                                                1.0916      0.101     10.763      0.000       0.893       1.290
+C(project_component)[T.JRASERVER::Administration - Fields]                                               1.8706      0.142     13.184      0.000       1.593       2.149
+C(project_component)[T.JRASERVER::Administration - Issue Types]                                          1.0593      0.198      5.352      0.000       0.671       1.447
+C(project_component)[T.JRASERVER::Administration - Others]                                               2.3789      0.095     24.966      0.000       2.192       2.566
+C(project_component)[T.JRASERVER::Administration - Permission Helper]                                    1.8827      0.055     33.952      0.000       1.774       1.991
+C(project_component)[T.JRASERVER::Administration - Screens]                                              2.0464      0.143     14.310      0.000       1.766       2.327
+C(project_component)[T.JRASERVER::Administration - Workflows]                                            2.0136      0.140     14.396      0.000       1.739       2.288
+C(project_component)[T.JRASERVER::Application Links]                                                     1.9412      0.100     19.476      0.000       1.746       2.137
+C(project_component)[T.JRASERVER::Backup & Restore (non-migration)]                                      1.3624      0.232      5.885      0.000       0.909       1.816
+C(project_component)[T.JRASERVER::Bulk Operations]                                                       1.7381      0.118     14.697      0.000       1.506       1.970
+C(project_component)[T.JRASERVER::Custom fields]                                                         1.5989      0.109     14.613      0.000       1.384       1.813
+C(project_component)[T.JRASERVER::Dashboard & Gadgets]                                                   1.2520      0.164      7.627      0.000       0.930       1.574
+C(project_component)[T.JRASERVER::Dashboards & Reports - Reports]                                        1.8240      0.137     13.337      0.000       1.556       2.092
+C(project_component)[T.JRASERVER::Data Center - Other]                                                   1.6663      0.107     15.623      0.000       1.457       1.875
+C(project_component)[T.JRASERVER::Documentation - All]                                                   1.4237      0.162      8.779      0.000       1.106       1.742
+C(project_component)[T.JRASERVER::Email notifications]                                                   1.9606      0.152     12.921      0.000       1.663       2.258
+C(project_component)[T.JRASERVER::Import / Export [Deprecated]]                                          1.2291      0.093     13.218      0.000       1.047       1.411
+C(project_component)[T.JRASERVER::Indexing]                                                              1.3385      0.150      8.933      0.000       1.045       1.632
+C(project_component)[T.JRASERVER::Infrastructure & Services - Application Lifecycle]                     1.3880      0.173      8.001      0.000       1.048       1.728
+C(project_component)[T.JRASERVER::Installation]                                                          1.1910      0.165      7.224      0.000       0.868       1.514
+C(project_component)[T.JRASERVER::Issue - Actions]                                                       0.6527      0.210      3.103      0.002       0.240       1.065
+C(project_component)[T.JRASERVER::Issue - Attachments]                                                   0.6127      0.184      3.323      0.001       0.251       0.974
+C(project_component)[T.JRASERVER::Issue - Comments]                                                      1.1185      0.197      5.669      0.000       0.732       1.505
+C(project_component)[T.JRASERVER::Issue - Create Issue]                                                 -0.1887      0.240     -0.787      0.431      -0.659       0.281
+C(project_component)[T.JRASERVER::Issue - Fields]                                                        1.1421      0.191      5.975      0.000       0.767       1.517
+C(project_component)[T.JRASERVER::Issue - Others]                                                       -0.7300      0.211     -3.461      0.001      -1.143      -0.317
+C(project_component)[T.JRASERVER::Issue - Sub-Tasks]                                                     1.5134      0.102     14.865      0.000       1.314       1.713
+C(project_component)[T.JRASERVER::Issue - Time Tracking & Worklog]                                       2.0312      0.144     14.135      0.000       1.750       2.313
+C(project_component)[T.JRASERVER::Issue - View Issue]                                                    1.1543      0.226      5.110      0.000       0.712       1.597
+C(project_component)[T.JRASERVER::JQL]                                                                   0.6480      0.141      4.588      0.000       0.371       0.925
+C(project_component)[T.JRASERVER::Java API]                                                              1.5372      0.153     10.021      0.000       1.237       1.838
+C(project_component)[T.JRASERVER::Jira Importers Plugin]                                                 2.4091      0.090     26.869      0.000       2.233       2.585
+C(project_component)[T.JRASERVER::Keyboard Shortcuts]                                                    0.1392      0.167      0.833      0.405      -0.188       0.467
+C(project_component)[T.JRASERVER::Licensing]                                                             1.5489      0.185      8.393      0.000       1.187       1.911
+C(project_component)[T.JRASERVER::Login]                                                                 1.0879      0.169      6.425      0.000       0.756       1.420
+C(project_component)[T.JRASERVER::Mail Server]                                                           2.4016      0.065     36.721      0.000       2.273       2.530
+C(project_component)[T.JRASERVER::Migration - Cloud to Server]                                           0.9296      0.071     13.080      0.000       0.790       1.069
+C(project_component)[T.JRASERVER::Migration - Server to Cloud]                                           1.4101      0.221      6.368      0.000       0.976       1.844
+C(project_component)[T.JRASERVER::Migration - Server to Server]                                          1.5617      0.192      8.116      0.000       1.185       1.939
+C(project_component)[T.JRASERVER::Mobile]                                                                2.1804      0.055     39.769      0.000       2.073       2.288
+C(project_component)[T.JRASERVER::Navigation - Export]                                                   1.1988      0.165      7.246      0.000       0.875       1.523
+C(project_component)[T.JRASERVER::Navigation - Filters]                                                  1.3682      0.154      8.883      0.000       1.066       1.670
+C(project_component)[T.JRASERVER::Navigation - Search]                                                   0.6503      0.190      3.414      0.001       0.277       1.024
+C(project_component)[T.JRASERVER::Navigation - View results]                                             0.7142      0.187      3.813      0.000       0.347       1.081
+C(project_component)[T.JRASERVER::Navigation Panel]                                                      0.8594      0.240      3.580      0.000       0.389       1.330
+C(project_component)[T.JRASERVER::Project - Actions]                                                     0.7064      0.229      3.091      0.002       0.258       1.154
+C(project_component)[T.JRASERVER::Project - Agile Boards]                                                1.4950      0.078     19.100      0.000       1.342       1.648
+C(project_component)[T.JRASERVER::Project - Issues]                                                    -23.1179      1.097    -21.082      0.000     -25.267     -20.969
+C(project_component)[T.JRASERVER::Project - Releases]                                                    2.2159      0.160     13.870      0.000       1.903       2.529
+C(project_component)[T.JRASERVER::Project Administration - Components]                                   2.2541      0.160     14.100      0.000       1.941       2.567
+C(project_component)[T.JRASERVER::Project Administration - Others]                                       2.2397      0.195     11.515      0.000       1.859       2.621
+C(project_component)[T.JRASERVER::Project Administration - Permissions]                                  2.0957      0.134     15.589      0.000       1.832       2.359
+C(project_component)[T.JRASERVER::Project Administration - Project Summary]                              0.8851      0.208      4.247      0.000       0.477       1.294
+C(project_component)[T.JRASERVER::Project Administration - Users and Roles]                              1.7144      0.113     15.188      0.000       1.493       1.936
+C(project_component)[T.JRASERVER::Project Administration - Versions]                                     1.7986      0.152     11.832      0.000       1.501       2.097
+C(project_component)[T.JRASERVER::Projects - Sidebar]                                                    0.0941      0.076      1.234      0.217      -0.055       0.244
+C(project_component)[T.JRASERVER::REST API]                                                              2.0889      0.207     10.111      0.000       1.684       2.494
+C(project_component)[T.JRASERVER::Rich Text Editor]                                                      0.4134      0.082      5.016      0.000       0.252       0.575
+C(project_component)[T.JRASERVER::Scheduled Tasks]                                                       2.3771      0.084     28.140      0.000       2.212       2.543
+C(project_component)[T.JRASERVER::System Administration  - Global Permissions]                           2.4652      0.125     19.695      0.000       2.220       2.710
+C(project_component)[T.JRASERVER::System Administration - Audit Logs]                                    2.6669      0.252     10.571      0.000       2.172       3.161
+C(project_component)[T.JRASERVER::System Administration - Configuration Tool]                            2.3072      0.059     39.164      0.000       2.192       2.423
+C(project_component)[T.JRASERVER::System Administration - General Configuration]                         0.8528      0.287      2.975      0.003       0.291       1.415
+C(project_component)[T.JRASERVER::System Administration - Integrity Checker]                             2.6366      0.070     37.511      0.000       2.499       2.774
+C(project_component)[T.JRASERVER::System Administration - Look and Feel]                                 1.5155      0.115     13.142      0.000       1.290       1.742
+C(project_component)[T.JRASERVER::System Administration - Others]                                        1.2647      0.252      5.028      0.000       0.772       1.758
+C(project_component)[T.JRASERVER::System Administration - Priorities]                                    1.1658      0.222      5.257      0.000       0.731       1.600
+C(project_component)[T.JRASERVER::System Administration - Secure Administrator Sessions]                 0.3725      0.083      4.473      0.000       0.209       0.536
+C(project_component)[T.JRASERVER::Translations]                                                        -22.8846      1.063    -21.524      0.000     -24.968     -20.801
+C(project_component)[T.JRASERVER::Troubleshooting and Support Tools (ATST)]                              1.1192      0.206      5.442      0.000       0.716       1.522
+C(project_component)[T.JRASERVER::UPM (Universal Plugin Manager)]                                        1.9408      0.086     22.695      0.000       1.773       2.108
+C(project_component)[T.JRASERVER::Unclassified]                                                          2.1949      0.218     10.070      0.000       1.768       2.622
+C(project_component)[T.JRASERVER::Upgrade]                                                               0.1282      0.287      0.447      0.655      -0.433       0.690
+C(project_component)[T.JRASERVER::User Management - LDAP Integration]                                    1.5516      0.195      7.954      0.000       1.169       1.934
+C(project_component)[T.JRASERVER::User Management - Others]                                              1.9536      0.172     11.352      0.000       1.616       2.291
+C(project_component)[T.JRASERVER::User Management - User Profile]                                        0.6422      0.243      2.642      0.008       0.166       1.119
+C(project_component)[T.JRASERVER::Webhooks]                                                              1.6260      0.178      9.128      0.000       1.277       1.975
+C(project_component)[T.MESOS::HTTP API]                                                                  2.9527      0.083     35.489      0.000       2.790       3.116
+C(project_component)[T.MESOS::Unclassified]                                                              2.1544      0.055     38.979      0.000       2.046       2.263
+C(project_component)[T.MESOS::agent]                                                                     1.8488      0.042     43.507      0.000       1.765       1.932
+C(project_component)[T.MESOS::allocation]                                                                2.3117      0.054     42.846      0.000       2.206       2.417
+C(project_component)[T.MESOS::build]                                                                    -1.1254      0.045    -24.782      0.000      -1.214      -1.036
+C(project_component)[T.MESOS::c++ api]                                                                   2.8214      0.063     45.137      0.000       2.699       2.944
+C(project_component)[T.MESOS::cli]                                                                       2.5683      0.055     46.331      0.000       2.460       2.677
+C(project_component)[T.MESOS::cmake]                                                                     2.1693      0.085     25.538      0.000       2.003       2.336
+C(project_component)[T.MESOS::containerization]                                                          2.4778      0.042     58.695      0.000       2.395       2.560
+C(project_component)[T.MESOS::docker]                                                                    1.8725      0.074     25.414      0.000       1.728       2.017
+C(project_component)[T.MESOS::documentation]                                                             1.9509      0.050     38.844      0.000       1.852       2.049
+C(project_component)[T.MESOS::executor]                                                                  2.0294      0.050     40.594      0.000       1.931       2.127
+C(project_component)[T.MESOS::fetcher]                                                                   1.6792      0.069     24.424      0.000       1.544       1.814
+C(project_component)[T.MESOS::framework]                                                                 2.7823      0.062     45.104      0.000       2.661       2.903
+C(project_component)[T.MESOS::java api]                                                                  1.6813      0.065     25.698      0.000       1.553       1.810
+C(project_component)[T.MESOS::libprocess]                                                                1.2561      0.048     26.272      0.000       1.162       1.350
+C(project_component)[T.MESOS::master]                                                                    2.1251      0.042     51.174      0.000       2.044       2.206
+C(project_component)[T.MESOS::modules]                                                                   3.9069      0.081     48.256      0.000       3.748       4.066
+C(project_component)[T.MESOS::network]                                                                 -22.9002      1.072    -21.371      0.000     -25.000     -20.800
+C(project_component)[T.MESOS::project website]                                                           0.8280      0.058     14.170      0.000       0.713       0.943
+C(project_component)[T.MESOS::python api]                                                                2.4720      0.063     39.057      0.000       2.348       2.596
+C(project_component)[T.MESOS::security]                                                                  3.6537      0.080     45.884      0.000       3.498       3.810
+C(project_component)[T.MESOS::storage]                                                                   3.1006      0.077     40.206      0.000       2.949       3.252
+C(project_component)[T.MESOS::stout]                                                                     0.2882      0.062      4.653      0.000       0.167       0.410
+C(project_component)[T.MESOS::test]                                                                     -3.0097      0.046    -64.790      0.000      -3.101      -2.919
+C(project_component)[T.MESOS::webui]                                                                     1.2166      0.051     23.898      0.000       1.117       1.316
+C(project_component)[T.MULE::Build: (other)]                                                             0.9698      0.067     14.579      0.000       0.839       1.100
+C(project_component)[T.MULE::Build: Distributions]                                                       1.7461      0.068     25.818      0.000       1.614       1.879
+C(project_component)[T.MULE::Build: Integration Tests]                                                   1.8662      0.113     16.525      0.000       1.645       2.087
+C(project_component)[T.MULE::Build: Libraries / Dependencies]                                            1.4008      0.074     18.863      0.000       1.255       1.546
+C(project_component)[T.MULE::Build: Maven]                                                               1.0893      0.096     11.328      0.000       0.901       1.278
+C(project_component)[T.MULE::Core: (other)]                                                              1.5134      0.131     11.579      0.000       1.257       1.770
+C(project_component)[T.MULE::Core: API]                                                                  2.6510      0.112     23.635      0.000       2.431       2.871
+C(project_component)[T.MULE::Core: Bootstrap / Standalone]                                               1.7058      0.064     26.578      0.000       1.580       1.832
+C(project_component)[T.MULE::Core: Classloading]                                                         1.2397      0.107     11.635      0.000       1.031       1.449
+C(project_component)[T.MULE::Core: Components]                                                           1.9690      0.093     21.203      0.000       1.787       2.151
+C(project_component)[T.MULE::Core: Concurrency / Threading]                                              1.5458      0.101     15.263      0.000       1.347       1.744
+C(project_component)[T.MULE::Core: Configuration]                                                        2.2509      0.041     55.359      0.000       2.171       2.331
+C(project_component)[T.MULE::Core: Containers]                                                           2.7282      0.057     48.134      0.000       2.617       2.839
+C(project_component)[T.MULE::Core: DSL processing]                                                       1.5573      0.106     14.750      0.000       1.350       1.764
+C(project_component)[T.MULE::Core: Deployment]                                                           1.7676      0.165     10.733      0.000       1.445       2.090
+C(project_component)[T.MULE::Core: Domains shared resources]                                             2.6830      0.086     31.306      0.000       2.515       2.851
+C(project_component)[T.MULE::Core: Endpoints]                                                            1.2855      0.061     21.053      0.000       1.166       1.405
+C(project_component)[T.MULE::Core: Event/Message]                                                        1.3573      0.059     22.834      0.000       1.241       1.474
+C(project_component)[T.MULE::Core: Exception Handling]                                                   1.8876      0.115     16.443      0.000       1.663       2.113
+C(project_component)[T.MULE::Core: Expressions]                                                          1.2979      0.070     18.626      0.000       1.161       1.434
+C(project_component)[T.MULE::Core: Flow]                                                                 2.1357      0.058     37.014      0.000       2.023       2.249
+C(project_component)[T.MULE::Core: Lifecycle]                                                            1.3879      0.069     20.121      0.000       1.253       1.523
+C(project_component)[T.MULE::Core: Logging]                                                              1.7019      0.069     24.730      0.000       1.567       1.837
+C(project_component)[T.MULE::Core: Non-Blocking]                                                         2.2186      0.092     24.063      0.000       2.038       2.399
+C(project_component)[T.MULE::Core: Policies]                                                           -22.9001      1.115    -20.538      0.000     -25.085     -20.715
+C(project_component)[T.MULE::Core: Queues (SEDA) / Persistence]                                          2.0298      0.082     24.861      0.000       1.870       2.190
+C(project_component)[T.MULE::Core: Registry]                                                             2.2886      0.076     30.300      0.000       2.141       2.437
+C(project_component)[T.MULE::Core: Routing / Filters]                                                    1.4684      0.113     13.018      0.000       1.247       1.689
+C(project_component)[T.MULE::Core: Streaming]                                                            1.9656      0.096     20.515      0.000       1.778       2.153
+C(project_component)[T.MULE::Core: Transformers]                                                         1.0193      0.109      9.332      0.000       0.805       1.233
+C(project_component)[T.MULE::Core: Transports]                                                           1.7506      0.118     14.845      0.000       1.519       1.982
+C(project_component)[T.MULE::Documentation / Website]                                                    0.7189      0.060     11.962      0.000       0.601       0.837
+C(project_component)[T.MULE::Examples / Tutorials]                                                       0.2529      0.046      5.496      0.000       0.163       0.343
+C(project_component)[T.MULE::Extensions]                                                                 3.3914      0.098     34.558      0.000       3.199       3.584
+C(project_component)[T.MULE::Extensions API]                                                             3.1678      0.079     40.152      0.000       3.013       3.322
+C(project_component)[T.MULE::Modules: (other)]                                                           2.7167      0.071     38.161      0.000       2.577       2.856
+C(project_component)[T.MULE::Modules: CXF]                                                               0.7605      0.077      9.816      0.000       0.609       0.912
+C(project_component)[T.MULE::Modules: File]                                                              1.1604      0.095     12.268      0.000       0.975       1.346
+C(project_component)[T.MULE::Modules: HTTP]                                                              1.5999      0.069     23.336      0.000       1.466       1.734
+C(project_component)[T.MULE::Modules: JCA Resource Adapter]                                              2.4127      0.055     43.918      0.000       2.305       2.520
+C(project_component)[T.MULE::Modules: Management / JMX]                                                  2.4771      0.059     42.186      0.000       2.362       2.592
+C(project_component)[T.MULE::Modules: Security (Spring Security, Acegi, PGP, WS-Security)]               2.2425      0.090     25.009      0.000       2.067       2.418
+C(project_component)[T.MULE::Modules: WS Consumer]                                                       3.1680      0.079     40.036      0.000       3.013       3.323
+C(project_component)[T.MULE::Modules: XML, XSLT, XPath, SXC]                                             1.9725      0.074     26.680      0.000       1.828       2.117
+C(project_component)[T.MULE::Schema]                                                                     1.6189      0.071     22.908      0.000       1.480       1.757
+C(project_component)[T.MULE::Test: Testing Framework]                                                    2.4795      0.107     23.121      0.000       2.269       2.690
+C(project_component)[T.MULE::Tooling Client]                                                           -22.9070      1.115    -20.551      0.000     -25.092     -20.722
+C(project_component)[T.MULE::Tools]                                                                      2.2931      0.054     42.487      0.000       2.187       2.399
+C(project_component)[T.MULE::Tools: Archetypes]                                                          1.5581      0.056     27.780      0.000       1.448       1.668
+C(project_component)[T.MULE::Transport: (other)]                                                         1.9675      0.067     29.200      0.000       1.835       2.100
+C(project_component)[T.MULE::Transport: Axis]                                                            0.7820      0.056     13.906      0.000       0.672       0.892
+C(project_component)[T.MULE::Transport: Email]                                                           0.9716      0.072     13.432      0.000       0.830       1.113
+C(project_component)[T.MULE::Transport: FTP / SFTP]                                                      1.6131      0.109     14.817      0.000       1.400       1.827
+C(project_component)[T.MULE::Transport: File]                                                            1.1374      0.103     11.018      0.000       0.935       1.340
+C(project_component)[T.MULE::Transport: HTTP(S) / Jetty]                                                 1.1148      0.111     10.045      0.000       0.897       1.332
+C(project_component)[T.MULE::Transport: JDBC]                                                            1.8365      0.056     32.688      0.000       1.726       1.947
+C(project_component)[T.MULE::Transport: JMS]                                                             0.9051      0.081     11.109      0.000       0.745       1.065
+C(project_component)[T.MULE::Transport: Quartz]                                                          1.3501      0.109     12.421      0.000       1.137       1.563
+C(project_component)[T.MULE::Transport: TCP / UDP / SSL / Multicast]                                     1.8321      0.070     26.039      0.000       1.694       1.970
+C(project_component)[T.MULE::Transport: VM]                                                              0.5998      0.116      5.185      0.000       0.373       0.827
+C(project_component)[T.MULE::Unclassified]                                                               1.8070      0.208      8.672      0.000       1.399       2.215
+C(project_component)[T.MULE::sdk]                                                                        1.8960      0.081     23.321      0.000       1.737       2.055
+C(project_component)[T.NEXUS::Blobstore]                                                                 1.7875      0.067     26.803      0.000       1.657       1.918
+C(project_component)[T.NEXUS::Bootstrap]                                                                 1.5945      0.064     24.855      0.000       1.469       1.720
+C(project_component)[T.NEXUS::Browse Remote]                                                             1.2112      0.067     17.987      0.000       1.079       1.343
+C(project_component)[T.NEXUS::Browse Storage]                                                            0.9605      0.057     16.881      0.000       0.849       1.072
+C(project_component)[T.NEXUS::Build]                                                                     1.9186      0.062     31.021      0.000       1.797       2.040
+C(project_component)[T.NEXUS::Build Tooling]                                                             2.3181      0.095     24.470      0.000       2.132       2.504
+C(project_component)[T.NEXUS::Capabilities]                                                              1.2923      0.065     19.751      0.000       1.164       1.421
+C(project_component)[T.NEXUS::Cleanup]                                                                   1.0694      0.079     13.529      0.000       0.914       1.224
+C(project_component)[T.NEXUS::Configuration]                                                             1.5799      0.056     28.139      0.000       1.470       1.690
+C(project_component)[T.NEXUS::Content Selectors]                                                         1.6416      0.064     25.497      0.000       1.515       1.768
+C(project_component)[T.NEXUS::Crowd]                                                                     1.5691      0.066     23.657      0.000       1.439       1.699
+C(project_component)[T.NEXUS::Database]                                                                  1.3278      0.068     19.521      0.000       1.194       1.461
+C(project_component)[T.NEXUS::Docker]                                                                    0.6248      0.052     11.988      0.000       0.523       0.727
+C(project_component)[T.NEXUS::Documentation]                                                             1.4112      0.083     17.050      0.000       1.249       1.573
+C(project_component)[T.NEXUS::HA]                                                                       -0.0789      0.092     -0.854      0.393      -0.260       0.102
+C(project_component)[T.NEXUS::Installer]                                                                 1.5182      0.075     20.345      0.000       1.372       1.664
+C(project_component)[T.NEXUS::LDAP]                                                                      0.9544      0.054     17.539      0.000       0.848       1.061
+C(project_component)[T.NEXUS::Logging]                                                                  -0.5801      0.054    -10.658      0.000      -0.687      -0.473
+C(project_component)[T.NEXUS::Maven]                                                                     0.0954      0.064      1.491      0.136      -0.030       0.221
+C(project_component)[T.NEXUS::Migration]                                                                 1.5147      0.090     16.786      0.000       1.338       1.692
+C(project_component)[T.NEXUS::NPM]                                                                       1.0758      0.063     17.192      0.000       0.953       1.198
+C(project_component)[T.NEXUS::NuGet]                                                                     0.9873      0.051     19.205      0.000       0.887       1.088
+C(project_component)[T.NEXUS::Outreach]                                                                  1.4502      0.071     20.555      0.000       1.312       1.589
+C(project_component)[T.NEXUS::P2]                                                                        0.6941      0.055     12.584      0.000       0.586       0.802
+C(project_component)[T.NEXUS::Proxy Repository]                                                          2.3262      0.073     31.765      0.000       2.183       2.470
+C(project_component)[T.NEXUS::PyPI]                                                                      1.1896      0.054     22.183      0.000       1.085       1.295
+C(project_component)[T.NEXUS::REST]                                                                      2.6377      0.086     30.582      0.000       2.469       2.807
+C(project_component)[T.NEXUS::Raw]                                                                       1.3746      0.055     25.006      0.000       1.267       1.482
+C(project_component)[T.NEXUS::Repository]                                                                0.8063      0.039     20.515      0.000       0.729       0.883
+C(project_component)[T.NEXUS::Repository Health Check]                                                   0.8856      0.064     13.889      0.000       0.761       1.011
+C(project_component)[T.NEXUS::Routing]                                                                   1.1217      0.083     13.590      0.000       0.960       1.283
+C(project_component)[T.NEXUS::RubyGems]                                                                  0.9204      0.088     10.445      0.000       0.748       1.093
+C(project_component)[T.NEXUS::S3]                                                                        2.7256      0.084     32.370      0.000       2.561       2.891
+C(project_component)[T.NEXUS::SSL]                                                                       2.0530      0.063     32.345      0.000       1.929       2.177
+C(project_component)[T.NEXUS::Scheduled Tasks]                                                           0.4187      0.075      5.600      0.000       0.272       0.565
+C(project_component)[T.NEXUS::Scripting]                                                                 2.6845      0.089     30.295      0.000       2.511       2.858
+C(project_component)[T.NEXUS::Search]                                                                   -0.4015      0.048     -8.403      0.000      -0.495      -0.308
+C(project_component)[T.NEXUS::Security]                                                                  0.1744      0.063      2.769      0.006       0.051       0.298
+C(project_component)[T.NEXUS::Staging]                                                                   2.1241      0.054     39.626      0.000       2.019       2.229
+C(project_component)[T.NEXUS::Support Tools]                                                             0.1286      0.071      1.802      0.072      -0.011       0.268
+C(project_component)[T.NEXUS::System Feeds]                                                              0.9555      0.063     15.072      0.000       0.831       1.080
+C(project_component)[T.NEXUS::Transport]                                                                 1.4313      0.074     19.426      0.000       1.287       1.576
+C(project_component)[T.NEXUS::UI]                                                                       -0.7108      0.050    -14.211      0.000      -0.809      -0.613
+C(project_component)[T.NEXUS::Unclassified]                                                              0.8775      0.039     22.420      0.000       0.801       0.954
+C(project_component)[T.NEXUS::Upgrade]                                                                   1.1636      0.089     13.065      0.000       0.989       1.338
+C(project_component)[T.NEXUS::Upload UI]                                                                -0.1679      0.088     -1.897      0.058      -0.341       0.006
+C(project_component)[T.NEXUS::User Token]                                                                1.5137      0.059     25.495      0.000       1.397       1.630
+C(project_component)[T.NEXUS::Yum]                                                                       1.2161      0.052     23.570      0.000       1.115       1.317
+C(project_component)[T.SERVER::Admin]                                                                    1.5576      0.056     27.602      0.000       1.447       1.668
+C(project_component)[T.SERVER::Aggregation Framework]                                                    1.5177      0.075     20.171      0.000       1.370       1.665
+C(project_component)[T.SERVER::Build]                                                                    1.9430      0.080     24.383      0.000       1.787       2.099
+C(project_component)[T.SERVER::Catalog]                                                                  1.3981      0.058     24.214      0.000       1.285       1.511
+C(project_component)[T.SERVER::Concurrency]                                                              1.1034      0.054     20.496      0.000       0.998       1.209
+C(project_component)[T.SERVER::Diagnostics]                                                              1.0008      0.083     12.128      0.000       0.839       1.163
+C(project_component)[T.SERVER::Geo]                                                                     -0.6572      0.043    -15.217      0.000      -0.742      -0.573
+C(project_component)[T.SERVER::HTTP Console]                                                             1.9386      0.056     34.430      0.000       1.828       2.049
+C(project_component)[T.SERVER::IDL]                                                                      0.8348      0.099      8.472      0.000       0.642       1.028
+C(project_component)[T.SERVER::Indexing]                                                                -0.7951      0.066    -12.062      0.000      -0.924      -0.666
+C(project_component)[T.SERVER::Internal Client]                                                          2.2021      0.048     45.534      0.000       2.107       2.297
+C(project_component)[T.SERVER::Internal Code]                                                            2.1231      0.059     35.745      0.000       2.007       2.240
+C(project_component)[T.SERVER::JavaScript]                                                               1.1451      0.050     22.878      0.000       1.047       1.243
+C(project_component)[T.SERVER::Logging]                                                                  1.5242      0.059     25.835      0.000       1.409       1.640
+C(project_component)[T.SERVER::MMAPv1]                                                                   0.6471      0.096      6.713      0.000       0.458       0.836
+C(project_component)[T.SERVER::MapReduce]                                                                0.1313      0.055      2.398      0.016       0.024       0.239
+C(project_component)[T.SERVER::Networking]                                                               2.2225      0.073     30.638      0.000       2.080       2.365
+C(project_component)[T.SERVER::Packaging]                                                                0.9611      0.050     19.365      0.000       0.864       1.058
+C(project_component)[T.SERVER::Performance]                                                              0.9916      0.072     13.833      0.000       0.851       1.132
+C(project_component)[T.SERVER::Portability]                                                              1.9070      0.075     25.478      0.000       1.760       2.054
+C(project_component)[T.SERVER::Querying]                                                                -0.2340      0.083     -2.813      0.005      -0.397      -0.071
+C(project_component)[T.SERVER::Replication]                                                             -0.2045      0.126     -1.618      0.106      -0.452       0.043
+C(project_component)[T.SERVER::Security]                                                                 2.4637      0.043     57.387      0.000       2.380       2.548
+C(project_component)[T.SERVER::Sharding]                                                                 0.4858      0.124      3.916      0.000       0.243       0.729
+C(project_component)[T.SERVER::Shell]                                                                    0.7836      0.056     13.945      0.000       0.673       0.894
+C(project_component)[T.SERVER::Stability]                                                               -0.6592      0.046    -14.453      0.000      -0.749      -0.570
+C(project_component)[T.SERVER::Storage]                                                                  1.2164      0.109     11.187      0.000       1.003       1.430
+C(project_component)[T.SERVER::Testing Infrastructure]                                                   0.6455      0.068      9.457      0.000       0.512       0.779
+C(project_component)[T.SERVER::Text Search]                                                              1.3991      0.076     18.311      0.000       1.249       1.549
+C(project_component)[T.SERVER::Tools]                                                                    0.9203      0.045     20.296      0.000       0.831       1.009
+C(project_component)[T.SERVER::Unclassified]                                                             0.9001      0.158      5.694      0.000       0.590       1.210
+C(project_component)[T.SERVER::Upgrade/Downgrade]                                                        0.8214      0.098      8.386      0.000       0.629       1.013
+C(project_component)[T.SERVER::Usability]                                                                2.0988      0.055     38.177      0.000       1.991       2.207
+C(project_component)[T.SERVER::WiredTiger]                                                              -0.0548      0.048     -1.131      0.258      -0.150       0.040
+C(project_component)[T.SERVER::Write Ops]                                                                1.4293      0.055     25.967      0.000       1.321       1.537
+C(project_component)[T.TIMOB::Android]                                                                  -1.6205      0.250     -6.494      0.000      -2.110      -1.131
+C(project_component)[T.TIMOB::BlackBerry]                                                               -1.0570      0.068    -15.524      0.000      -1.190      -0.924
+C(project_component)[T.TIMOB::CLI]                                                                       0.0840      0.021      3.920      0.000       0.042       0.126
+C(project_component)[T.TIMOB::Code Processor]                                                            2.0366      0.087     23.506      0.000       1.867       2.206
+C(project_component)[T.TIMOB::Core]                                                                      1.9123      0.058     33.025      0.000       1.799       2.026
+C(project_component)[T.TIMOB::Drillbit]                                                                  1.3684      0.092     14.884      0.000       1.188       1.549
+C(project_component)[T.TIMOB::Hyperloop]                                                                 0.5112      0.042     12.122      0.000       0.429       0.594
+C(project_component)[T.TIMOB::LiveView]                                                                  0.5563      0.057      9.687      0.000       0.444       0.669
+C(project_component)[T.TIMOB::MobileWeb]                                                                -1.3062      0.011   -119.955      0.000      -1.328      -1.285
+C(project_component)[T.TIMOB::TiAPI]                                                                     2.5192      0.054     46.621      0.000       2.413       2.625
+C(project_component)[T.TIMOB::Tizen]                                                                   -22.8515      1.085    -21.059      0.000     -24.978     -20.725
+C(project_component)[T.TIMOB::Tooling]                                                                   0.8863      0.053     16.787      0.000       0.783       0.990
+C(project_component)[T.TIMOB::Unclassified]                                                             -1.4057      0.051    -27.805      0.000      -1.505      -1.307
+C(project_component)[T.TIMOB::Windows]                                                                  -0.3462      0.010    -35.684      0.000      -0.365      -0.327
+C(project_component)[T.TIMOB::Windows Hybrid]                                                           -2.9180      0.077    -37.683      0.000      -3.070      -2.766
+C(project_component)[T.TIMOB::iOS]                                                                      -1.9028      0.081    -23.582      0.000      -2.061      -1.745
+bug_count_lag1                                                                                          -0.0066      0.001     -5.441      0.000      -0.009      -0.004
+bug_count_lag2                                                                                           0.0020      0.002      0.977      0.329      -0.002       0.006
+bug_count_lag3                                                                                           0.0013      0.002      0.613      0.540      -0.003       0.005
+bug_count_lag4                                                                                          -0.0018      0.002     -0.822      0.411      -0.006       0.002
+quarter_index                                                                                            0.0211      0.006      3.307      0.001       0.009       0.034
+========================================================================================================================================================================

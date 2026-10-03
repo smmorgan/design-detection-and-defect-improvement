@@ -221,3 +221,7 @@ gcp_results/distilbert_*/
 *.safetensors
 gcp_results/*_standard_*/
 gcp_results/roberta_conservative_*/
+
+# Full TAWOS DB pulls + full-population labeled CSVs (regenerable via
+# pull_full_tawos_projects.py + the RQ2 label pipeline; ~400MB, not committed)
+data/tawos_full/

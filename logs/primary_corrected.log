@@ -1,0 +1,1049 @@
+2026-09-29 19:03:24,845 - INFO - Panel: 463 rows -> 367 after dropping NA lag/control rows
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+2026-09-29 19:03:24,940 - INFO - Running 1000-permutation null for H1 (this is slow)...
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: invalid value encountered in multiply
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3706: RuntimeWarning: divide by zero encountered in scalar divide
+  size = 1 / alpha * mu**Q
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3707: RuntimeWarning: invalid value encountered in divide
+  prob = size / (size + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3708: RuntimeWarning: invalid value encountered in subtract
+  coeff = gamma_ln(size + endog) - gamma_ln(endog + 1) - gamma_ln(size)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3785: RuntimeWarning: divide by zero encountered in scalar divide
+  a1 = 1 / alpha * mu**Q
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3786: RuntimeWarning: invalid value encountered in divide
+  prob = a1 / (a1 + mu)  # a1 aka "size" in _ll_nbin
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3800: RuntimeWarning: invalid value encountered in subtract
+  dgpart = digamma(y + a1) - digamma(a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3802: RuntimeWarning: divide by zero encountered in scalar power
+  da1 = -(alpha**-2)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: invalid value encountered in multiply
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3706: RuntimeWarning: divide by zero encountered in scalar divide
+  size = 1 / alpha * mu**Q
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3707: RuntimeWarning: invalid value encountered in divide
+  prob = size / (size + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3708: RuntimeWarning: invalid value encountered in subtract
+  coeff = gamma_ln(size + endog) - gamma_ln(endog + 1) - gamma_ln(size)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3785: RuntimeWarning: divide by zero encountered in scalar divide
+  a1 = 1 / alpha * mu**Q
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3786: RuntimeWarning: invalid value encountered in divide
+  prob = a1 / (a1 + mu)  # a1 aka "size" in _ll_nbin
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3800: RuntimeWarning: invalid value encountered in subtract
+  dgpart = digamma(y + a1) - digamma(a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3802: RuntimeWarning: divide by zero encountered in scalar power
+  da1 = -(alpha**-2)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: invalid value encountered in multiply
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3706: RuntimeWarning: divide by zero encountered in scalar divide
+  size = 1 / alpha * mu**Q
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3707: RuntimeWarning: invalid value encountered in divide
+  prob = size / (size + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3708: RuntimeWarning: invalid value encountered in subtract
+  coeff = gamma_ln(size + endog) - gamma_ln(endog + 1) - gamma_ln(size)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3785: RuntimeWarning: divide by zero encountered in scalar divide
+  a1 = 1 / alpha * mu**Q
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3786: RuntimeWarning: invalid value encountered in divide
+  prob = a1 / (a1 + mu)  # a1 aka "size" in _ll_nbin
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3800: RuntimeWarning: invalid value encountered in subtract
+  dgpart = digamma(y + a1) - digamma(a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3802: RuntimeWarning: divide by zero encountered in scalar power
+  da1 = -(alpha**-2)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+
+=== M0 (controls only) ===
+                     NegativeBinomial Regression Results                      
+==============================================================================
+Dep. Variable:              bug_count   No. Observations:                  367
+Model:               NegativeBinomial   Df Residuals:                      357
+Method:                           MLE   Df Model:                            9
+Date:                Tue, 29 Sep 2026   Pseudo R-squ.:                 0.01803
+Time:                        19:03:24   Log-Likelihood:                -2343.1
+converged:                       True   LL-Null:                       -2386.1
+Covariance Type:              cluster   LLR p-value:                 1.006e-14
+===========================================================================================
+                              coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                   1.6783      0.582      2.882      0.004       0.537       2.820
+C(project)[T.DNN]          -0.1549      0.315     -0.493      0.622      -0.771       0.462
+C(project)[T.JRASERVER]    -0.5008      0.104     -4.800      0.000      -0.705      -0.296
+C(project)[T.MESOS]        -0.8285      0.344     -2.410      0.016      -1.502      -0.155
+C(project)[T.MULE]         -1.2723      0.245     -5.185      0.000      -1.753      -0.791
+C(project)[T.NEXUS]        -0.5579      0.240     -2.326      0.020      -1.028      -0.088
+C(project)[T.SERVER]       -1.0041      0.239     -4.193      0.000      -1.473      -0.535
+C(project)[T.TIMOB]        -0.5791      0.259     -2.235      0.025      -1.087      -0.071
+bug_count_lag1             -0.0006      0.001     -1.155      0.248      -0.002       0.000
+quarter_index              -0.0009      0.012     -0.077      0.939      -0.024       0.022
+alpha                       0.5789      0.098      5.904      0.000       0.387       0.771
+===========================================================================================
+
+=== M1 (+ design ratio, lags 1-4) ===
+                     NegativeBinomial Regression Results                      
+==============================================================================
+Dep. Variable:              bug_count   No. Observations:                  367
+Model:               NegativeBinomial   Df Residuals:                      353
+Method:                           MLE   Df Model:                           13
+Date:                Tue, 29 Sep 2026   Pseudo R-squ.:                 0.01963
+Time:                        19:03:24   Log-Likelihood:                -2339.3
+converged:                       True   LL-Null:                       -2386.1
+Covariance Type:              cluster   LLR p-value:                 2.726e-14
+===========================================================================================
+                              coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                   1.6725      0.573      2.918      0.004       0.549       2.796
+C(project)[T.DNN]          -0.1620      0.309     -0.525      0.600      -0.767       0.443
+C(project)[T.JRASERVER]    -0.4583      0.152     -3.023      0.003      -0.756      -0.161
+C(project)[T.MESOS]        -0.6894      0.257     -2.680      0.007      -1.194      -0.185
+C(project)[T.MULE]         -1.1963      0.193     -6.194      0.000      -1.575      -0.818
+C(project)[T.NEXUS]        -0.5518      0.235     -2.351      0.019      -1.012      -0.092
+C(project)[T.SERVER]       -1.0198      0.247     -4.128      0.000      -1.504      -0.536
+C(project)[T.TIMOB]        -0.6352      0.290     -2.190      0.029      -1.204      -0.067
+bug_count_lag1             -0.0005      0.001     -1.069      0.285      -0.002       0.000
+quarter_index               0.0014      0.010      0.137      0.891      -0.019       0.022
+design_ratio_lag1          -0.9236      0.313     -2.949      0.003      -1.537      -0.310
+design_ratio_lag2          -0.5724      0.250     -2.288      0.022      -1.063      -0.082
+design_ratio_lag3          -0.0042      0.553     -0.008      0.994      -1.089       1.080
+design_ratio_lag4           0.0166      0.251      0.066      0.947      -0.474       0.508
+alpha                       0.5694      0.092      6.195      0.000       0.389       0.750
+===========================================================================================
+
+=== M2 (+ temporal features) ===
+                     NegativeBinomial Regression Results                      
+==============================================================================
+Dep. Variable:              bug_count   No. Observations:                  367
+Model:               NegativeBinomial   Df Residuals:                      351
+Method:                           MLE   Df Model:                           15
+Date:                Tue, 29 Sep 2026   Pseudo R-squ.:                 0.02037
+Time:                        19:03:24   Log-Likelihood:                -2337.5
+converged:                       True   LL-Null:                       -2386.1
+Covariance Type:              cluster   LLR p-value:                 4.407e-14
+==============================================================================================
+                                 coef    std err          z      P>|z|      [0.025      0.975]
+----------------------------------------------------------------------------------------------
+Intercept                      1.5326        nan        nan        nan         nan         nan
+C(project)[T.DNN]             -0.1966        nan        nan        nan         nan         nan
+C(project)[T.JRASERVER]       -0.5555   1.01e+14  -5.48e-15      1.000   -1.99e+14    1.99e+14
+C(project)[T.MESOS]           -0.6983   1.42e+14  -4.92e-15      1.000   -2.78e+14    2.78e+14
+C(project)[T.MULE]            -1.1027   4.27e+14  -2.58e-15      1.000   -8.37e+14    8.37e+14
+C(project)[T.NEXUS]           -0.5320        nan        nan        nan         nan         nan
+C(project)[T.SERVER]          -1.0042        nan        nan        nan         nan         nan
+C(project)[T.TIMOB]           -0.5847   1.28e+15  -4.56e-16      1.000   -2.51e+15    2.51e+15
+bug_count_lag1                -0.0005        nan        nan        nan         nan         nan
+quarter_index                 -0.0004      0.251     -0.002      0.999      -0.492       0.491
+design_ratio_lag1             -0.8933      0.909     -0.983      0.325      -2.674       0.887
+design_ratio_lag2             -0.5910        nan        nan        nan         nan         nan
+design_ratio_lag3             -0.0250      2.597     -0.010      0.992      -5.114       5.064
+design_ratio_lag4              0.0407      1.902      0.021      0.983      -3.687       3.769
+gini_design_effort             0.2356        nan        nan        nan         nan         nan
+front_loaded_index            -0.2146        nan        nan        nan         nan         nan
+quarters_since_changepoint     0.0076      0.041      0.186      0.852      -0.072       0.087
+alpha                          0.5640      0.095      5.950      0.000       0.378       0.750
+==============================================================================================
+
+H1 (M0 vs M1) LR stat=7.651, df=4, p=0.1052
+H2 (M1 vs M2) LR stat=3.504, df=2, p=0.1734
+NOTE: H2 nominally adds 3 terms (gini_design_effort, front_loaded_index, quarters_since_changepoint) but only 2 actual degree(s) of freedom is identified -- front_loaded_index is a per-project constant (by its own pre-registered definition: whole-history share of design tickets in the first third of observed quarters), exactly collinear with C(project), and contributes nothing beyond it. gini_design_effort (expanding-window, varies within project) and quarters_since_changepoint are the real additions. The naive df=3 test understates significance.
+H1 permutation null: observed LR stat=7.651, permutation p=0.2068 (1000/1000 permuted refits succeeded)2026-09-29 19:04:19,976 - INFO - Running blocked-time CV MAE for M0/M1/M2...
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: overflow encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3997: RuntimeWarning: overflow encountered in exp
+  return np.exp(linpred)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in multiply
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3801: RuntimeWarning: invalid value encountered in divide
+  dparams = exog * a1 * (y - mu) / (mu + a1)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3804: RuntimeWarning: invalid value encountered in divide
+  dgpart + np.log(a1) - np.log(a1 + mu) - (y - mu) / (a1 + mu)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:3709: RuntimeWarning: divide by zero encountered in log
+  llf = coeff + size * np.log(prob) + endog * np.log(1 - prob)
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/discrete/discrete_model.py:268: HessianInversionWarning: Inverting hessian failed, no bse or cov_params available
+  mlefit = super().fit(
+/home/smorgan/repos/design-detection-and-defect-improvement/.venv/lib/python3.12/site-packages/statsmodels/genmod/generalized_linear_model.py:1488: SpecificationWarning: cov_type not fully supported with var_weights
+  glm_results = GLMResults(
+
+
+M0: MAE=389.977  folds_used=17  folds_dropped_nonconverged=0  folds_skipped_thin_training=11
+M1: MAE=369.298  folds_used=17  folds_dropped_nonconverged=0  folds_skipped_thin_training=11
+M2: MAE=368.442  folds_used=17  folds_dropped_nonconverged=0  folds_skipped_thin_training=11
+
+=== H3 (reverse: bug_count -> design_ratio) ===
+                   Generalized Linear Model Regression Results                    
+==================================================================================
+Dep. Variable:     design_ratio_corrected   No. Observations:                  416
+Model:                                GLM   Df Residuals:                      401
+Model Family:                    Binomial   Df Model:                           14
+Link Function:                      Logit   Scale:                          1.0000
+Method:                              IRLS   Log-Likelihood:                -46878.
+Date:                    Tue, 29 Sep 2026   Deviance:                       18797.
+Time:                            19:04:22   Pearson chi2:                 1.93e+04
+No. Iterations:                        10   Pseudo R-squ. (CS):              1.000
+Covariance Type:                  cluster                                         
+===========================================================================================
+                              coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------------------
+Intercept                  -3.4731      0.490     -7.094      0.000      -4.433      -2.514
+C(project)[T.DM]            2.8333      0.328      8.633      0.000       2.190       3.477
+C(project)[T.DNN]          -0.2093      0.270     -0.774      0.439      -0.739       0.321
+C(project)[T.FAB]          -0.3444      0.323     -1.067      0.286      -0.977       0.288
+C(project)[T.JRASERVER]     0.7764      0.028     27.861      0.000       0.722       0.831
+C(project)[T.MESOS]         1.0878      0.248      4.388      0.000       0.602       1.574
+C(project)[T.MULE]          0.4856      0.137      3.546      0.000       0.217       0.754
+C(project)[T.NEXUS]        -0.2140      0.254     -0.843      0.399      -0.711       0.283
+C(project)[T.SERVER]       -0.2459      0.051     -4.848      0.000      -0.345      -0.146
+C(project)[T.TIMOB]        -3.8049      0.383     -9.945      0.000      -4.555      -3.055
+bug_count_lag1             -0.0010      0.001     -1.044      0.296      -0.003       0.001
+bug_count_lag2              0.0014      0.001      1.177      0.239      -0.001       0.004
+bug_count_lag3              0.0003      0.000      0.725      0.468      -0.001       0.001
+bug_count_lag4             -0.0006      0.001     -0.683      0.494      -0.002       0.001
+quarter_index               0.0272      0.007      3.784      0.000       0.013       0.041
+===========================================================================================

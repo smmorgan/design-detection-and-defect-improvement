@@ -1,0 +1,380 @@
+{
+  "aug250": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "n_seeds": 5,
+    "models": {
+      "svm": {
+        "mean_f1_across_seeds": 0.6649,
+        "mean_auc_across_seeds": 0.8591,
+        "mean_accuracy_across_seeds": 0.7861,
+        "sd_f1_across_seeds": 0.009,
+        "sd_auc_across_seeds": 0.0052,
+        "sd_accuracy_across_seeds": 0.0077,
+        "per_seed_mean_f1": {
+          "42": 0.6593,
+          "43": 0.6573,
+          "44": 0.68,
+          "45": 0.6635,
+          "46": 0.6645
+        },
+        "per_fold": {
+          "CONFSERVER": {
+            "f1_mean": 0.7853,
+            "f1_sd": 0.019
+          },
+          "DM": {
+            "f1_mean": 0.5904,
+            "f1_sd": 0.0233
+          },
+          "DNN": {
+            "f1_mean": 0.6868,
+            "f1_sd": 0.0284
+          },
+          "FAB": {
+            "f1_mean": 0.6859,
+            "f1_sd": 0.0188
+          },
+          "JRASERVER": {
+            "f1_mean": 0.7226,
+            "f1_sd": 0.0181
+          },
+          "MESOS": {
+            "f1_mean": 0.7144,
+            "f1_sd": 0.0343
+          },
+          "MULE": {
+            "f1_mean": 0.6895,
+            "f1_sd": 0.0203
+          },
+          "NEXUS": {
+            "f1_mean": 0.7082,
+            "f1_sd": 0.0135
+          },
+          "SERVER": {
+            "f1_mean": 0.4074,
+            "f1_sd": 0.0251
+          },
+          "TIMOB": {
+            "f1_mean": 0.6589,
+            "f1_sd": 0.0119
+          }
+        }
+      },
+      "gradient_boosting": {
+        "mean_f1_across_seeds": 0.6375,
+        "mean_auc_across_seeds": 0.833,
+        "mean_accuracy_across_seeds": 0.7822,
+        "sd_f1_across_seeds": 0.01,
+        "sd_auc_across_seeds": 0.0055,
+        "sd_accuracy_across_seeds": 0.0116,
+        "per_seed_mean_f1": {
+          "42": 0.6554,
+          "43": 0.6339,
+          "44": 0.6339,
+          "45": 0.6315,
+          "46": 0.633
+        },
+        "per_fold": {
+          "CONFSERVER": {
+            "f1_mean": 0.7589,
+            "f1_sd": 0.0239
+          },
+          "DM": {
+            "f1_mean": 0.494,
+            "f1_sd": 0.0193
+          },
+          "DNN": {
+            "f1_mean": 0.6387,
+            "f1_sd": 0.0189
+          },
+          "FAB": {
+            "f1_mean": 0.5924,
+            "f1_sd": 0.0673
+          },
+          "JRASERVER": {
+            "f1_mean": 0.7841,
+            "f1_sd": 0.015
+          },
+          "MESOS": {
+            "f1_mean": 0.6774,
+            "f1_sd": 0.0346
+          },
+          "MULE": {
+            "f1_mean": 0.6849,
+            "f1_sd": 0.0184
+          },
+          "NEXUS": {
+            "f1_mean": 0.7031,
+            "f1_sd": 0.0193
+          },
+          "SERVER": {
+            "f1_mean": 0.4377,
+            "f1_sd": 0.0719
+          },
+          "TIMOB": {
+            "f1_mean": 0.6041,
+            "f1_sd": 0.0257
+          }
+        }
+      }
+    }
+  },
+  "aug500": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "n_seeds": 5,
+    "models": {
+      "svm": {
+        "mean_f1_across_seeds": 0.6575,
+        "mean_auc_across_seeds": 0.8585,
+        "mean_accuracy_across_seeds": 0.7752,
+        "sd_f1_across_seeds": 0.0068,
+        "sd_auc_across_seeds": 0.004,
+        "sd_accuracy_across_seeds": 0.0044,
+        "per_seed_mean_f1": {
+          "42": 0.6573,
+          "43": 0.6505,
+          "44": 0.6613,
+          "45": 0.6514,
+          "46": 0.6668
+        },
+        "per_fold": {
+          "CONFSERVER": {
+            "f1_mean": 0.7864,
+            "f1_sd": 0.0221
+          },
+          "DM": {
+            "f1_mean": 0.5791,
+            "f1_sd": 0.0105
+          },
+          "DNN": {
+            "f1_mean": 0.6654,
+            "f1_sd": 0.0265
+          },
+          "FAB": {
+            "f1_mean": 0.68,
+            "f1_sd": 0.0163
+          },
+          "JRASERVER": {
+            "f1_mean": 0.7162,
+            "f1_sd": 0.017
+          },
+          "MESOS": {
+            "f1_mean": 0.7045,
+            "f1_sd": 0.0143
+          },
+          "MULE": {
+            "f1_mean": 0.6809,
+            "f1_sd": 0.0176
+          },
+          "NEXUS": {
+            "f1_mean": 0.7005,
+            "f1_sd": 0.0359
+          },
+          "SERVER": {
+            "f1_mean": 0.4219,
+            "f1_sd": 0.0154
+          },
+          "TIMOB": {
+            "f1_mean": 0.6397,
+            "f1_sd": 0.0134
+          }
+        }
+      },
+      "gradient_boosting": {
+        "mean_f1_across_seeds": 0.6413,
+        "mean_auc_across_seeds": 0.8406,
+        "mean_accuracy_across_seeds": 0.7869,
+        "sd_f1_across_seeds": 0.015,
+        "sd_auc_across_seeds": 0.005,
+        "sd_accuracy_across_seeds": 0.0058,
+        "per_seed_mean_f1": {
+          "42": 0.6276,
+          "43": 0.6324,
+          "44": 0.6317,
+          "45": 0.6552,
+          "46": 0.6598
+        },
+        "per_fold": {
+          "CONFSERVER": {
+            "f1_mean": 0.7551,
+            "f1_sd": 0.0281
+          },
+          "DM": {
+            "f1_mean": 0.4962,
+            "f1_sd": 0.0176
+          },
+          "DNN": {
+            "f1_mean": 0.6316,
+            "f1_sd": 0.042
+          },
+          "FAB": {
+            "f1_mean": 0.6058,
+            "f1_sd": 0.0445
+          },
+          "JRASERVER": {
+            "f1_mean": 0.7609,
+            "f1_sd": 0.034
+          },
+          "MESOS": {
+            "f1_mean": 0.7302,
+            "f1_sd": 0.0255
+          },
+          "MULE": {
+            "f1_mean": 0.7058,
+            "f1_sd": 0.018
+          },
+          "NEXUS": {
+            "f1_mean": 0.6965,
+            "f1_sd": 0.02
+          },
+          "SERVER": {
+            "f1_mean": 0.4125,
+            "f1_sd": 0.0925
+          },
+          "TIMOB": {
+            "f1_mean": 0.6189,
+            "f1_sd": 0.0208
+          }
+        }
+      }
+    }
+  },
+  "baseline": {
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "n_seeds": 5,
+    "models": {
+      "svm": {
+        "mean_f1_across_seeds": 0.6662,
+        "mean_auc_across_seeds": 0.8612,
+        "mean_accuracy_across_seeds": 0.8096,
+        "sd_f1_across_seeds": 0.0,
+        "sd_auc_across_seeds": 0.0,
+        "sd_accuracy_across_seeds": 0.0,
+        "per_seed_mean_f1": {
+          "42": 0.6662,
+          "43": 0.6662,
+          "44": 0.6662,
+          "45": 0.6662,
+          "46": 0.6662
+        },
+        "per_fold": {
+          "CONFSERVER": {
+            "f1_mean": 0.7379,
+            "f1_sd": 0.0
+          },
+          "DM": {
+            "f1_mean": 0.6154,
+            "f1_sd": 0.0
+          },
+          "DNN": {
+            "f1_mean": 0.642,
+            "f1_sd": 0.0
+          },
+          "FAB": {
+            "f1_mean": 0.6909,
+            "f1_sd": 0.0
+          },
+          "JRASERVER": {
+            "f1_mean": 0.7925,
+            "f1_sd": 0.0
+          },
+          "MESOS": {
+            "f1_mean": 0.6852,
+            "f1_sd": 0.0
+          },
+          "MULE": {
+            "f1_mean": 0.7206,
+            "f1_sd": 0.0
+          },
+          "NEXUS": {
+            "f1_mean": 0.7048,
+            "f1_sd": 0.0
+          },
+          "SERVER": {
+            "f1_mean": 0.4,
+            "f1_sd": 0.0
+          },
+          "TIMOB": {
+            "f1_mean": 0.6729,
+            "f1_sd": 0.0
+          }
+        }
+      },
+      "gradient_boosting": {
+        "mean_f1_across_seeds": 0.6299,
+        "mean_auc_across_seeds": 0.8295,
+        "mean_accuracy_across_seeds": 0.791,
+        "sd_f1_across_seeds": 0.0146,
+        "sd_auc_across_seeds": 0.0039,
+        "sd_accuracy_across_seeds": 0.007,
+        "per_seed_mean_f1": {
+          "42": 0.6038,
+          "43": 0.6376,
+          "44": 0.636,
+          "45": 0.636,
+          "46": 0.636
+        },
+        "per_fold": {
+          "CONFSERVER": {
+            "f1_mean": 0.7418,
+            "f1_sd": 0.0172
+          },
+          "DM": {
+            "f1_mean": 0.5147,
+            "f1_sd": 0.0055
+          },
+          "DNN": {
+            "f1_mean": 0.6304,
+            "f1_sd": 0.0096
+          },
+          "FAB": {
+            "f1_mean": 0.5812,
+            "f1_sd": 0.0357
+          },
+          "JRASERVER": {
+            "f1_mean": 0.7688,
+            "f1_sd": 0.0093
+          },
+          "MESOS": {
+            "f1_mean": 0.6013,
+            "f1_sd": 0.0217
+          },
+          "MULE": {
+            "f1_mean": 0.6979,
+            "f1_sd": 0.0122
+          },
+          "NEXUS": {
+            "f1_mean": 0.7118,
+            "f1_sd": 0.013
+          },
+          "SERVER": {
+            "f1_mean": 0.4278,
+            "f1_sd": 0.1152
+          },
+          "TIMOB": {
+            "f1_mean": 0.6233,
+            "f1_sd": 0.0078
+          }
+        }
+      }
+    }
+  }
+}

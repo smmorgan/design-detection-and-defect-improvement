@@ -224,3 +224,7 @@ gcp_results/roberta_conservative_*/
 
 # Claude Code local settings (contains API keys used in allowlisted commands)
 .claude/
+
+# Full TAWOS DB pulls + full-population labeled CSVs (regenerable via
+# pull_full_tawos_projects.py + the RQ2 label pipeline; ~400MB, not committed)
+data/tawos_full/

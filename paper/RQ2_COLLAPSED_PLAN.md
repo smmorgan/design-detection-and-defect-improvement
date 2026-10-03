@@ -109,6 +109,14 @@ control depend on it. **Verify against the live TAWOS MySQL schema before anythi
 else.** If it is absent, the fallbacks (issue-key prefix, labels, text clustering)
 stack a second layer of measurement error on top of the classifier's.
 
+**Resolved 2026-09-27:** the connector's docstring only covers the Issue table; the
+live schema has separate `Component`/`Issue_Component` tables the connector never
+queries. Component data exists, with real architectural-subsystem names, for 56–95%
+of issues in 9 of the 10 in-scope projects (CONFSERVER is the weak case at 46%). No
+text-extraction fallback needed. Full breakdown, quality checks, and a note that
+Fix_Version/release-date coverage is too inconsistent (0% for DM) to use as a time
+axis: see `COMPONENT_SCHEMA_FINDINGS.md` at repo root.
+
 ### 2. Attenuation from classifier error
 
 The predictor is a model output at LOPO F1 ≈ 0.73, with a per-project range of

@@ -1,0 +1,589 @@
+\documentclass[preprint,12pt]{elsarticle}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{array}
+\usepackage{lineno}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+
+\journal{Journal of Systems and Software}
+
+\begin{document}
+
+\linenumbers
+
+\title{Design Mining in Software Projects Using Transformer Models: A Cross-Project Evaluation on JIRA Tickets}
+
+\author[binghamton]{Steven Morgan}
+\author[umgc]{Jeff Daniels, Ph.D.}
+\affiliation[binghamton]{organization={Department of Systems Science and Industrial Engineering, Binghamton University, State University of New York},
+            city={Binghamton},
+            state={NY},
+            postcode={13902},
+            country={USA}}
+\affiliation[umgc]{organization={Graduate School of Technology, University of Maryland Global Campus},
+            city={Adelphi},
+            state={MD},
+            postcode={20783},
+            country={USA}}
+
+
+\begin{frontmatter}
+\begin{abstract}
+Architectural design work in software projects is widely acknowledged as critical to project success, yet detecting and quantifying such work remains challenging. This paper investigates whether transformer based models can outperform existing techniques for design mining, the automated classification of design related discussions in software engineering work. We fine tune three transformer architectures (BERT, RoBERTa, and DistilBERT) on the Stack Overflow design mining dataset of Mahadi et al. and then transfer the resulting classifiers to 1,786 manually labeled JIRA issues drawn from ten projects in the TAWOS (Tawosi Agile Web hosted Open Source) dataset. Additional comparisons against a modern encoder (ModernBERT), a LoRA-tuned decoder (Qwen2.5-1.5B), and zero/few-shot prompting with three LLMs provide further contrast on the effectiveness of the fine-tuning approach. A hyperparameter search across ten configurations yields a best F1 of 0.907 and ROC AUC of 0.965 on the Stack Overflow benchmark. For cross project generalization on TAWOS, leave one project out (LOPO) evaluation with metadata enrichment achieves a 5-seed averaged mean F1 of 0.743 ($\pm$0.013 across seeds, $\sigma$=0.087 across projects). This significantly exceeds support vector machine (F1=0.666) and gradient boosting (F1=0.630, 5-seed-averaged). Every evaluated modern-encoder, decoder, and LLM-prompting baseline under Holm-corrected paired Wilcoxon tests was also significant, though per-project performance remains heterogeneous (F1 0.58--0.82) and the margin over the closest baseline, few-shot prompting with a general-purpose LLM, is comparatively modest. Validating reproducibility found single LOPO training runs sensitive to ordinary GPU nondeterminism by up to 0.02 F1, enough to change which configuration appears best. All headline results use 5-seed averaged evaluation. Integrated gradients attribution analysis shows the model grasps architecturally related concepts but also leans heavily on specific terms (Docker, Helm, plug-in) that explain cross project variability. A qualitative review of misclassifications and an independent second-annotator reliability check (Cohen's $\kappa$=0.436) together indicate that ground-truth label quality, not model capacity, accounts for a substantial share of the classifier's residual error. We discuss the implications of an inherent recall bias under TAWOS's 28\% design prevalence for downstream tooling and the resulting limitations of using single-annotator labels and keyword-derived pseudo-labels as ground truth.
+\end{abstract}
+
+\begin{keyword}
+Design mining, software architecture, transformer models, BERT, text classification, JIRA, cross-project generalization, transfer learning
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+
+There is a fundamental gap between how information technology systems are designed and how they are implemented. Critical requirements can be entirely misconstrued, leaving users to manage workarounds. Project Management, Enterprise Architecture, Systems Architecture, and Systems Engineering have all been applied to varying degrees to implement technical solutions, yet they consistently fall short of meeting project expectations. Project success is typically defined as finishing on time, on budget, and meeting predefined scope~\cite{loureiro2024}.
+
+The Standish Group's CHAOS report, based on surveys of approximately 5,000 software projects annually, found that between 2010 and 2015, only 36\%--41\% of software projects were considered successful, with roughly 20\% classified as outright failures~\cite{standish2015}. As of 2024, worldwide IT spending was expected to exceed \$5 trillion~\cite{gartner2024}. Given the high failure rate and large market rate, there is room for significant methodology improvement. 
+
+Agile project implementations and smaller projects are generally more successful. The CHAOS Report indicates that Agile teams are up to four times more effective at delivering projects. Meanwhile, 58\% of small projects with clear goals and objectives tend to succeed~\cite{sandle2020}. Agile methodologies emphasize that software differs from traditional engineering in that high-effort upfront design is not effective in software projects where iteration and feedback are more valuable than rigorous process. Pereira et al.~\cite{pereira2021} assessed project success through the perspectives of practitioners, finding that 36\% considered their projects to only partially succeed or fail.
+
+Soft Computing offers a variety of techniques for analyzing systems behavior, including neural networks, evolutionary computing, fuzzy logic, and agent-based modeling. There has been some success in applying these methods to predict faults in software, identify changes in team velocity, and automatically categorize issues~\cite{afzal2011, mahdi2021, pospieszny2018, petkovic2016, zhang2003}. Nature-inspired optimization algorithms and neural networks are among the most common approaches~\cite{mahajan2022, siva2023a, sarro2021, siva2023b}.
+
+There is a lack of clarity between accepted methods for identifying architectural work in software programs and understanding its impact on project outcomes. Research to automate and classify design-related work, referred to as \emph{design mining}, has been carried out using traditional soft computing techniques~\cite{mahadi2021}. Other similar research has employed transformers for help desk support and defect prediction~\cite{incekas2024, zangari2023}, yet little work has examined whether transformers, or automation in general, can improve our understanding of how architectural work relates to project success. That is the underlying motivation of this research.
+
+Efficiently quantifying the amount of design work and how it relates to other aspects of project success opens up additional lines of research. This paper is focusing on one question in particular as the foundation for broader understanding. \emph{Can design mining be performed on tickets collected from JIRA using machine learning techniques?} This question is valuable because little research of this nature has been performed specific to software engineering tickets.  TAWOS contains over 458,000 issues and 1.6 million comments from 39 open-source projects. By demonstrating improved detection of design work at scale, subsequent research can investigate whether such detection predicts changes in defect rates and whether the temporal distribution of architectural effort influences project outcomes.The contributions of this paper are:
+
+\begin{enumerate}
+\item Application of design mining to the TAWOS dataset, representing operational viability for design mining in practical settings.
+\item A comprehensive cross-project generalization analysis using leave-one-project-out validation, demonstrating that transformer models outperform traditional machine learning baselines.
+\item Attribution analysis using integrated gradients to explain classification decisions and identify challenges for cross-project generalization.
+\end{enumerate}
+
+\section{Related Work}
+
+\subsection{Machine Learning in Software Engineering}
+
+Machine learning has been extensively applied to software engineering problems including defect prediction, effort estimation, and bug triaging. Afzal and Torkar~\cite{afzal2011} performed a systematic literature review of genetic programming applied to software projects, finding it performed comparably to neural networks and logistic regression for project estimation, while outperforming other techniques for fault tolerance and quality prediction.
+
+Software fault prediction has been studied using a variety of techniques. Vineeta and Srinivasan~\cite{vineeta2019} used random forests and Na\"ive Bayes on the NASA Promise dataset, finding both achieved greater than 90\% accuracy. Siva et al.~\cite{siva2023a} applied adaptive artificial jelly optimization with LSTM to achieve 93\% accuracy for bug prediction.  Siva et al.~\cite{siva2023b} later introduced an adaptive golden eagle optimizer for feature selection, achieving 80\% accuracy on PROMISE data and 85\% on NASA data. Mahajan and Chaudhary~\cite{mahajan2022} achieved 85.1\% improvement over the state of the art for bug localization using a cuckoo search-based optimization with CNN.
+
+Estimating software development costs remains one of the primary reasons projects fail to sustain funding. Pospieszny et al.~\cite{pospieszny2018} compared support vector machines, multi-layer perceptrons, and generalized linear models, finding all methods appropriate for predicting software estimates, with the support vector machine performing best at predicting cost and duration. The TAWOS dataset has been used for effort estimation by Tawosi et al.~\cite{tawosi2022}, though neither their deep learning approach nor the TF-IDF baseline of Choetkiertikul et al.~\cite{choetkiertikul2019} proved effective at estimating issue completion across most projects.
+
+\subsection{Design Mining}
+
+Design mining is the automated identification of design-related discussions in software engineering artifacts (tickets, commits, threads, etc.). It was advanced significantly by Mahadi et al.~\cite{mahadi2021}. Their approach introduced pre-labeled Stack Overflow data and demonstrated applicability to GitHub projects using a back-propagation network, outperforming ten alternative algorithms. Their key contributions included reducing the need for human-labeled data and developing a software-specific vocabulary extracted from academic papers.
+
+Kleebaum et al.~\cite{kleebaum2021} developed ConDec, a tool that plugs into JIRA to elicit decision records, using logistic regression with high recall but poor precision. Dhaouadi et al.~\cite{dhaouadi2023} extracted decision rationale from Linux commit messages using gradient boosting with TF-IDF features. Herold et al.~\cite{herold2020} proposed a machine learning pipeline for detecting software architecture degradation, though their systematic review found little prior research combining detection with causal analysis and remediation.
+
+Moore et al.~\cite{moore2003} attempted to quantify architecture effort using qualitative measures such as stakeholder quality, while Nord et al.~\cite{nord2014} reviewed approaches for capturing design quality metrics, all involving qualitative scoring. These approaches require direct human involvement for consistent information capture, motivating the need for automated methods.
+
+\subsection{Defect Prediction and Feature Selection}
+
+Li et al.~\cite{li2024} surveyed software defect prediction, identifying key future directions including data labeling quality, deep learning models, privacy-preserving data sharing, multi-feature fusion, line-level prediction, and unsupervised learning. Matloob et al.~\cite{matloob2021} found random forest, boosting, and bagging to be the most common ensemble methods, with AUC, accuracy, and recall as the most common performance measures. Giray et al.~\cite{giray2023} found that CNNs and RNNs were the most commonly used deep learning approaches, noting external features such as documentation or tickets are seldom used for prediction.
+
+Ali et al.~\cite{ali2023} performed a systematic review of feature selection methods, categorizing them as filter, wrapper, embedded, and hybrid, with filter and hybrid being most common. Li et al.~\cite{li2023} demonstrated that XGBoost performed best for feature identification when compared across nine classifiers for effort-aware defect prediction.
+
+Liu et al.~\cite{liu2023} showed that using code comments and commit messages as external knowledge improved defect detection over code-only features. Wang et al.~\cite{wang2024} demonstrated improved accuracy for bug triaging using Bi-LSTM with attention and ELMo across 35 models.
+
+\subsection{Transformer Models for Text Classification}
+
+BERT (Bidirectional Encoder Representations from Transformers)~\cite{devlin2019} provides contextual awareness by processing text bidirectionally, making it well-suited for classification tasks. BERT can be fine-tuned with small datasets and requires modification of only a single classification layer. It builds upon ELMo~\cite{peters2018} and GPT~\cite{radford2018}, combining bidirectional context with simplified fine-tuning.
+
+Trust and Minghim~\cite{trust2024} compared eight large language models using various fine-tuning techniques, finding BERT variants performed best on classification tasks. Mullis et al.~\cite{mullis2023} demonstrated above 90\% accuracy when using BERT to classify functional and non-functional requirements in engineering documents. Yucalar~\cite{yucalar2023} achieved a 95\% F-score using BERT on Turkish software requirements, confirming cross-language effectiveness. Nursapa et al.~\cite{nursapa2025} compared CodeBERT and CodeT5 for architectural smell detection, with CodeT5 consistently outperforming CodeBERT while both maintained at least 80\% effectiveness.
+
+Zhang and Wu~\cite{zhang2020} used abstract syntax trees combined with transformer-based word embeddings, achieving 8\% improvement over other deep learning approaches for defect prediction. Incekas~\cite{incekas2024} found BERTopic highly effective for topic modeling of help desk tickets. However, Zangari et al.~\cite{zangari2023} found that traditional SVM outperformed BERT for multi-level ticket classification, attributing this to noisy underlying datasets.
+
+\section{Research Method}
+
+\subsection{Overview}
+
+This research relies on systematically testing various transformer configurations to identify which approach will be the most effective at identifying design work in JIRA tickets from the TAWOS dataset. The approach follows a sequential methodology: (1)~fine-tune transformer models on labeled Stack Overflow data, (2)~apply transfer learning and manual labeling to the TAWOS dataset, and (3)~compare transformer performance against traditional machine learning baselines using cross-project validation. It also compares against modern large language models (LLM) and modern transformer models. Figure~\ref{fig:pipeline} summarizes this pipeline.
+
+In this paper, \emph{design mining} refers specifically to the binary text classification of individual JIRA tickets as design-related or not, following the terminology and task framing of Mahadi et al.~\cite{mahadi2021}. It does not extract design artifacts, decisions, or architectural models from those tickets. Section~\ref{sec:discussion} returns to this scoping when discussing downstream applications.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=8mm and 12mm,
+  stage/.style={rectangle, draw, rounded corners, align=center, minimum width=3.1cm, minimum height=1.1cm, fill=gray!8},
+  arr/.style={-{Latex[length=2mm]}, thick}
+]
+\node[stage] (so) {Stage 1\\Fine-tune on Stack\\Overflow design data};
+\node[stage, right=of so] (transfer) {Stage 2\\Transfer learning +\\manual labels on TAWOS};
+\node[stage, right=of transfer] (lopo) {Stage 3\\Leave-one-project-out\\cross-validation};
+\node[stage, below=of transfer] (compare) {Comparison\\SVM, GB, ModernBERT,\\Qwen+LoRA, LLM baselines};
+\draw[arr] (so) -- (transfer);
+\draw[arr] (transfer) -- (lopo);
+\draw[arr] (lopo) -- (compare);
+\end{tikzpicture}
+\caption{Overview of the three-stage pipeline: Stack Overflow pretraining, TAWOS transfer learning with manual and cherry-picked labels, and leave-one-project-out cross-validation against traditional-ML, modern-encoder, and LLM baselines.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Datasets}
+
+The Stack Overflow Design Mining Dataset~\cite{mahadi2021} contains approximately 260,000 labeled discussions from Stack Overflow, pre-processed and vectorized for software engineering text. Labels are binary: \emph{design} or \emph{non-design}. The dataset includes software-specific stop words and two vectorization techniques (TF-IDF and word embeddings).
+
+The TAWOS Dataset~\cite{tawosi2022} contains 458,232 issues from 39 open-source projects collected from JIRA repositories. Unlike Stack Overflow, TAWOS issues represent planned work with effort information, relationships to other issues, descriptions, and comments, representing a directly applicable operational dataset.
+
+\subsection{Data Preprocessing}
+
+For the Stack Overflow dataset, existing preprocessing and vectorization from Mahadi et al.~\cite{mahadi2021} was derived based on the available dataset and literature. For the TAWOS dataset, preprocessing included removing duplicate issues, filtering automatically generated issues, normalizing whitespace, and removing URLs, email addresses, and system-generated information. The same software-specific stop words based on the Mahadi dataset were applied for consistency when comparing methods, however, it was found that the stop words caused degraded performance with transformer models and was not used for the shared results.
+
+\subsection{Labeling the TAWOS Dataset}
+\label{sec:labeling}
+
+Initial transfer learning using the Stack Overflow fine-tuned model exhibited self-affirmation bias, producing near-perfect but invalid scores. To address this, 1,786 issues from ten projects were manually reviewed and labeled. Projects were selected across different repositories to ensure variety and reduce bias.
+
+During manual review, design issues were defined as those involving documentation or creation of architecture, code or process refactoring for project-level improvement, or design for new features. Non-design issues included bug fixes, code cleanup, and implementation tasks with clear scope. Of the manually labeled issues, 28\% were classified as design, a significant class imbalance compared to the 50/50 split in the Stack Overflow data. All labeling described here was performed by a single primary annotator; Section~\ref{sec:discussion}'s Threats to Validity discussion reports an inter-rater reliability check against a second, independent annotator on a stratified subsample.
+
+To address this imbalance (28\% design), a cherry-picking heuristic was developed to identify high-probability design examples. Issues were first passed through a set of hard exclusion rules: issue type (bug, sub-task, test task, technical task), version-upgrade or migration language, documentation-only changes, issues containing Java stack traces or requests for improved logging, any mention of deployment, and summaries dominated by UI-only vocabulary (e.g. \emph{button}, \emph{css}, \emph{tooltip}). This criteria was developed largely from observation and analysis of manually labeled data. Remaining issues were then scored using a weighted keyword search over the issue summary and description: 37 strong architectural phrases (e.g. \emph{microservices}, \emph{event-driven}, \emph{api gateway}, \emph{oauth}, \emph{message broker}) contributed $+3$ points each, 31 medium-signal phrases (e.g. \emph{refactor}, \emph{authentication}, \emph{caching}, \emph{rate limit}) contributed $+2$, and 10 weak, single-word signals (e.g. \emph{api}, \emph{service}, \emph{plugin}) contributed $+1$; issue type also carried a bonus of $+2$ or $+3$ for feature/enhancement/story type issues. Narrowly scoped API and UI changes were penalized at $-2$ each. The keywords were compiled in part from the list developed by ~\cite{mahadi2021}. A minimum total of 5 points was required for selection, yielding 4,989 cherry-picked design labels and 4,995 cherry-picked non-design labels in total, drawn from a combination of curated project exports (top-35-per-file plus 100 cross-file candidates) and an unfiltered TAWOS database pull (all issues scoring above threshold). A manual audit of 100 high confidence sampled heuristic labels found 96\% agreement with a human reviewer.
+
+The heuristic's proves to provide no meaningful improvement. Table 4 shows that LOPO performance with augmented results are within one standard deviation across 1,786 manually labeled tickets (mean F1 0.707 for the 'best' result). Other attempts using descriptive information, excluding metadata from the ticket, did not improve the results either, which lead to further tests from additional JIRA ticket information.
+
+\begin{table}[t]
+\centering
+\label{tab:labels}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Source} & \textbf{Design} & \textbf{Non-Design} \\
+\midrule
+Manually Labeled & 496 & 1,290 \\
+Cherry-Picked & 4,989 & 4,995 \\
+\midrule
+\textbf{Total} & \textbf{5,485} & \textbf{6,285} \\
+\bottomrule
+\end{tabular}
+\caption{Final Label Count for Fine-Tuning on TAWOS Data}
+\end{table}
+
+\subsection{Evaluation Metrics}
+
+Following Mahadi et al.~\cite{mahadi2021}, accuracy and AUC are used as metrics, supplemented by precision and recall. The F1 score is considered the primary metric because it is best used to measure the accuracy of an unbalanced dataset. Accuracy is defined as:
+\begin{equation}
+\text{Acc} = \frac{TP + TN}{TP + TN + FP + FN}
+\label{eq:acc}
+\end{equation}
+Recall measures correctly identified positives:
+\begin{equation}
+\text{Recall} = \frac{TP}{TP + FN}
+\label{eq:recall}
+\end{equation}
+Precision measures the ratio of true positives among all positive classifications:
+\begin{equation}
+\text{Prec} = \frac{TP}{TP + FP}
+\label{eq:prec}
+\end{equation}
+The F1 score is the harmonic mean of precision and recall:
+\begin{equation}
+F_1 = \frac{2 \cdot \text{Prec} \cdot \text{Recall}}{\text{Prec} + \text{Recall}}
+\label{eq:f1}
+\end{equation}
+AUC is calculated as:
+\begin{equation}
+\text{AUC} = \frac{\frac{TP}{TP+FN} + \frac{TN}{TN+FP}}{2}
+\label{eq:auc}
+\end{equation}
+
+\subsection{Model Architecture}
+
+The BERT base model uses a 512-token limit with a BERT tokenizer. Each example receives a \texttt{[CLS]} token denoting the instance and \texttt{[SEP]} tokens marking separations between fields. For example: \texttt{[CLS] Socialize use of event driven architecture [SEP] Update design log [SEP]}. Each token embedding combines word embedding, segment embedding, and position embedding.
+
+Fine-tuning adds a classification layer on top of the pre-trained model. An initial fine-tuning stage uses the Stack Overflow dataset with a learning rate of 2e-5, batch size of 16, and 3--5 epochs. A second fine-tuning stage uses the TAWOS labeled data with a smaller learning rate and fewer epochs for more modest adaptation. A dropout layer prevents overfitting, and a dense layer with Softmax provides classification probabilities.
+
+\subsection{Comparison with Traditional Methods}
+
+To provide a fair baseline, support vector machine (SVM) and gradient boosting (GB) models were trained using hyperparameter grid search with stratified 5-fold cross-validation. For SVM, 12 combinations were tested over regularization strength ($C \in \{0.1, 1, 10\}$), kernel (RBF, linear), and gamma (scale, auto). For GB, 54 combinations were tested over number of estimators ($\{100, 200, 300\}$), max depth ($\{3, 5, 7\}$), learning rate ($\{0.01, 0.1, 0.2\}$), and subsample ($\{0.8, 1.0\}$). With 5-fold validation, this resulted in 330 model combinations tested.
+
+\section{Results}
+
+\subsection{Stage 1: Fine-Tuning on Stack Overflow Data}
+
+Ten experiments were completed across bert-base-uncased, roberta-base, and distilbert-base-uncased using the Mahadi et al.~\cite{mahadi2021} Stack Overflow dataset with the same training and validation splits. Results are shown in Table~\ref{tab:stage1}.
+
+roberta-base with a conservative learning rate of 1e-5 achieved the best F1 score of 0.9066 and AUC of 0.9650. bert-base-uncased was a close second (F1=0.9045, AUC=0.9634). All models performed similarly, with aggressive learning rates causing rapid overfitting, with F1 $\approx$ 0.5, regressing to guessing odds.
+
+\begin{table}[t]
+\centering
+\caption{Stage 1 Results: Training on Stack Overflow Data}
+\label{tab:stage1}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Model} & \textbf{BS} & \textbf{LR} & \textbf{E} & \textbf{F1} & \textbf{AUC} \\
+\midrule
+roberta & 16 & 1e-5 & 3 & \textbf{0.907} & 0.965 \\
+roberta & 16 & 2e-5 & 3 & 0.906 & 0.965 \\
+roberta & 16 & 5e-6 & 5 & 0.905 & 0.965 \\
+distilbert & 16 & 2e-5 & 3 & 0.905 & 0.964 \\
+distilbert & 16 & 1e-5 & 3 & 0.905 & 0.964 \\
+bert & 16 & 5e-6 & 5 & 0.905 & 0.963 \\
+distilbert & 16 & 5e-6 & 5 & 0.905 & 0.963 \\
+\midrule
+roberta & 32 & 2e-5 & 3 & 0.906 & \textbf{0.966} \\
+bert & 32 & 2e-5 & 3 & 0.906 & 0.965 \\
+distilbert & 32 & 2e-5 & 3 & 0.905 & 0.964 \\
+\bottomrule
+\end{tabular}
+\begin{center}
+\footnotesize BS = Batch Size, LR = Learning Rate, E = Epochs. 
+\end{center}
+\end{table}
+
+The seven BS=16 rows above the rule were run on the local 12~GiB vRAM GPU used throughout this study. All three BS=32 attempts (roberta, bert, distilbert) failed with CUDA out-of-memory on that same local GPU. The three BS=32 rows below the rule were instead run on a Google Cloud Platform (GCP) g2-standard-4 GPU instance (1$\times$ NVIDIA L4, 24~GiB) at a combined cost of about \$6 for all three models (Table~\ref{tab:batch32cost}, Section~\ref{sec:overhead}). None of the three exceeds the best BS=16 result (roberta, LR=1e-5, F1=0.907); roberta and distilbert are within 0.001 F1 of their own matched-hyperparameter (LR=2e-5, E=3) BS=16 counterpart, and bert's BS=32 result is only 0.0011 above its single completed BS=16 run, the added cloud cost buys no measurable accuracy improvement here.
+
+\subsection{Stage 2: Transfer Learning to TAWOS}
+
+Transfer learning experiments used RoBERTa and BERT fine-tuned first on Stack Overflow data, then adapted to the TAWOS dataset. Transfer learning in this context is an attempt to label data based on the Stack Overflow fine tuned model. The data labeled by the fine tuned model was then used to adapt the model according to the TAWOS dataset. A 60/20/20 training/test/evaluation split was used. Inverse-frequency class weights on cross-entropy loss~\cite{mao2023} addressed the class imbalance. Results are shown in Table 3. The purpose of attempting transfer learning was to address the small number of manually labeled data, the cherry-picking method was an attempt to address the overly optimistic results of transfer learning.
+
+The roberta\_transfer configuration using inverse-frequency class weighting achieved an F1 of 0.9597, while the balanced configuration (\texttt{roberta\_transfer\_balanced}) reached F1 of 0.9804. However, the near-perfect results for all models suggested that transfer learning was overfitting data and creating confirmation bias in the training. Effectively, the models had learned how each fine-tuned version would label and classify, hence re-affirming itself.
+
+\begin{table}[t]
+\centering
+\label{tab:transfer}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Experiment} & \textbf{Prec} & \textbf{Rec} & \textbf{F1} & \textbf{AUC} \\
+\midrule
+roberta\_transfer & 0.948 & 0.972 & 0.960 & 0.979 \\
+roberta\_balanced & \textbf{0.966} & \textbf{0.995} & \textbf{0.980} & 0.947 \\
+bert\_conservative & 0.915 & 0.921 & 0.918 & \textbf{0.994} \\
+\bottomrule
+\end{tabular}
+\caption{Transfer Learning Validation Metrics (Best Epoch)}
+\end{table}
+
+\subsection{Cross-Project Generalization (LOPO)}
+
+Leave-one-project-out (LOPO) analysis trained on nine projects and validated on the held-out project. Various configurations of data augmentation, layer freezing, and manual weighting were tested. Table 4 presents the aggregated results.
+
+The Aug top-250 configuration, augmenting with 500 balanced (half design, half not design) cherry-picked samples, reached the numerically highest mean F1 of 0.707, though as shown below none of the six non-freezing configurations are statistically distinguishable from one another. The baseline with only manual labels achieved F1=0.697 with the best AUC of 0.893. Additional augmentation beyond 250 samples showed no significant improvement, contradicting prior studies~\cite{nam2013, uddin2022} that found augmentation improved results. This ordering is consistent with each following tests. When applicable results are averaged over 5 different runs for each configuration. Section~\ref{sec:metadata} reports a reproducibility check finding run-to-run F1 variance of $\pm$0.01--0.02, and Section~\ref{sec:discussion} notes that this specific augmentation benefit does not hold once metadata fields (Section~\ref{sec:metadata}) are added, so it should be read as evidence for augmentation's effect in this text-only setting specifically, not as a general finding.
+
+The freezing of layers 10 (Freeze 10) substantially degraded the results, although combining the freezing with the full augmented data set partially recovered the performance (Mean F1 = 0.657). Pseudo-labels from Stack Overflow transfer learning also underperformed the baseline.
+
+\begin{table}[t]
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Config} & \textbf{Aug} & \textbf{$\bar{F_1}$ ($\pm$SD)} & \textbf{$\bar{\text{AUC}}$} & \textbf{$\bar{\text{Acc}}$} \\
+\midrule
+Aug-250 & 500 & 0.707 $\pm$ 0.015 & 0.893 & 0.814 \\
+Aug-1000 & 2000 & 0.704 $\pm$ 0.009 & 0.885 & 0.812 \\
+Aug-750 & 1500 & 0.702 $\pm$ 0.009 & 0.882 & 0.805 \\
+Aug-500 & 1000 & 0.701 $\pm$ 0.015 & 0.890 & 0.804 \\
+Baseline & 0 & 0.697 $\pm$ 0.013 & 0.893 & 0.808 \\
+Aug all & $\sim$10K & 0.695 $\pm$ 0.015 & 0.887 & 0.811 \\
+Pseudo+Aug-250 & 2380$^\ddagger$ & 0.688$^\dagger$ & 0.882 & 0.821 \\
+Pseudo (SO-transfer) & 21517$^\ddagger$ & 0.670$^\dagger$ & 0.876 & 0.818 \\
+\midrule
+Freeze 10+aug & $\sim$10K & 0.657 $\pm$ 0.005 & 0.861 & 0.750 \\
+Freeze 10 & 0 & 0.630 $\pm$ 0.009 & 0.838 & 0.739 \\
+\bottomrule
+\end{tabular}
+\caption{LOPO Cross-Validation Results (RoBERTa, text-only), 5-seed averaged}
+\label{tab:lopo}
+\begin{flushleft}
+\footnotesize Aug = total augmented samples (design + non-design). Mean $\pm$ SD is computed over 5 seeds (42--46) for all rows except the two Pseudo rows$^\dagger$, which use self-training pseudo-labels (confidence $\geq$0.85) from the Stage-1 SO-transfer model rather than cherry-picked heuristic labels and were not re-swept (single run each). $^\ddagger$Pseudo+Aug-250 combines 1,880 balanced pseudo-labels with the 500 Aug-250 cherry-picked samples. 
+\end{flushleft}
+\end{table}
+
+The six non-freezing configurations (above Freeze 10+aug) are not statistically distinguishable from one another. Pairwise paired Wilcoxon tests on seed-averaged per-project F1 we performed, all $p>0.23$. Table 4 should be read as descriptive, not as evidence any one of them is best. Freezing layer 10 does produce a significant drop relative to Baseline ($p$=0.027, Cohen's $d$=1.0) demonstrating that freezing layer 10 did not improve performance. Previous work~\cite{howard2018ulmfit} found that freezing specific layers during training on a small dataset improved results on NLP tasks, conversely, the results on this design mining dataset were significantly worse (Mean F1 = 0.657) compared to the baseline. 
+
+The model exhibited a recall bias with weaker precision, indicating a tendency to over-label issues as design. The seed-averaged mean recall 0.812 vs.\ mean precision 0.632 for the baseline configuration, pooled across the ten LOPO folds and five seeds. Certain projects consistently scored lower. SERVER (F1=0.505) and DM (F1=0.577) were the weakest, while CONFSERVER reached the highest F1 of 0.823, all under the same Baseline configuration and seed-averaging protocol as Table~\ref{tab:lopo}. A project's design rate correlated moderately, though not significantly, with its F1 (Spearman $\rho$=0.57, $p$=0.089, $n$=10 projects). CONFSERVER's highest design rate (33.5\%) coincided with its highest F1, and SERVER's lowest design rate (19.8\%) coincided with its lowest F1. This is a weaker and less reliable relationship than the project-level text characteristics reported in Section~\ref{sec:discussion} (out-of-vocabulary rate, $\rho$=$-$0.77; description sparsity, $\rho$=$-$0.64). Therefore project-specific language variation, rather than class balance alone, remains the primary challenge. Design rate should not be dismissed as fully unrelated to performance. Further analysis is provided in the discussion section.
+
+\subsection{Comparison with SVM and Gradient Boosting}
+
+The grid-search hyperparameter selection was stable across seeds for SVM ($C$=1, linear kernel, gamma=scale in all 5 baseline seeds; cross-validated F1 0.718--0.750, mean 0.735) and varied slightly for GB (mostly learning rate=0.1, max depth=3, subsample=0.8; cross-validated F1 0.672--0.692, mean 0.684).
+
+An initial single-seed run of these configurations reported GB's best LOPO result under Aug-500 (F1=0.636) and a best Aug-250 configuration of SVM with an F1=0.680. Following the same reproducibility protocol as as the ROBERTa tests, we ran all three augmentation levels for both SVM and GB over 5 seeds (42--46). Table 5 reports the resulting mean $\pm$ SD. Seed-averaging shows SVM performed best without augmentation (F1=0.666 $\pm$ 0.000, AUC=0.861). SVM's LOPO F1 is in fact seed-invariant at this augmentation level, the linear-kernel solver and TF-IDF features are deterministic once no randomly-sampled augmented examples are introduced. GB improved marginally with augmentation (F1=0.630 $\pm$ 0.015 baseline vs.\ 0.641 $\pm$ 0.015 at Aug-500), a gap smaller than one seed's worth of noise for either configuration. RoBERTa's best text-only LOPO result (mean F1=0.707, single run) outperformed both SVM ($+$4.1\%) and GB ($+$6.6\%, vs.\ GB's own best config, Aug-500).
+
+\begin{table}[t]
+\centering
+\label{tab:lopo_trad}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Config} & \textbf{Model} & \textbf{$\bar{F_1}$ ($\pm$SD)} & \textbf{$\bar{\text{AUC}}$} & \textbf{$\bar{\text{Acc}}$} & \textbf{$\bar{\text{Prec}}$} & \textbf{$\bar{\text{Rec}}$} \\
+\midrule
+Baseline & SVM & \textbf{0.666 $\pm$ 0.000} & \textbf{0.861} & \textbf{0.810} & \textbf{0.652} & 0.699 \\
+Baseline & GB & 0.630 $\pm$ 0.015 & 0.829 & 0.791 & 0.616 & 0.660 \\
+Aug-250 & SVM & 0.665 $\pm$ 0.009 & 0.859 & 0.786 & 0.593 & 0.775 \\
+Aug-250 & GB & 0.638 $\pm$ 0.010 & 0.833 & 0.782 & 0.590 & 0.707 \\
+Aug-500 & SVM & 0.657 $\pm$ 0.007 & 0.859 & 0.775 & 0.571 & \textbf{0.791} \\
+Aug-500 & GB & 0.641 $\pm$ 0.015 & 0.841 & 0.787 & 0.594 & 0.711 \\
+\bottomrule
+\end{tabular}
+\caption{LOPO Analysis: SVM and Gradient Boosting, Mean $\pm$ SD over 5 Seeds (42--46)}
+\end{table}
+
+\subsection{Metadata Enrichment and Weighting Optimization}
+\label{sec:metadata}
+
+Adding JIRA issue type and priority as additional \texttt{[SEP]}-delimited fields improved results over the text-only baseline (Table 6). Two further modifications were tested on top of this metadata-enriched model: a softened class weighting scheme that applies a square root to the inverse-frequency weights,
+\begin{subequations}\label{eq:weights}
+\begin{align}
+w_{\text{neg}} &= \sqrt{\text{total} \mathbin{/} (2 \cdot n_{\text{neg}}) \label{eq:wneg}} \\
+w_{\text{pos}} &= \sqrt{\text{total} \mathbin{/} (2 \cdot n_{\text{pos}}) \label{eq:wpos}}
+\end{align}
+\end{subequations}
+intended to reduce the penalty for incorrect labeling and improve precision at a modest cost to recall; and a per-fold decision threshold tuned on each LOPO fold's validation project instead of the default 0.5.
+
+An initial single training run identified Base+Meta+SqrtW as the best configuration (F1=0.7325). Re-running that exact configuration with the same seed, data, and code reproduced a mean LOPO F1 of only 0.7106, a 0.022 drop attributable to ordinary GPU nondeterminism. Kernel autotuning and floating-point reductions are not fixed by seeding data order and dropout alone~\cite{zhuang2022}. Since several of the six configurations in Table 4 were reported within 0.03 F1 of one another, single-run comparisons of this magnitude are not distinguishable from training noise. We ran all six configurations for 5 seeds each (42--46, 30 LOPO runs total) and report mean $\pm$ SD across seeds in Table 6. Per-project means are additionally averaged before computing cross-project spread, the table's F1 values are more stable than any individual run. Section~\ref{sec:significance} discusses the consequences for statistical testing, and Section~\ref{sec:discussion} returns to this as a threat to internal validity.
+
+\begin{table}[t]
+\centering
+\label{tab:meta}
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Config} & \textbf{$\bar{F_1}$ ($\pm$SD)} & \textbf{$\bar{\text{AUC}}$} & \textbf{$\bar{\text{Acc}}$} & \textbf{$\bar{\text{Prec}}$} & \textbf{$\bar{\text{Rec}}$} \\
+\midrule
+Base+Meta & \textbf{0.743 $\pm$ 0.013} & 0.914 & \textbf{0.845} & \textbf{0.692} & 0.829 \\
+Base+Meta+SqrtW & 0.727 $\pm$ 0.012 & 0.913 & 0.832 & 0.678 & 0.826 \\
+Base+Meta+Thresh & 0.723 $\pm$ 0.014 & 0.911 & 0.827 & 0.669 & 0.834 \\
+Aug250+Meta & 0.718 $\pm$ 0.009 & 0.913 & 0.807 & 0.641 & 0.861 \\
+Aug250+Meta+SqrtW & 0.709 $\pm$ 0.017 & 0.914 & 0.799 & 0.629 & \textbf{0.869} \\
+Aug250+Meta+Thresh & 0.709 $\pm$ 0.017 & 0.913 & 0.793 & 0.622 & 0.883 \\
+\bottomrule
+\end{tabular}
+\caption{LOPO with Metadata and Weighting Modifications, Mean $\pm$ SD over 5 Seeds (42--46)}
+\end{table}
+
+Under this seed averaged evaluation, Base+Meta (no additional weighting) is the strongest configuration, not Base+Meta+SqrtW. It achieves the highest mean F1 (0.743 $\pm$ 0.013), accuracy (0.845), and precision (0.692) of all six configurations, beating Base+Meta+SqrtW by 0.016 F1 ($p$=0.014, Cohen's $d$=0.75 on seed-averaged folds). The opposite of the single run ranking. The square-root weighting and per-fold threshold-tuning variants each reduce mean F1 relative to plain Base+Meta once averaged over seeds, and neither reliably improves precision the way the single-run result suggested. Both were tested, but when averaged out, neither yielded the actual best result. AUC, by contrast, is essentially unchanged across all six configurations (0.911--0.914) and across seeds (SD $\le$ 0.005), consistent with AUC's threshold-independence~\cite{fawcett2006}.
+
+\subsection{Attribution Analysis}
+
+Integrated gradients~\cite{sundararajan2017}, a method that satisfies the \emph{Sensitivity} and \emph{Implementation Invariance} axioms and has been validated for transformer model explainability~\cite{lundstrom2022}, was applied to the fine-tuned RoBERTa model.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/attribution_analysis.png}
+\caption{Mean integrated-gradients attribution scores (with standard deviation whiskers and per-word sample counts $n$) for the top-20 words associated with the design class (left) and non-design class (right).}
+\label{fig:attribution}
+\end{figure}
+
+The analysis revealed that words such as \emph{design}, \emph{automation}, \emph{architecture}, and \emph{logic} exhibited the strongest positive attribution for the design class, while \emph{plugin}, \emph{docker}, \emph{connector}, \emph{helm}, and \emph{rest} pointed to implementation work. High standard deviations of attribution scores indicate context dependency, supporting the difficulty of design identification since many common phrases carry ambiguous meaning.
+
+Domain-specific phrases improved attribution but raised generalizability concerns. Domain and project specific language (e.g., Docker, Helm) may not transfer across organizations or projects. Analysis of false positives confirmed that phrases such as \emph{write}, \emph{verify}, and \emph{correctness} triggered overly aggressive design labeling, consistent with the recall-biased behavior observed in the LOPO analysis.
+
+Looking beyond the top few words, the full top-20 attribution lists reveal a systematic split in vocabulary breadth. The design-class list includes words that appear in only 3--9 of the 100 sampled design tickets each (\emph{debugger}, \emph{indexing}, \emph{queue}, \emph{message}, \emph{documentation}, \emph{repository}, \emph{workspace}, \emph{certificates}), i.e. narrow but individually strong signals. The non-design list instead includes several high-frequency, broadly-applicable words: \emph{app} appears in 16 of the 100 non-design samples, \emph{docker} in 10, \emph{plugin} and \emph{custom} in 9 each, alongside narrower infrastructure-specific terms (\emph{helm}, \emph{mesos}, \emph{csi}, \emph{nexus}). The top 20 words for each class is depicted in Figure 2. 
+
+This asymmetry matters for downstream deployment. An organization whose technology stack does not use Docker, Helm, or Mesos should not expect the non-design attribution pattern to transfer as-is. A meaningful share of the model's non-design work signal is tied to this specific TAWOS project mix (JIRA/Confluence-server infrastructure, Mesos, Nexus) rather than to implementation work in general. This suggests that before reusing this classifier on a new project, a practitioner should re-run attribution analysis on a small labeled sample from their own repository to check whether the model is keying on genuinely task-relevant vocabulary or on artifacts of the training projects' technology choices. The other practical option would be to further train the model on the practitioners project specific language.
+
+\subsection{Comparison with Modern Encoder, Decoder, and LLM Baselines}
+\label{sec:llm-baselines}
+
+The comparisons above use BERT, RoBERTa, and DistilBERT, all released in 2018--2019. To situate these results against more recent architectures, we evaluate ModernBERT~\cite{warner2024modernbert} as a modern encoder baseline, Qwen2.5-1.5B~\cite{qwen2024technical} fine-tuned with LoRA adapters~\cite{hu2022lora} as a decoder baseline. LoRA was chosen to relieve memory pressure on the local GPU after initial testing on it continuously failed. Zero and few-shot prompting~\cite{brown2020fewshot} with three LLMs (Claude, GPT-4o, and a locally-hosted Llama3.1:8b) as a training-free baseline was also tested. All configurations are evaluated on the same LOPO protocol as other tests discussed, using the manually labeled 1,786-ticket set (no cherry-picked augmentation) for the encoder/decoder fine-tuning runs, and the full ten held-out projects for the LLM prompting runs.
+
+
+ModernBERT was fine-tuned identically to RoBERTa in Stage 1 (F1=0.9104, AUC=0.9657 on the Stack Overflow benchmark, exceeding all three legacy encoders) before LOPO evaluation. Qwen2.5-1.5B+LoRA was evaluated cold-start, meaning no fine-tuning beyond what is publicly available, and after an additional Stage-1 SO-corpus pretraining pass matched to the encoder pipeline. LLM baselines used the same ten TAWOS projects with no fine-tuning: a zero-shot prompt describing the labeling task, and a few-shot variant with labeled examples in-context.
+
+\begin{table}[t]
+\centering
+\caption{LOPO Comparison with Modern Encoder, Decoder, and LLM Baselines}
+\label{tab:llm_baselines}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Type} & \textbf{$\bar{F_1}$} & \textbf{$\sigma_{F_1}$} & \textbf{$\bar{\text{AUC}}$} \\
+\midrule
+RoBERTa (Base+Meta) & Fine-tuned encoder & \textbf{0.743} & 0.087 & \textbf{0.914} \\
+ModernBERT & Fine-tuned encoder & 0.688 & 0.091 & 0.891 \\
+Claude few-shot & Prompted LLM & 0.693 & 0.094 & 0.884 \\
+GPT-4o few-shot & Prompted LLM & 0.688 & 0.089 & 0.871 \\
+Claude zero-shot & Prompted LLM & 0.672 & 0.081 & 0.874 \\
+GPT-4o zero-shot & Prompted LLM & 0.666 & 0.078 & 0.860 \\
+Llama3.1:8b zero-shot & Prompted LLM & 0.631 & 0.081 & 0.743 \\
+Llama3.1:8b few-shot & Prompted LLM & 0.621 & 0.081 & 0.747 \\
+Qwen2.5-1.5B+LoRA (pretrained) & Fine-tuned decoder & 0.578 & 0.080 & 0.833 \\
+Qwen2.5-1.5B+LoRA (cold-start) & Fine-tuned decoder & 0.526 & 0.077 & 0.729 \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\footnotesize RoBERTa and ModernBERT rows use the 5-seed averaged results from Table~\ref{tab:meta}'s reproducibility protocol. All other rows are single runs. Prompted LLMs have no training seed. The two Qwen+LoRA variants were not averaged due to high-training cost and the overall poor ranking.
+\end{flushleft}
+\end{table}
+
+RoBERTa with metadata remains the strongest configuration. The margin over the best prompted LLM (Claude few-shot, F1=0.693) is 0.049 F1 and, unlike in an earlier single-run comparison against the softened-weighting configuration, is statistically significant under a paired Wilcoxon signed-rank test once both are evaluated on seed-averaged folds (Section~\ref{sec:significance}). Though the effect size is only medium ($d$=0.72). ModernBERT, despite the highest Stage-1 F1 of any encoder, underperforms RoBERTa's LOPO result, indicating that Stage-1 SO-corpus performance does not predict cross-project generalization. Qwen2.5-1.5B+LoRA trails every encoder and every LLM prompting configuration. Stage-1 SO-corpus pretraining substantially improves it over the cold-start variant ($+$0.052 F1, $+$0.104 AUC), but LoRA fine-tuning of only 4.4M of the model's 1.55B parameters (0.28\%) appears insufficient to close the gap to full encoder fine-tuning on a dataset of this size.
+
+\subsection{Statistical Significance Testing}
+\label{sec:significance}
+
+To assess whether the F1 and AUC differences above reflect genuine performance gaps rather than sampling variation across the ten LOPO folds, paired Wilcoxon signed-rank tests compared between the top ROBERTa configuration and each other model family. Together with Cohen's $d$ for effect size and a Holm-Bonferroni step-down correction for the 11 comparisons (family-wise $\alpha=0.05$). We use the Wilcoxon signed-rank test rather than a paired $t$-test because the two conditions being compared share the same 10 held-out projects. Making this a matched-pairs design, with only $n=10$ paired differences there is no reliable way to verify the normality assumption a $t$-test requires. Per-project performance is known to be heterogeneous, Section~\ref{sec:cross-project} reports an F1 range of 0.58--0.82 across projects for the top configuration. A test that only assumes the paired differences are symmetric about their median is the more defensible choice for classifier comparisons of this size~\cite{carrasco2020statistical}. RoBERTa's own per-fold F1 values are averaged over the same 5-seed sweep described in Section~\ref{sec:metadata}'s review of reproducibility. Single-run per-fold F1 carries enough GPU-nondeterminism noise to change which comparisons reach significance. Table 8 reports F1 significance comparisons.
+
+Uncorrected, every one of the 11 comparisons reaches significance at $\alpha=0.05$, including the closest margin, Claude few-shot ($p=0.049$, $d=0.72$, medium effect). This is a substantively different picture from an analysis using the single-run Base+Meta+SqrtW configuration as the RoBERTa baseline, where the Claude-few-shot comparison was not significant ($p=0.106$). The difference traces entirely to which configuration is compared and to averaging over 5 seeds, not to any change in the LLM baselines themselves.
+
+Under Holm-Bonferroni correction, all 11 comparisons remain significant, including SVM ($p_{\text{holm}}=0.0215$) and Claude few-shot ($p_{\text{holm}}=0.0488$). Both lost significance after correction in the single-run, SqrtW-based analysis (SVM: $p_{\text{holm}}=0.082$; Claude few-shot never reached significance even uncorrected). Seed-averaging is not uniformly favorable significance. It tightens the paired differences for every comparison, which can either reveal a real effect that single-run noise obscured (as with SVM and ModernBERT here) or fail to rescue a genuinely small, noisy difference. In this case every comparison happens to improve, but this should be read as evidence that Base+Meta is a more reproducible and defensible baseline than Base+Meta+SqrtW, not as license to skip seed-averaging in future comparisons of similarly F1 differences.
+
+\begin{table}[t]
+\centering
+\label{tab:significance}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Model} & \textbf{Mean $\Delta$F1} & \textbf{Cohen's $d$} & \textbf{$p$} & \textbf{$p$ (Holm)} \\
+\midrule
+Qwen2.5-1.5B+LoRA (cold) & 0.216 & 3.39 & 0.0020 & 0.0215 \\
+Qwen2.5-1.5B+LoRA (pretrained) & 0.164 & 4.66 & 0.0020 & 0.0215 \\
+Llama3.1:8b few-shot & 0.122 & 2.63 & 0.0020 & 0.0215 \\
+Gradient Boosting & 0.113 & 2.15 & 0.0020 & 0.0215 \\
+Llama3.1:8b zero-shot & 0.111 & 1.86 & 0.0020 & 0.0215 \\
+GPT-4o zero-shot & 0.077 & 1.37 & 0.0020 & 0.0215 \\
+SVM & 0.076 & 1.17 & 0.0020 & 0.0215 \\
+Claude zero-shot & 0.070 & 1.28 & 0.0020 & 0.0215 \\
+GPT-4o few-shot & 0.055 & 0.87 & 0.0195 & 0.0391 \\
+ModernBERT & 0.055 & 1.89 & 0.0020 & 0.0215 \\
+Claude few-shot & 0.049 & 0.72 & 0.0488 & 0.0488 \\
+\bottomrule
+\end{tabular}
+\caption{Paired Wilcoxon Signed-Rank Tests vs.\ RoBERTa (Base+Meta, seed-averaged), reported on F1, $n=10$ folds}
+\end{table}
+
+The AUC comparisons agree with the F1 picture under this corrected baseline. All 11 are significant after Holm correction, including Claude few-shot ($p=0.037$, Holm-corrected $p=0.037$), RoBERTa's closest competitor on both metrics. AUC's Holm-corrected $p$-values are also uniformly smaller than F1's for the same comparison (e.g. Claude few-shot: 0.037 vs.\ 0.049), consistent with AUC's threshold-independence and the far lower seed-to-seed variance already noted in Table 6 (SD $\le$0.005 vs.\ up to 0.017 for F1). AUC is the more statistically stable metric for ranking model families, even though F1 remains the operational metric for the classification decision itself.
+
+\subsection{Computational Overhead}
+\label{sec:overhead}
+
+Classification accuracy alone understates the practical cost differences between these approaches. Table~\ref{tab:overhead} summarizes wall-clock and monetary cost across model families, computed from the same training and inference runs used above.
+
+\begin{table}[t]
+\centering
+\label{tab:overhead}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Config} & \textbf{Wall-clock} & \textbf{Cost/1K} \\
+\midrule
+RoBERTa-base Stage-1 pretrain & 3.20h & N/A \\
+DistilBERT-base Stage-1 pretrain & 1.65h & N/A \\
+ModernBERT-base Stage-1 pretrain & 5.00h & N/A \\
+Qwen2.5-1.5B+LoRA Stage-1 pretrain & 16.59h & N/A \\
+Qwen2.5-1.5B+LoRA LOPO (cold) & 2.68h & N/A \\
+Qwen2.5-1.5B+LoRA LOPO (pretrained) & 2.68h & N/A \\
+SVM+GB grid search+LOPO (CPU) & 0.06h & N/A \\
+Claude few-shot & 3.23 s/ticket & \$7.02 \\
+Claude zero-shot & 3.26 s/ticket & \$5.13 \\
+GPT-4o few-shot & 2.44 s/ticket & \$2.39 \\
+GPT-4o zero-shot & 1.55 s/ticket & \$1.34 \\
+Llama3.1:8b (local) few-shot & 3.87 s/ticket & \$0.00 \\
+Llama3.1:8b (local) zero-shot & 1.55 s/ticket & \$0.00 \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\caption{Computational Overhead by Model Family}
+\end{flushleft}
+\end{table}
+
+Three results stand out. First, BERT-base-uncased never completed a successful Stage-1 training run at batch size=32 on the same 11.69~GiB GPU that trained RoBERTa (124.6 M Parameters) and DistilBERT (67 M Parameters) successfully at that setting, across three independent attempts, all failing with a CUDA out-of-memory error. A separate, successful BERT-base run does exist at batch size=16 (F1=0.9045, AUC=0.9634), but it was not the configuration carried forward into Stage 2 since RoBERTa scored higher on Stage 1. Second, Qwen2.5-1.5B+LoRA's Stage-1 pretraining is more than 3$\times$ the wall-clock of the next most expensive encoder (ModernBERT, 5.00h, 149.6 M Parameters) despite training only 0.28\% of its parameters (4.4M of 1.55B), reflecting the larger base model's forward and backward pass cost even under LoRA and gradient checkpointing on a 10-fold retrain. Against this cost, Qwen2.5-1.5B+LoRA's LOPO accuracy (Section~\ref{sec:llm-baselines}) trails both the fine-tuned encoders and the zero and few-shot LLM baselines, which require no training cost at all beyond per-ticket inference. For a practitioner choosing among these options, the prompted-LLM baselines offer a favorable quick solution. There's no training pipeline required, but there is a recurring per-ticket monetary cost. Whereas the fine-tuned encoders offer the best accuracy at a one-time training cost and low ongoing maintenance.
+
+Third, the batch size=32 configuration that failed locally completed successfully on a larger Google Cloud Platform (GCP) instance. Table~\ref{tab:batch32cost} reproduces all three batch size=32 Stage-1 runs on a GCP g2-standard-4 instance (1$\times$ NVIDIA L4, 24~GiB), at a combined cost of about \$6 for all three model families. Note, this is the absolute cost of a run. Failed runs, object storage, and other tests did incur modest additional costs totaling another \$30. However, the resulting test F1 is at most 0.001 higher than the matched-hyperparameter batch size=16 run for roberta and distilbert (0.9065 vs.\ 0.9059, and 0.9055 vs.\ 0.9052, respectively), and only 0.0011 above bert's best completed batch size=16 run, which used different hyperparameters since no matched-LR bert batch size=16 run exists, all of these gaps are an order of magnitude smaller than the $\pm$0.01--0.02 seed-to-seed standard deviation observed elsewhere in this study. Paying for a larger-memory cloud GPU therefore buys no measurable accuracy improvement here. Only faster wall-clock via the L4's greater throughput. For a practitioner without cloud budget, batch size=16 on consumer-grade hardware is not a compromise. It reaches the similar accuracy and requires significantly less complexity to manage.
+
+\begin{table}[t]
+\centering
+\caption{Cost of Reproducing batch size=32 on GCP GPU Hardware}
+\label{tab:batch32cost}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{Wall-clock} & \textbf{Cost} & \textbf{Test F1 / AUC} \\
+\midrule
+bert-base-uncased & 4.81h & \$3.40 & 0.9056 / 0.9646 \\
+roberta-base & 2.50h & \$1.76 & 0.9065 / 0.9656 \\
+distilbert-base-uncased & 1.28h$^\dagger$ & \$0.91$^\dagger$ & 0.9055 / 0.9642 \\
+\midrule
+Total, all three models & 8.59h$^\dagger$ & \$6.07$^\dagger$ & \\
+\bottomrule
+\end{tabular}
+\begin{flushleft}
+\footnotesize All three runs on a GCP g2-standard-4 instance, on-demand pricing, us-central1, \$0.7068/hr.  bert-base and roberta-base wall-clock is measured directly from consecutive run-start timestamps. The three jobs ran back-to-back on one instance. $^\dagger$distilbert-base's end time was not recorded, it was last in the sequence. Its wall-clock and cost are estimated by scaling roberta-base's measured batch size=32 time by the local batch size=16 distilbert/roberta wall-clock ratio (0.514$\times$), not measured directly, so the total row is an estimate. 
+\end{flushleft}
+\end{table}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Transformer Advantage for Design Mining}
+
+The results demonstrate that transformer-based models, specifically RoBERTa, outperform traditional machine learning approaches for cross-project design mining. The best RoBERTa configuration (\texttt{Base+Meta}, F1=0.743 $\pm$ 0.013 \& Accuracy=0.845, table 6) exceeds the same-protocol SVM baseline (F1=0.666 \& Accuracy=0.810) by 11.5\% \& 4.3\%, and the Gradient Boosting baseline (F1=0.630 \& Accuracy=0.791, 5-seed-averaged) by 17.9\% \& 6.8\%, in relative F1 and accuracy improvement, respectively. Both gaps are statistically significant under Holm-corrected paired Wilcoxon tests (Section~\ref{sec:significance}). This advantage is attributable to the transformer's ability to capture contextual relationships in text. This is particularly important for design discussions where terms carry different meanings depending on context.
+
+On the Stack Overflow data, all three legacy transformer architectures achieved F1 scores above 0.90, substantially exceeding the state-of-the-art reported by Mahadi et al.~\cite{mahadi2021}. ModernBERT, evaluated under the same Stage-1 protocol, reached the highest Stage-1 F1 of any encoder (0.9104, AUC=0.9657), yet did not carry this advantage through to cross-project LOPO performance (Section~\ref{sec:llm-baselines}), where RoBERTa remained the strongest configuration. This narrow, largely architecture-independent gap on Stack Overflow (0.9045--0.9104 F1) combined with a much wider spread on LOPO (0.526--0.743 F1 across all evaluated model families, Table~\ref{tab:llm_baselines}) suggests that the dataset's classification signal is learnable by any modern transformer architecture with appropriate hyperparameters, but that cross-project generalization, not Stack Overflow fine-tuning, is the harder and more architecture-sensitive problem.
+
+\subsection{Cross-Project Generalization Challenges}
+\label{sec:cross-project}
+
+The LOPO results reveal significant variability across projects. F1 ranged from 0.58 on SERVER to 0.82 on CONFSERVER for the best performing Base+Meta configuration. This indicates that project-specific language remains a fundamental challenge. Unlike prior work in cross-project defect prediction~\cite{nam2013, dam2021} where transfer learning consistently improved results, additional automated data augmentation in this study showed no meaningful improvements in the text-only tests (Table~\ref{tab:lopo}). Testing with additional metadata outperformed augmentation, suggesting that the approach in this context is only adding noise to the results and should be modified or disregarded. Given the consistency in results with augmentation across various seeds, it is showing that the heuristic is further anchoring the models accuracy against a rule set that does not transfer across projects. That the decision is truly more nuanced.
+
+Which projects are hard is not an artifact of any one model. Across all 13 model families evaluated in this study, project difficulty rankings agree closely (Kendall's $W=0.70$, $p<10^{-13}$ on F1; $W=0.64$, $p<10^{-12}$ on AUC). SERVER is the single worst-performing project for 9 of the 13 models, including the top RoBERTa configuration (F1=0.58). DM is worst for the remaining 4. This consistency lets project difficulty be characterized independently of any one model's behavior. 
+
+Two project-level text characteristics correlate strongly with mean F1 across all 13 models. Measuring the out-of-vocabulary (OOV) rate provides further explanation for cross project generalization. OOV rate measures the fraction of vocabulary in a project that were not captured in other projects. A high OOV rate means that a project had a high project specific vocab count. The OOV rate relative to the other nine projects calculated across all 10 projects ($\rho=-0.77$, $p=0.009$) and empty or sparse ticket descriptions ratio both correlate negatively ($\rho=-0.64$, $p=0.046$). While a project's Bug ticket share correlates positively ($\rho=0.73$, $p=0.016$), since Bug tickets are the easiest, most consistently-labeled non-design class. These are exploratory Spearman correlations, uncorrected for multiple comparisons, and should be read as descriptive rather than confirmatory.
+
+A manual review of every false positive and false negative on the two difficulty extremes (CONFSERVER and SERVER, 100\% coverage of 18 and 19 errors respectively) plus DM (all false negatives, a random sample of false positives), 65 tickets total from the Base+Meta configuration, sharpens this picture into per-project mechanisms and quantifies how much of the "error" is really model failure. Over half of the sampled errors, 52.3\% (34/65), were categorized as label-quality issues rather than model failures. Either genuinely ambiguous tickets where a second rater could reasonably disagree, or gold labels that look wrong on re-reading. This converges with the independent inter-rater finding below (Section~\ref{sec:threats}) that ground-truth quality, not model capacity, is a major limitation. Three of the label-error tickets in DM are near-identical auto-generated "Deploy for X" tickets labeled design, directly contradicting this study's own deployment hard-exclusion rule (Section~\ref{sec:labeling}). This is a fixable annotation mistake rather than inherent ambiguity. The remaining, genuine model errors have distinct, project-linked signatures. 
+
+False positives are driven either by implementation tickets using design-sounding vocabulary (API, schema, refactor) or by project-specific jargon (Docker, Helm, Mesos terms), the latter occurring only in CONFSERVER and DM. False negatives are driven either by design work described in terse, jargon-free language, or by under-described tickets defaulting to the majority (non-design) class. This maps directly onto each project's own text characteristics. SERVER's errors are dominated by sparse descriptions. 21.6\% of its tickets have near-empty descriptions, the highest of all 10 projects, and 40.6\% of its design tickets contain none of the architectural keywords the cherry-picking heuristic searches for. DM's are dominated by vocabulary shift. Its out-of-vocabulary rate is the second-highest of all 10 projects. CONFSERVER's residual errors are mostly genuine ambiguity rather than either failure mode, consistent with it being the easiest of the three. Notably, the model's most confident errors are disproportionately label-quality issues, not model misjudgments. Tickets coded as label errors have the highest mean prediction margin from the decision threshold (0.38) of any error category. In other words, the model was confidently wrong, but actually correct. Under-described tickets sit closest to the threshold (0.17). Confidently wrong predictions are a better place to look for label noise than for model weakness.
+
+The model's recall-biased behavior, mean recall 0.829 vs.\ mean precision 0.692, suggests it captures a broad notion of design-related language but lacks the specificity needed to distinguish design from implementation work. This is consistent with the false-positive patterns above. A softened class weighting scheme was tested as a way to trade recall for precision, but Section~\ref{sec:metadata}'s seed-averaged evaluation found it did not reliably improve precision once training noise was accounted for. Per-fold decision threshold tuning was tested for the same purpose and also failed to help. For a deployment that needs higher precision than Base+Meta provides, the error analysis above suggests a more targeted lever than reweighting. Since project-specific jargon and design/implementation vocabulary confusion are identifiable per-project failure modes, a practitioner could audit and adjust the small set of terms driving false positives in their own project rather than retuning the model's global loss function.
+
+\subsection{Practical Implications}
+
+For practitioners, these results suggest that transformer-based design mining can serve as a screening tool for identifying architectural work in large JIRA repositories, with the caveat that human review remains necessary for precision-sensitive applications. The metadata enrichment finding, that issue type and priority improve classification, is actionable, as these fields are standard in most project management tools.
+
+The attribution analysis provides interpretable signals that could help engineering managers understand what the model considers design work, enabling calibration to organization-specific definitions of architectural effort.
+
+With the ability to actively identify architecture or design work, this line of thinking lends itself to the prospect of a new project management tool altogether. There has long been a debate over the value of architecture work~\cite{gong2019}. With active classification of tasks, it naturally follows that impact of design work (or other types of non-operational tasks) can be measured. IE: Did defect rate for module \emph{X} drop after the re-design occurred? Attempting to measure impact is being left to future work.
+
+Another implication is that quantifying the amount of architecture work can be performed across projects to understand if a team has fallen into or leans towards 'analysis paralysis'~\cite{brown1998antipatterns}. It is common in software design, especially in large organizations and regulated industries, to get bogged down trying to ensure that all requirements are accounted for up front. This is counter to the notion that Agile methodologies focus on (iterative delivery), yet analysis of decision stagnation in software projects remains largely qualitative at best ~\cite{cao2008agile}. Confidently analyzing projects and their delivery rate is now more achievable, and can help improve on-time and on-budget delivery by flagging that architecture work is disproportionate to other successful projects. 
+
+\subsection{Threats to Validity}
+\label{sec:threats}
+
+\textbf{Internal validity:} The manual labeling process, while systematic, introduces subjectivity. The 28\% design rate in TAWOS versus 50\% in Stack Overflow represents a distribution shift that may affect transfer learning. The cherry-picking heuristic introduced noise and potentially systematic biases in augmented labels; it was demonstrated that higher levels of augmentation with this approach resulted in less reliable outputs. Separately, a reproducibility check (Section~\ref{sec:metadata}) found that re-running the same LOPO configuration with the same seed and data produced mean F1 values differing by up to 0.02 across training runs, due to GPU/cuDNN nondeterminism rather than any change in data or hyperparameters. Because several configurations in this study were originally compared on single runs within that margin, the single-run ranking initially reported for Table~\ref{tab:meta} was later found to select the wrong configuration as "best" (a classic winner's-curse effect from selecting a maximum over many noisy comparisons); all headline results in this paper were revised to use 5-seed-averaged evaluation after this was discovered. We flag this as a general caution for LOPO studies of this size: any single-run F1 difference smaller than approximately 0.02 should not be treated as a reliable ranking signal without seed-averaging or an equivalent check.
+
+\textbf{External validity:} Results are based on open-source projects, which may differ from proprietary software development in communication patterns and design documentation practices. The TAWOS dataset represents a specific snapshot of JIRA usage, and design language may evolve over time.
+
+\textbf{Construct validity:} The definition of ``design work'' is inherently ambiguous and context-dependent, and this study relies on a single primary annotator's judgment for its 1,786 manually labeled tickets (Section~\ref{sec:labeling}). To assess how much this matters, a second, independent annotator labeled the same 250-ticket stratified sample used for ground truth. Agreement was moderate (Cohen's $\kappa=0.436$; raw agreement 72.8\%; PABAK=0.456, which is higher than $\kappa$ because the two annotators' design-class base rates differ sharply). The disagreement is not random noise: it is a systematic, one-directional prevalence gap (the second annotator labeled 46\% of tickets design vs.\ 27.6\% for the primary annotator; of the 68 disagreements, 57 were tickets the primary annotator called non-design and the second annotator called design, versus only 11 the other way, a split an exact McNemar test rejects as symmetric with $p<10^{-7}$), concentrated almost entirely in ``Improvement'' and ``Suggestion'' issue types (100\% design rate from the second annotator on both, vs.\ 36.8\% and 50.0\% from the primary annotator), while Bug tickets agreed 95.6\% of the time. The most likely cause is that no shared written definition of ``design'' was given to the second annotator, who appears to have applied a broader everyday reading (including minor UI/feature-request tickets) than the primary annotator's narrower architectural definition (Section~\ref{sec:labeling}) — a definitional gap rather than inherent task difficulty, and in principle fixable with a written annotator guide and an adjudication pass, neither of which this study performed. This result should be read as a genuine limitation on the ground-truth quality underlying all reported metrics, not as a validation that passed. It is also independently corroborated by the qualitative error analysis in Section~\ref{sec:cross-project}: 52.3\% of the model's sampled misclassifications were themselves categorized as label-quality issues rather than model failures, a second, model-side signal pointing at the same underlying problem. The evaluation metrics, while standard, may not fully capture the utility of design mining for downstream applications such as defect prediction.
+
+\section{Conclusion}
+
+This paper demonstrates that transformer-based models can effectively perform design mining on JIRA tickets at a scale not previously attempted. Fine-tuning RoBERTa on the Stack Overflow design mining dataset achieves F1=0.907 and AUC=0.965, while cross-project generalization on the TAWOS dataset yields a 5-seed-averaged F1=0.743 ($\pm$0.013) with metadata enrichment, significantly outperforming SVM (11.5\% relative F1) and gradient boosting (17.9\% relative F1) baselines under Holm-corrected paired Wilcoxon tests.
+
+Key findings include: 1) transformer models capture design-related contextual signals that traditional machine learning approaches miss 2) data augmentation at various levels showed no significant improvement in results. 3) JIRA metadata fields did provide meaningful signals towards improvement. 4) project-specific language variation is the primary barrier to generalization, not class imbalance, and is consistent enough across 13 independently-evaluated model families (Kendall's $W=0.70$) to be characterized by project-level text statistics (out-of-vocabulary rate, description sparsity) rather than treated as idiosyncratic per-model noise; (5) ground-truth label quality, not model capacity, accounts for a substantial share of apparent classification error — a second annotator agreed only moderately with the primary labels ($\kappa=0.436$), and independently, 52\% of the model's own sampled misclassifications were judged to be label-quality issues on re-reading rather than genuine model failures; and (6) LOPO F1 differences smaller than approximately 0.02 are not reliably distinguishable from ordinary GPU training nondeterminism, that changed which configuration this paper reports as its best result and should caution against over-interpreting close single-run comparisons in similarly-sized cross-project evaluations.
+
+Future work will apply the design classifier developed here to predict changes in defect rates and examine whether the temporal distribution of architectural effort, front-loaded versus continuous, influences project quality. These investigations will test fundamental assumptions underlying Waterfall and Agile methodologies regarding when and how design work should be performed.
+
+Future work will use this classifier as a measurement instrument in a causal analysis of defect rates as a function of architectural effort distribution. Establishing a causal rather than correlational link will require differences across module windows or an instrumental variable design, together with a discussion of confounders such as team size, code complexity, and deadline pressure. The downstream claim that the temporal distribution of design effort influences project quality informally, the Waterfall versus Agile question, should be treated as a hypothesis to be tested under such a design rather than a finding of the present paper.
+
+\section*{Data Availability}
+
+The Stack Overflow design mining dataset is publicly available as described in Mahadi et al.~\cite{mahadi2021}. The TAWOS dataset is publicly available as described in Tawosi et al.~\cite{tawosi2022}. The manual labels and code used in this study are available from the authors at https://github.com/smmorgan/design-detection-and-defect-improvement.
+
+\section*{CRediT authorship contribution statement}
+
+\textbf{Steven Morgan:} Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing -- original draft, Writing -- review \& editing, Visualization. \textbf{Jeff Daniels, Ph.D.:} Writing -- review \& editing.
+
+\section*{Declaration of competing interest}
+
+The authors declare that there are no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Acknowledgments}
+
+The author would like to thank the Department of Systems Science at Binghamton University for their support of this research.
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+
+During the preparation of this work the authors used Claude and Claude Code in order to generate code, review analysis and refine writing. After using this tool/service, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
+
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+
+\end{document}

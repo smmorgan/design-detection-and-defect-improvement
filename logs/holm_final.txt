@@ -1,0 +1,13 @@
+                         unit correction missing_handling hypothesis  p_value                        note  holm_adjusted_p  significant_at_0.05
+project x component x quarter        raw           bucket         H1   0.0045 permutation null, 2000 reps           0.0540                False
+project x component x quarter  corrected           bucket         H1   0.0065 permutation null, 2000 reps           0.0715                False
+project x component x quarter        raw             drop         H1   0.0595 permutation null, 2000 reps           0.5950                False
+project x component x quarter  corrected             drop         H1   0.0690 permutation null, 2000 reps           0.6210                False
+            project x quarter        raw              NaN         H1   0.0709 permutation null, 1000 reps           0.6210                False
+            project x quarter  corrected              NaN         H2   0.1734         chi-square LR, df=2           1.0000                False
+            project x quarter  corrected              NaN         H1   0.2068 permutation null, 1000 reps           1.0000                False
+project x component x quarter        raw           bucket         H2   0.2074         chi-square LR, df=2           1.0000                False
+project x component x quarter  corrected           bucket         H2   0.2288         chi-square LR, df=2           1.0000                False
+            project x quarter        raw              NaN         H2   0.3126         chi-square LR, df=2           1.0000                False
+project x component x quarter        raw             drop         H2   0.3768         chi-square LR, df=2           1.0000                False
+project x component x quarter  corrected             drop         H2   0.3948         chi-square LR, df=2           1.0000                False

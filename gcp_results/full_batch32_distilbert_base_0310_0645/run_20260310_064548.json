@@ -1,0 +1,93 @@
+{
+  "mode": "full",
+  "model_name": "distilbert-base-uncased",
+  "max_length": 512,
+  "batch_size": 32,
+  "learning_rate": 2e-05,
+  "num_epochs": 3,
+  "dropout_rate": 0.1,
+  "random_seed": 42,
+  "data_source": "./data/data/train_data/raw/combined.csv",
+  "initial_samples": 200000,
+  "final_samples": 200000,
+  "train_samples": 140000,
+  "val_samples": 30000,
+  "test_samples": 30000,
+  "duplicates_removed": 0,
+  "auto_generated_removed": 0,
+  "short_texts_removed": 0,
+  "best_val_epoch": 3,
+  "best_val": {
+    "accuracy": 0.9038,
+    "precision": 0.9112016293279023,
+    "recall": 0.8948,
+    "f1_score": 0.9029263370332997,
+    "auc": 0.9632427688888888,
+    "true_positives": 13422,
+    "true_negatives": 13692,
+    "false_positives": 1308,
+    "false_negatives": 1578
+  },
+  "test": {
+    "accuracy": 0.9060666666666667,
+    "precision": 0.9112761647535449,
+    "recall": 0.8997333333333334,
+    "f1_score": 0.9054679637705468,
+    "auc": 0.9642289688888889,
+    "true_positives": 13496,
+    "true_negatives": 13686,
+    "false_positives": 1314,
+    "false_negatives": 1504
+  },
+  "output_dir": "./output_distilbert_base",
+  "device": "cuda",
+  "run_id": "20260310_064548",
+  "timestamp": "2026-03-10T06:45:48.364866",
+  "full_history": {
+    "train_loss": [
+      0.30914160561008114,
+      0.2212272275992802,
+      0.17985307114635196
+    ],
+    "val_loss": [
+      0.2553929366282563,
+      0.24911706191676258,
+      0.25899783064768134
+    ],
+    "val_metrics_per_epoch": [
+      {
+        "accuracy": 0.8978333333333334,
+        "precision": 0.8889395815681418,
+        "recall": 0.9092666666666667,
+        "f1_score": 0.8989882345186698,
+        "auc": 0.9605608666666666,
+        "true_positives": 13639,
+        "true_negatives": 13296,
+        "false_positives": 1704,
+        "false_negatives": 1361
+      },
+      {
+        "accuracy": 0.9022,
+        "precision": 0.896542658078086,
+        "recall": 0.9093333333333333,
+        "f1_score": 0.9028926987489243,
+        "auc": 0.9638604311111112,
+        "true_positives": 13640,
+        "true_negatives": 13426,
+        "false_positives": 1574,
+        "false_negatives": 1360
+      },
+      {
+        "accuracy": 0.9038,
+        "precision": 0.9112016293279023,
+        "recall": 0.8948,
+        "f1_score": 0.9029263370332997,
+        "auc": 0.9632427688888888,
+        "true_positives": 13422,
+        "true_negatives": 13692,
+        "false_positives": 1308,
+        "false_negatives": 1578
+      }
+    ]
+  }
+}

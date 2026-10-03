@@ -143,8 +143,11 @@ def run_model_family_comparisons(results_dir, seed_avg=False):
     }
     if seed_avg:
         sweep_dir = results_dir / "seed_sweep"
-        configs["roberta_best"] = (sweep_dir / "base_meta_sqrtw_seedavg_results.json", None)
+        trad_sweep_dir = Path("traditional_ml/seed_sweep")
+        configs["roberta_best"] = (sweep_dir / "base_meta_seedavg_results.json", None)
         configs["modernbert"] = (sweep_dir / "modernbert_meta_sqrtw_seedavg_results.json", None)
+        configs["svm"] = (trad_sweep_dir / "baseline_svm_seedavg_results.json", None)
+        configs["gradient_boosting"] = (trad_sweep_dir / "baseline_gradient_boosting_seedavg_results.json", None)
 
     loaded = {}
     for name, (path, keys) in configs.items():

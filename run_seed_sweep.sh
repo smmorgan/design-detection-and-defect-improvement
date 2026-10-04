@@ -19,6 +19,14 @@ CONFIGS=(
   "base_meta|--pretrained_model $ROBERTA --metadata --class_weighting inverse --threshold fixed --val_selection balance"
   "baseline|--pretrained_model $ROBERTA --class_weighting inverse --threshold fixed --val_selection smallest"
   "modernbert_meta_sqrtw|--pretrained_model $MODERNBERT --metadata --class_weighting sqrt --threshold tuned --val_selection balance --batch_size 8"
+  # Remaining tab:meta rows. Aug250 adds the top 250 heuristic D and N labels
+  # to each fold's training set. Note the paper's row names understate what
+  # they do: the "SqrtW" rows also tune a per-fold threshold, while the
+  # "Thresh" rows tune one on top of full inverse-frequency weights.
+  "aug250_meta|--pretrained_model $ROBERTA --metadata --augment --aug_max 250 --class_weighting inverse --threshold fixed --val_selection balance"
+  "aug250_meta_sqrtw|--pretrained_model $ROBERTA --metadata --augment --aug_max 250 --class_weighting sqrt --threshold tuned --val_selection balance"
+  "base_meta_thresh|--pretrained_model $ROBERTA --metadata --class_weighting inverse --threshold tuned --val_selection balance"
+  "aug250_meta_thresh|--pretrained_model $ROBERTA --metadata --augment --aug_max 250 --class_weighting inverse --threshold tuned --val_selection balance"
 )
 
 for seed in $SEEDS; do

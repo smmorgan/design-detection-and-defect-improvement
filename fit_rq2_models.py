@@ -123,48 +123,96 @@ def nested_lr_test(restricted, full):
     return lr_test(restricted.llf, full.llf, df_diff) + (df_diff,)
 
 
-def permutation_test_h1(data, ratio_col='design_ratio_corrected', n_perms=N_PERMUTATIONS, seed=RNG_SEED):
-    """Shuffle the design ratio within project (preserves each project's own
-    autocorrelation/level, breaks the link to bug_count), refit M0 vs M1, and
-    see how often the permuted LR stat exceeds the observed one.
-    Non-parametric check on the chi-square-based H1 p-value.
+def circular_offset(rng, n, min_gap=len(LAGS) + 1):
+    """Random circular-shift offset for a series of length n, at least min_gap
+    from 0 in both directions. A shift of 1-4 quarters would line a lag column
+    back up with a neighbouring real lag and leak the true effect into the null.
+    Falls back to any non-zero offset when the series is too short for that."""
+    lo, hi = min_gap, n - min_gap
+    return int(rng.integers(lo, hi + 1)) if hi >= lo else int(rng.integers(1, n))
+
+
+def permutation_null(panel, clean, series_col, ratio_col, m0_formula, m1_formula,
+                     n_perms, seed, scheme='shuffle', return_draws=False):
+    """Null distribution of the H1 LR statistic (M0 vs M1), built by
+    re-randomising the design ratio within each series and rebuilding its lags.
+
+    panel: the full lagged panel (every quarter of every series).
+    clean: the rows the reported fits use (a subset of panel's index).
+
+    Each draw re-randomises the ratio over the *full* series, recomputes the
+    lag columns on the full panel, then refits on exactly `clean`'s rows.
+
+    Fixed 2026-10-04. The original version shuffled and re-lagged inside
+    `clean` itself, so every permuted refit lost each series' first 4 rows:
+    335 vs 367 rows at the project unit, and 2,774 vs 3,919 for
+    component/drop. It also drew permuted values only from quarters after the
+    first 4. This is the same class of bug as RQ2_INITIAL_RESULTS.md §2e.
+
+    Positions where the ratio is NaN (no resolved issues) stay fixed, so
+    clean's lag columns never gain NaNs. M0 doesn't involve the ratio, so it
+    is fit once.
+
+    scheme='shuffle'   within-series permutation (the pre-registered null).
+    scheme='circular'  within-series circular shift by a random offset (see
+                       circular_offset); keeps the ratio's own autocorrelation
+                       intact, which the shuffle destroys.
     """
     rng = np.random.default_rng(seed)
-    m0_formula = 'bug_count ~ bug_count_lag1 + quarter_index + C(project)'
-    m1_terms = ' + '.join(f'design_ratio_lag{k}' for k in LAGS)
-    m1_formula = f'{m0_formula} + {m1_terms}'
-
-    fit_cols = ['bug_count', 'bug_count_lag1', 'quarter_index',
-                'project', 'log_exposure'] + [f'design_ratio_lag{k}' for k in LAGS]
-    clean = data.dropna(subset=fit_cols)
-
+    lag_cols = [f'design_ratio_lag{k}' for k in LAGS]
     m0 = fit_nb_glm(m0_formula, clean)
     m1 = fit_nb_glm(m1_formula, clean)
-    observed_stat, _ = lr_test(m0.llf, m1.llf, len(LAGS))
+    observed_stat = 2 * (m1.llf - m0.llf)
 
-    exceed, n_ok = 0, 0
+    series = panel[series_col].to_numpy()
+    has_ratio = panel[ratio_col].notna().to_numpy()
+    groups = [np.flatnonzero((series == s) & has_ratio) for s in pd.unique(series)]
+    base = panel[ratio_col].to_numpy(copy=True)
+
+    exceed, n_ok, draws = 0, 0, []
     for _ in range(n_perms):
-        perm = clean.copy()
-        perm[ratio_col] = perm.groupby('project')[ratio_col].transform(
-            lambda s: rng.permutation(s.values)
-        )
+        new = base.copy()
+        for idx in groups:
+            if len(idx) < 2:
+                continue
+            if scheme == 'shuffle':
+                new[idx] = base[rng.permutation(idx)]
+            else:
+                new[idx] = np.roll(base[idx], circular_offset(rng, len(idx)))
+        perm = panel.copy()
+        perm[ratio_col] = new
         for k in LAGS:
-            perm[f'design_ratio_lag{k}'] = perm.groupby('project')[ratio_col].shift(k)
-        perm = perm.dropna(subset=[f'design_ratio_lag{k}' for k in LAGS])
+            perm[f'design_ratio_lag{k}'] = perm.groupby(series_col)[ratio_col].shift(k)
+        perm = perm.loc[clean.index]
+        assert not perm[lag_cols].isna().any().any(), 'permuted lags gained NaNs'
         try:
             m1_perm = fit_nb_glm(m1_formula, perm)
-            m0_perm = fit_nb_glm(m0_formula, perm)
-            stat, _ = lr_test(m0_perm.llf, m1_perm.llf, len(LAGS))
         except Exception:
             continue
+        stat = 2 * (m1_perm.llf - m0.llf)
         n_ok += 1
         if stat >= observed_stat:
             exceed += 1
+        if return_draws:
+            draws.append({'lr': float(stat), 'converged': bool(m1_perm.mle_retvals['converged']),
+                          **{c: float(m1_perm.params[c]) for c in lag_cols}})
 
     # (exceed + 1) / (n_ok + 1): the observed statistic counts as one draw
     # from the null, so p can never be exactly 0, and failed refits shrink
     # the denominator instead of silently counting as non-exceedances.
-    return observed_stat, (exceed + 1) / (n_ok + 1), n_ok
+    out = (observed_stat, (exceed + 1) / (n_ok + 1), n_ok)
+    return out + (draws, m0, m1) if return_draws else out
+
+
+def permutation_test_h1(panel, clean, ratio_col='design_ratio_corrected', n_perms=N_PERMUTATIONS, seed=RNG_SEED):
+    """Shuffle the design ratio within project (keeps each project's own
+    level, breaks the link to bug_count), refit M0 vs M1 on the reported rows,
+    and count how often the permuted LR stat reaches the observed one.
+    Non-parametric check on the chi-square-based H1 p-value.
+    """
+    m0_formula = 'bug_count ~ bug_count_lag1 + quarter_index + C(project)'
+    m1_formula = m0_formula + ' + ' + ' + '.join(f'design_ratio_lag{k}' for k in LAGS)
+    return permutation_null(panel, clean, 'project', ratio_col, m0_formula, m1_formula, n_perms, seed)
 
 
 def blocked_time_cv_mae(data, formula, offset_col='log_exposure', min_train_quarters=8,
@@ -321,9 +369,9 @@ def main():
         # M0/M1 on a larger sample (e.g. it would put DM/FAB back in, which
         # the M2 dropna excludes for having no detected changepoint), so the
         # permutation p-value would be testing a different statistic than the
-        # one being reported alongside it. clean already satisfies
-        # permutation_test_h1's own dropna, so this is a no-op restriction.
-        obs_stat, perm_p, n_ok = permutation_test_h1(clean, ratio_col=args.ratio_col)
+        # one being reported alongside it. The full panel is passed as well,
+        # so permuted lags are rebuilt from whole series (see permutation_null).
+        obs_stat, perm_p, n_ok = permutation_test_h1(panel, clean, ratio_col=args.ratio_col)
         print(f"H1 permutation null: observed LR stat={obs_stat:.3f}, permutation p={perm_p:.4f} "
               f"({n_ok}/{N_PERMUTATIONS} permuted refits succeeded)")
 

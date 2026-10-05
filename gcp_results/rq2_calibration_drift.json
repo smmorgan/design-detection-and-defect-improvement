@@ -1,0 +1,195 @@
+{
+  "n_labels_by_source": {
+    "manual_curated": 1786,
+    "random_audit": 300
+  },
+  "audit_stopping_rule": {
+    "n_labelled": 300,
+    "uniform_prefix": true,
+    "k": 10
+  },
+  "era_coverage": {
+    "manual_curated": {
+      "early": {
+        "n": 0,
+        "n_design": 0,
+        "n_unresolved_creation_basis": 0
+      },
+      "middle": {
+        "n": 38,
+        "n_design": 38,
+        "n_unresolved_creation_basis": 9
+      },
+      "late": {
+        "n": 1748,
+        "n_design": 458,
+        "n_unresolved_creation_basis": 1051
+      }
+    },
+    "random_audit": {
+      "early": {
+        "n": 100,
+        "n_design": 11,
+        "n_unresolved_creation_basis": 0
+      },
+      "middle": {
+        "n": 100,
+        "n_design": 7,
+        "n_unresolved_creation_basis": 0
+      },
+      "late": {
+        "n": 100,
+        "n_design": 9,
+        "n_unresolved_creation_basis": 0
+      }
+    }
+  },
+  "drift_test_random_audit": {
+    "status": "ok",
+    "n": 300,
+    "eras": [
+      "early",
+      "middle",
+      "late"
+    ],
+    "design_count_by_era": {
+      "early": 11,
+      "middle": 7,
+      "late": 9
+    },
+    "intercept_shift": {
+      "status": "ok",
+      "lr_stat": 1.2186,
+      "df": 2,
+      "p_value": 0.5437240839162956,
+      "converged": true,
+      "era_terms": {
+        "C(era)[T.middle]": -0.7016,
+        "C(era)[T.late]": -0.3297
+      }
+    },
+    "intercept_and_slope": {
+      "status": "ok",
+      "lr_stat": 6.7466,
+      "df": 4,
+      "p_value": 0.14990315566504755,
+      "converged": true,
+      "era_terms": {
+        "C(era)[T.middle]": -1.5729,
+        "C(era)[T.late]": -0.2836,
+        "logit_p:C(era)[T.middle]": 0.8357,
+        "logit_p:C(era)[T.late]": -0.1209
+      }
+    }
+  },
+  "transfer_check_curated_to_random": {
+    "status": "ok",
+    "by_era": {
+      "early": {
+        "n": 100,
+        "observed_design_rate": 0.1154,
+        "predicted_design_rate": 0.1234,
+        "raw_classifier_rate": 0.1533
+      },
+      "middle": {
+        "n": 100,
+        "observed_design_rate": 0.0726,
+        "predicted_design_rate": 0.1878,
+        "raw_classifier_rate": 0.2053
+      },
+      "late": {
+        "n": 100,
+        "observed_design_rate": 0.065,
+        "predicted_design_rate": 0.1517,
+        "raw_classifier_rate": 0.1731
+      },
+      "all": {
+        "n": 300,
+        "observed_design_rate": 0.0843,
+        "predicted_design_rate": 0.1543,
+        "raw_classifier_rate": 0.1773
+      }
+    }
+  },
+  "per_era_sens_spec_random_audit": {
+    "status": "ok",
+    "by_era": {
+      "early": {
+        "n": 100,
+        "n_design": 11,
+        "sensitivity": 0.5461,
+        "sensitivity_ci95": [
+          0.2338,
+          1.0
+        ],
+        "sensitivity_counts": "8/11",
+        "sensitivity_wilson95": [
+          0.4344,
+          0.9025
+        ],
+        "sensitivity_reliable": true,
+        "specificity": 0.8979,
+        "specificity_ci95": [
+          0.8551,
+          0.9428
+        ],
+        "specificity_counts": "78/89",
+        "specificity_wilson95": [
+          0.7921,
+          0.9296
+        ]
+      },
+      "middle": {
+        "n": 100,
+        "n_design": 7,
+        "sensitivity": 1.0,
+        "sensitivity_ci95": [
+          1.0,
+          1.0
+        ],
+        "sensitivity_counts": "7/7",
+        "sensitivity_wilson95": [
+          0.6457,
+          1.0
+        ],
+        "sensitivity_reliable": true,
+        "specificity": 0.8569,
+        "specificity_ci95": [
+          0.7768,
+          0.9322
+        ],
+        "specificity_counts": "81/93",
+        "specificity_wilson95": [
+          0.7879,
+          0.9246
+        ]
+      },
+      "late": {
+        "n": 100,
+        "n_design": 9,
+        "sensitivity": 0.5161,
+        "sensitivity_ci95": [
+          0.1664,
+          0.8994
+        ],
+        "sensitivity_counts": "5/9",
+        "sensitivity_wilson95": [
+          0.2667,
+          0.8112
+        ],
+        "sensitivity_reliable": true,
+        "specificity": 0.8507,
+        "specificity_ci95": [
+          0.7606,
+          0.9281
+        ],
+        "specificity_counts": "77/91",
+        "specificity_wilson95": [
+          0.7582,
+          0.9061
+        ]
+      }
+    },
+    "note": "sensitivity/specificity and *_ci95 are population-weighted (stratified bootstrap); *_counts and *_wilson95 are unweighted. Sensitivity is imprecise with ~10 labels per stratum"
+  }
+}

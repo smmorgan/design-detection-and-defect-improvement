@@ -474,13 +474,230 @@ classifier error.
 
 ## 7. Still open (supersedes §5's list)
 
-1. **Rogan-Gladen correction (§1)**: needs a decision (options a-d in §5).
-   SIMEX, part of the pre-registered measurement-error check (§8 of the
-   pre-registration), also hasn't run.
-2. **Drop vs. bucket divergence (§6)**: characterise the "Unclassified"
-   series (size, issue-type mix, time profile) and check whether they alone
-   carry the bucket-cell signal. This is an exploratory follow-up, reported
-   as such and kept outside the Holm family.
+1. **Rogan-Gladen correction (§1)**: still needs a decision. The audit
+   inputs don't fix it (§8b). Recommendation in §8b: raw tests as the
+   measurement-error-robust tests, SIMEX (§9b, now run) for corrected effect
+   sizes, the 12-test Holm family kept as the confirmatory verdict.
+2. ~~**Drop vs. bucket divergence (§6)**~~: done (§9a). The bucket signal is
+   carried by the 7 Unclassified series, which are confounded by triage
+   practice.
 3. **Commit the RQ2 work**: all of it is still uncommitted on
    `rq2-collapsed-plan`.
 
+
+## 8. Calibration audit: time-drift check (2026-10-03)
+
+300 random resolved tickets (10 per project x era, drawn and frozen before
+labelling: `draw_calibration_audit_sample.py`, pre-registration §11) were
+hand-labelled blind to the classifier output, all 300 (stopping rank k=10).
+`rq2_calibration.py` -> `gcp_results/rq2_calibration_drift.json`, log in
+`logs/rq2_calibration_drift.log`. 27/300 are design.
+
+**No detectable drift in calibration over project history.** P(design | classifier
+score) does not differ by era: intercept-shift LR test p=0.54 (df=2); with the slope
+also allowed to vary, p=0.15 (df=4). Specificity is flat across eras
+(78/89, 81/93, 77/91 = 0.88, 0.87, 0.85 early/middle/late). Sensitivity has no
+monotone trend (8/11, 7/7, 5/9). Caveat: with 300 tickets this test only reliably
+catches large drift; in simulation it detected a moderate drift (early-era odds
+ratio ~0.37) only 34% of the time. Read this as "no evidence of drift, large drift
+ruled out", not "calibration proven constant".
+
+**The bigger finding: the classifier over-counts design work by about 2x in the
+general population.** Population-weighted:
+
+| | early | middle | late | all |
+|---|---|---|---|---|
+| True design rate (audit labels) | 0.115 | 0.073 | 0.065 | **0.084** (95% CI 0.052-0.118) |
+| Classifier-flagged rate | 0.153 | 0.205 | 0.173 | **0.177** (0.134-0.223) |
+| Predicted by calibration fit on curated labels | 0.123 | 0.188 | 0.152 | **0.154** |
+
+Overall (unweighted) sensitivity 20/27 = 0.74 (Wilson 0.55-0.87) and specificity
+236/273 = 0.86 (0.82-0.90). With ~92% of tickets non-design, the 14% false-positive
+rate produces more flagged tickets than the true positives do (37 FP vs 20 TP).
+
+**Consequences:**
+- **Option 1 (score-based correction calibrated on the curated labels) fails its
+  own transfer check.** The curated-fit calibration predicts 15.4% design; the true
+  rate is 8.4%, outside the 95% CI (no bootstrap replicate reached 0.154). The
+  curated sample's selection is *not* explained by the classifier score, so it
+  can't be reused through calibration either. Any correction has to be estimated
+  from the random audit.
+- **Rogan-Gladen with audit-based inputs becomes feasible at the pooled level.**
+  The apparent rate (0.177) is now above the false-positive floor (1 - 0.86 =
+  0.14), unlike with the curated-sample specificities (§1). Per-project
+  sensitivity/specificity can't be estimated from 30 tickets each, so a correction
+  would have to use pooled audit values. Since drift wasn't detected, those values
+  can be pooled across eras too. Individual project-quarters may still fall
+  below the floor and clip; that needs checking before relying on the corrected
+  cells.
+- **For the main (uncorrected) result:** the measured design ratio is roughly
+  half noise. That's consistent with attenuation toward the null (pre-registration
+  §9). With no detected drift, there is no sign that the error is time-varying in
+  a way that would create or reverse the lag effects. Large-drift scenarios are
+  ruled out; smaller drift remains possible.
+
+### 8b. Rogan-Gladen with audit-based inputs: still not viable at the panel level
+
+Pooled population-weighted audit values are sensitivity 0.669 and specificity
+0.868, so sens + spec - 1 = 0.537 (95% CI 0.33-0.75). Applied to every
+project-quarter, they still clip heavily: **44% of project-quarters and ~60% of
+component-quarters** fall below the false-positive floor (0.132) and correct to 0.
+This ranges from 100% of quarters for SERVER to 0% for DM and FAB.
+
+The reason is that **the classifier's false-positive rate differs by project**
+(audit negatives flagged: DM 9/27, MULE 6/25 ... TIMOB 0/28; chi-square
+heterogeneity test p=0.004, permutation p=0.003). A single pooled specificity
+can't fit all projects. Per-project values from 30 tickets each are far too
+imprecise to correct per project-quarter. So **neither the curated-sample inputs
+(§1) nor the audit inputs give a usable per-row correction.** I did not re-run the
+corrected cells with these inputs; that would swap one degenerate correction for
+another.
+
+**Why this matters less than it looks:**
+- **Hypothesis tests:** with constant sensitivity/specificity and no clipping,
+  Rogan-Gladen is the same linear rescaling of the raw ratio for every row. The
+  H1/H2 LR tests, the permutation null and the PELT change points (L2 cost,
+  variance-scaled penalty) are all invariant to that rescaling. A "correct"
+  pooled correction therefore gives exactly the raw-ratio tests. The raw cells
+  *are* the corrected tests, minus clipping artefacts.
+- **Project differences in false-positive rate:** these mostly shift a project's
+  apparent ratio up or down by a constant amount. That enters the model as a
+  per-project constant, which the `C(project)` fixed effects absorb. What they
+  don't absorb is any difference across projects in how strongly the apparent
+  ratio tracks the true one (sens + spec - 1). This is a residual limitation.
+- **Effect sizes:** correct the *coefficient* instead of the data. *(Corrected
+  2026-10-03: an earlier draft of this bullet multiplied by 1/(sens + spec - 1)
+  = 1.86. That is backwards.)* In expectation the apparent ratio is
+  (1 - spec) + a x true ratio, with a = sens + spec - 1 = 0.537. A one-point move
+  in the true ratio therefore shows up as only a 0.537-point move in the apparent
+  ratio, so a coefficient per unit of *apparent* ratio is *larger* in magnitude
+  than the coefficient per unit of *true* ratio. The scale correction is to
+  multiply by a = **0.537 (95% CI 0.33-0.75)**. Example: primary-unit
+  `design_ratio_lag1` = -1.29 raw becomes about -0.69, i.e. +10 percentage
+  points of true design share goes with ~7% fewer bugs the next quarter
+  (component unit: -0.23 to -0.30 -> -0.12 to -0.16, ~1-2%). This is only the
+  scale part. The per-ticket noise added by misclassification attenuates the
+  raw coefficient toward zero, which pushes the other way. SIMEX (§9) handles
+  both at once and is the better corrected estimate. These are point estimates
+  of an effect that is not significant after Holm, so they are illustrative only.
+
+**Recommendation (needs your decision, since it changes pre-registered cells):**
+report the raw-ratio tests as the measurement-error-robust tests. Report the
+SIMEX coefficients (§9) as the corrected effect sizes. Report the original
+corrected cells as a documented, failed correction rather than as evidence. This
+would also remove 6 near-duplicate tests from the Holm family; doing that is a
+deviation, so record it in pre-registration §11 if adopted.
+
+**Warning on that last point:** dropping the corrected cells changes the headline
+result. With only the 6 raw tests, Holm makes the bucket-cell H1 (p=0.0045)
+significant (adjusted 0.027), where it was 0.054 in the 12-test family. Because
+this deviation was proposed *after* the results were seen, it must not be adopted
+as the confirmatory answer. Keep the 12-test family as the pre-registered verdict
+(not significant). If the 6-test family is reported at all, label it exploratory
+and note that the bucket signal comes from the "Unclassified" series (§6, §7 item 2).
+
+## 9. Exploratory follow-ups: the Unclassified series and SIMEX (2026-10-03)
+
+### 9a. Does the "Unclassified" series carry the bucket-cell signal? (§7 item 2)
+
+`explore_unclassified_series.py` -> `gcp_results/rq2_unclassified_check.json`,
+log `logs/unclassified_check.log`. Exploratory, outside the Holm family. Raw
+ratio, on the bucket cell's own M2-complete sample (4,185 rows, 209 series).
+
+- **Sanity check passes:** the bucket panel minus its Unclassified series is
+  identical to the drop panel. So the drop/bucket difference comes entirely
+  from those series. Only 7 Unclassified series reach the fitted sample
+  (FAB, NEXUS and TIMOB have none), totalling 266 rows.
+- **The Unclassified series have a much stronger lag effect than real
+  components:**
+
+  | Sample | Rows / series | lag1 | lag2 | H1 chi-sq p | H1 perm p |
+  |---|---|---|---|---|---|
+  | Bucket, all series | 4185 / 209 | -0.30 | -0.23 | 0.0002 | 0.0045 (§6) |
+  | Unclassified only | 266 / 7 | **-1.91** | **-2.06** | 1.5e-5 | **0.018** (2000 perms) |
+  | Bucket minus Unclassified (= drop) | 3919 / 202 | -0.23 | -0.16 | 0.0076 | 0.0595 (§6) |
+
+  Lag x Unclassified interaction: LR = 42.0, df = 4, chi-square p = 1.7e-8
+  (lag1/lag2 interaction terms about -2.05 each). Treat that chi-square p as
+  optimistic. The §2e/§6 permutation nulls show the chi-square p-values for
+  this model family are about an order of magnitude too small.
+- **Why the Unclassified series are suspect as evidence about design work:**
+  - They are large: no-component issues are 61% of CONFSERVER's resolved
+    issues, 42-45% of JRASERVER, MESOS and DM, and under 10% only for MULE and
+    TIMOB. Each Unclassified series is therefore one of the largest series in
+    its project.
+  - Their composition changes over time much more than any real component's.
+    The no-component share falls sharply over project history in CONFSERVER
+    (77% -> 39%, early -> late era) and NEXUS (62% -> 8%), and rises in DM, MULE
+    and SERVER. That reflects changes in triage practice (when teams started
+    assigning components), not changes in the work itself. A series whose
+    membership is driven by triage practice can produce a lag association
+    between its own flagged-design share and its own bug count without any
+    causal link to design work.
+  - They differ in content: in all 10 projects they have a *lower* bug share
+    than component-linked issues (e.g. DM 3% vs 15%, MULE 21% vs 50%) and a
+    higher classifier-flagged design share in 7 of 10.
+- **Reading:** the drop-cell result (permutation p = 0.06, lag1 -0.23) is the
+  better estimate of the within-subsystem association. The bucket cell's
+  stronger result is driven by 7 heterogeneous catch-all series whose
+  membership changes with triage practice. It should not be cited as
+  support for H1. Since the bucket cell is the only cell that comes near
+  Holm significance (§6), this strengthens the "not supported" reading.
+
+### 9b. MC-SIMEX (pre-registration §8)
+
+`simex_rq2.py` -> `gcp_results/rq2_simex/simex_{unit}_{pi}.json`, logs
+`logs/simex_*.log`. It uses MC-SIMEX for misclassified binary labels
+(Küchenhoff et al. 2006). Each ticket's observed label is re-misclassified
+through Pi^lambda, using audit sensitivity/specificity (§8), for lambda in
+{0.5, 1, 1.5, 2}. The ratios are rebuilt from tickets, M1 is refit on the same
+rows as the reported fits, and the result is extrapolated to lambda = -1. The
+ticket-level rebuild reproduces the panel's `resolved_total` and
+`design_ratio_raw` exactly (asserted). Two error models:
+- `pooled`: sens 0.669 / spec 0.868 for every project.
+- `project_spec`: per-project audit specificity with pooled sensitivity.
+
+B = 200 replicates per lambda at the primary unit (3-4 of 800 refits did not
+converge; they are included in the means) and B = 50 at the component unit
+(all converged). Raw ratio.
+
+`design_ratio_lag1` (naive cluster SE in brackets):
+
+| Unit | Naive | SIMEX quadratic (pooled / project spec) | SIMEX linear (pooled / project spec) |
+|---|---|---|---|
+| project x quarter | -1.29 [0.33] | -0.61 / -0.91 | -1.30 / -1.42 |
+| component, drop | -0.23 [0.09] | -0.47 / -0.46 | -0.29 / -0.29 |
+| component, bucket | -0.30 [0.09] | -0.56 / -0.57 | -0.37 / -0.38 |
+
+`design_ratio_lag2` behaves the same way: primary -0.78 -> -0.41 to -0.72;
+drop -0.16 -> -0.20 to -0.32; bucket -0.23 -> -0.29 to -0.42. Lags 3-4 stay
+small and unstable in sign, as in the naive fits.
+
+**Reading:**
+- **The sign of the short-lag effect is stable under every correction.**
+  lag1 and lag2 stay negative in all 12 extrapolations (3 units x 2 error
+  models x 2 extrapolants). The measurement error is not creating or reversing
+  the direction of the association.
+- **The magnitude is not stable, and the two units move in opposite
+  directions.** At the component unit, adding misclassification shrinks the
+  coefficient toward zero (classic attenuation: component-quarters are small,
+  so per-ticket noise dominates), and SIMEX roughly doubles it. At the project
+  unit, adding misclassification *grows* the coefficient at first (the scale
+  effect from §8b dominates, because project-quarters are large and averaging
+  removes most per-ticket noise), and SIMEX shrinks it. The two effects
+  partly converge: about -0.6 to -0.9 (project) vs -0.5 to -0.6 (component,
+  quadratic).
+- **The project-unit extrapolation is unreliable.** Its lambda curve is
+  non-monotone (it peaks at lambda 0.5-1), so quadratic and linear disagree by
+  about 2x. The quadratic estimate (-0.61 to -0.91) agrees with §8b's
+  scale-only correction (-0.69). The linear estimate barely moves from the
+  naive value.
+- **Effect size, illustrative only (H1 is not significant after Holm):** a
+  corrected lag1 of about -0.5 to -0.9 means +10 percentage points of true
+  design share goes with roughly 5-9% fewer bugs the next quarter.
+- **Not done (deviation from pre-registration §8, recorded in §11):** SIMEX
+  covers M1 only, not M2. M2's change-point feature would have to be
+  re-detected for every replicate, and H2 is null in every cell. There are no
+  SIMEX standard errors. "Each project's error rate" is implemented as
+  per-project specificity only, because the audit has too few positives per
+  project to estimate per-project sensitivity.

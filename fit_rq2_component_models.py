@@ -36,6 +36,7 @@ from fit_rq2_models import (
     fit_h3_reverse,
     fit_nb_glm,
     nested_lr_test,
+    permutation_null,
 )
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -51,51 +52,19 @@ def add_lag_features(panel, ratio_col='design_ratio_corrected'):
     return panel
 
 
-def permutation_test_h1_component(data, ratio_col='design_ratio_corrected', n_perms=N_PERMUTATIONS, seed=RNG_SEED):
-    """Same logic as fit_rq2_models.permutation_test_h1, but shuffles within
+def permutation_test_h1_component(panel, clean, ratio_col='design_ratio_corrected', n_perms=N_PERMUTATIONS, seed=RNG_SEED):
+    """Same as fit_rq2_models.permutation_test_h1, but shuffles within
     project_component (the finer series identity) rather than project, since
-    that's the unit whose own autocorrelation/level should be preserved.
+    that's the unit whose own level should be preserved.
 
     n_perms is set by --n_permutations (default 2000). The original 200 was
     chosen for runtime but turned out too coarse to resolve p-values near the
     Holm threshold -- see the --n_permutations comment in main().
     """
-    rng = np.random.default_rng(seed)
     m0_formula = 'bug_count ~ bug_count_lag1 + quarter_index + C(project_component)'
-    m1_terms = ' + '.join(f'design_ratio_lag{k}' for k in LAGS)
-    m1_formula = f'{m0_formula} + {m1_terms}'
-
-    fit_cols = ['bug_count', 'bug_count_lag1', 'quarter_index',
-                'project_component', 'project', 'log_exposure'] + [f'design_ratio_lag{k}' for k in LAGS]
-    clean = data.dropna(subset=fit_cols)
-
-    m0 = fit_nb_glm(m0_formula, clean)
-    m1 = fit_nb_glm(m1_formula, clean)
-    observed_stat, _, _ = nested_lr_test(m0, m1)
-
-    exceed, n_ok = 0, 0
-    for _ in range(n_perms):
-        perm = clean.copy()
-        perm[ratio_col] = perm.groupby('project_component')[ratio_col].transform(
-            lambda s: rng.permutation(s.values)
-        )
-        for k in LAGS:
-            perm[f'design_ratio_lag{k}'] = perm.groupby('project_component')[ratio_col].shift(k)
-        perm = perm.dropna(subset=[f'design_ratio_lag{k}' for k in LAGS])
-        try:
-            m1_perm = fit_nb_glm(m1_formula, perm)
-            m0_perm = fit_nb_glm(m0_formula, perm)
-            stat, _, _ = nested_lr_test(m0_perm, m1_perm)
-        except Exception:
-            continue
-        n_ok += 1
-        if stat >= observed_stat:
-            exceed += 1
-
-    # (exceed + 1) / (n_ok + 1): the observed statistic counts as one draw
-    # from the null, so p can never be exactly 0, and failed refits shrink
-    # the denominator instead of silently counting as non-exceedances.
-    return observed_stat, (exceed + 1) / (n_ok + 1), n_ok
+    m1_formula = m0_formula + ' + ' + ' + '.join(f'design_ratio_lag{k}' for k in LAGS)
+    return permutation_null(panel, clean, 'project_component', ratio_col,
+                            m0_formula, m1_formula, n_perms, seed)
 
 
 def main():
@@ -157,7 +126,7 @@ def main():
         # already satisfies this function's own dropna, so this is a no-op
         # restriction, not a scope change.
         obs_stat, perm_p, n_ok = permutation_test_h1_component(
-            clean, ratio_col=args.ratio_col, n_perms=args.n_permutations
+            panel, clean, ratio_col=args.ratio_col, n_perms=args.n_permutations
         )
         print(f"H1 permutation null ({args.n_permutations} reps): observed LR stat={obs_stat:.3f}, "
               f"permutation p={perm_p:.4f} ({n_ok}/{args.n_permutations} permuted refits succeeded)")

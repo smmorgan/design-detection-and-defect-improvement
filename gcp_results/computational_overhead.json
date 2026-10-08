@@ -131,6 +131,41 @@
     "gpu_capacity": "11.69 GiB",
     "note": "The batch_size=32 sweep never completed a successful run across 3 attempts -- same GPU that successfully trained RoBERTa-base and DistilBERT-base at batch_size=32. A separate, successful bert-base-uncased Stage-1 run does exist at batch_size=16 (gcp_results/bert_very_conservative_0308_2027, F1=0.9045/AUC=0.9634); BERT was excluded from Stage 2/LOPO because RoBERTa scored higher on Stage 1, not because no BERT checkpoint was available."
   },
+  "batch32_gcp_reproduction": [
+    {
+      "config": "bert-base-uncased",
+      "hardware": "GCP g2-standard-4 (1x NVIDIA L4, 24 GiB, rented)",
+      "batch_size": 32,
+      "wall_clock_s": 17333.501145,
+      "cost_usd": 3.4031440581349996,
+      "is_estimated": false,
+      "local_batch_size_16_wall_clock_s": 19101.584,
+      "test_f1": 0.9055972147830744,
+      "test_auc": 0.9645694466666666
+    },
+    {
+      "config": "roberta-base",
+      "hardware": "GCP g2-standard-4 (1x NVIDIA L4, 24 GiB, rented)",
+      "batch_size": 32,
+      "wall_clock_s": 8985.108314,
+      "cost_usd": 1.7640762656486664,
+      "is_estimated": false,
+      "local_batch_size_16_wall_clock_s": 11579.298,
+      "test_f1": 0.9064573719136322,
+      "test_auc": 0.9655895955555555
+    },
+    {
+      "config": "distilbert-base-uncased",
+      "hardware": "GCP g2-standard-4 (1x NVIDIA L4, 24 GiB, rented)",
+      "batch_size": 32,
+      "wall_clock_s": 4613.9799713635275,
+      "cost_usd": 0.9058780677110393,
+      "is_estimated": true,
+      "local_batch_size_16_wall_clock_s": 5946.133,
+      "test_f1": 0.9054679637705468,
+      "test_auc": 0.9642289688888889
+    }
+  ],
   "traditional_ml": {
     "config": "SVM + GradientBoosting (combined, TF-IDF features)",
     "total_wall_clock_s": 208.856,
@@ -147,6 +182,7 @@
     "BERT-base has zero successful runs (3/3 attempts hit CUDA OOM on an 11.69 GiB GPU), so it has no LOPO results and cannot appear in the model-family significance tests or an apples-to-apples overhead row.",
     "Qwen2.5-1.5B+LoRA now has both a Stage-1 SO-pretraining run (in transformer_pretraining, ~16.6h) and two full 10-fold LOPO fine-tuning spans (in decoder_lora_lopo: cold-start from the public checkpoint, and from the Stage-1-pretrained checkpoint) -- unlike RoBERTa/DistilBERT/ModernBERT, whose LOPO fine-tuning time was never logged separately, so the Qwen LOPO wall-clock figures are not apples-to-apples with the 'single Stage-1 run only' rows for the encoder models.",
     "Only 4,361,216 of Qwen2.5-1.5B's 1,548,078,592 parameters (0.28%) are trainable under LoRA, in both the Stage-1 pretraining run and the LOPO fine-tuning runs -- vs. 100% trainable for RoBERTa/DistilBERT/ModernBERT's full fine-tuning.",
-    "LLM baseline wall-clock times include exponential-backoff retry delays and are affected by shared-account rate limits (see llm_clients.py); they reflect this run's conditions, not a hard per-ticket API floor."
+    "LLM baseline wall-clock times include exponential-backoff retry delays and are affected by shared-account rate limits (see llm_clients.py); they reflect this run's conditions, not a hard per-ticket API floor.",
+    "batch_size=32 Stage-1 runs for all three encoder families succeeded on a rented GCP g2-standard-4 instance (1x NVIDIA L4, 24 GiB) after failing with CUDA OOM on the local 11.69 GiB GPU (see bert_base above); their test F1/AUC is statistically indistinguishable from the local batch_size=16 configuration actually used throughout the paper, so the added cloud cost buys no measurable accuracy improvement. distilbert-base's batch_size=32 wall-clock/cost is an estimate (see batch32_gcp_overhead docstring), not a direct measurement."
   ]
 }

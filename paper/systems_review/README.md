@@ -1,5 +1,9 @@
 # Chapter 2 → standalone review article
 
+> **Frozen (2026-10-09).** The target venue changed from MDPI *Systems* to
+> CSIMQ. Active work is in `../csimq_review/`; this version is kept for
+> reference only and must not be submitted anywhere.
+
 Draft of dissertation Chapter 2 ("Software System Design") reworked as a
 standalone academic article.
 

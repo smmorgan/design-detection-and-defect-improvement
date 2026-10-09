@@ -302,3 +302,31 @@ than the curated-sample error rates, in two variants: pooled, and per-project
 specificity with pooled sensitivity (the audit has too few positives per project
 for per-project sensitivity). No SIMEX standard errors; it is read as a
 point-estimate stability check. Results: `RQ2_INITIAL_RESULTS.md` §9b.
+
+**Bug fix, recorded 2026-10-09 (`permutation_null`):** the H1 permutation null
+(§7) originally shuffled/re-lagged *inside* the already-dropna'd fitting rows,
+so every permuted refit lost each series' first 4 quarters relative to the
+reported fit (335 vs 367 rows at the primary unit; 2,774 vs 3,919 at
+component/drop). Fixed to shuffle over the full panel and then subset to the
+reported rows. This changed every H1 permutation p-value in §6/§9a of
+`RQ2_INITIAL_RESULTS.md`; the Holm verdict (no test significant) is unchanged,
+but the margins moved further from significance (closest cell 0.054→0.072
+raw, 0.0715→0.0770 corrected). See `RQ2_INITIAL_RESULTS.md` §10.
+
+**Deviation, recorded 2026-10-09 (circular-shift null, not pre-registered):**
+§7's permutation null is specified as a within-series shuffle. A second null
+scheme, circular shift (`circular_offset` in `fit_rq2_models.py`), was added
+after the fact as a robustness check: shuffling destroys design_ratio's own
+autocorrelation, which can make the shuffle null artificially narrow
+(anti-conservative) for an autocorrelated series; the circular shift preserves
+each series' autocorrelation and only breaks its alignment with bug_count. It
+was run only for the raw ratio (uncorrected is already primary per this
+section), at all 3 units. **The shuffle null remains the primary, Holm-tested
+statistic per this pre-registration; circular is reported alongside as a
+sensitivity check, not a replacement.** Results: `RQ2_INITIAL_RESULTS.md` §10.
+
+**Deviation, recorded (power/equivalence analysis, §9):** the MDE/TOST
+analysis in `power_equivalence_rq2.py` was written and run after seeing the
+H1/H2 results above, not specified in advance of any outcome-data modeling.
+It is read as a post hoc characterization of what effect sizes the data could
+and couldn't have detected, not a confirmatory test.

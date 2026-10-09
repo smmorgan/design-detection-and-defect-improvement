@@ -407,7 +407,13 @@ correction problem.
    4/12 filled) and re-run it for the final Holm-adjusted family.
 3. Write up the final results section once the above lands.
 
-## 6. Full spec-grid results with Holm correction (2026-09-29)
+## 6. Full spec-grid results with Holm correction (2026-09-29) — SUPERSEDED, see §10
+
+**Superseded 2026-10-09**: `permutation_null` had a bug that lost each
+series' first 4 rows in every permuted refit, biasing every H1 permutation
+p-value below. The fix and the corrected numbers are in §10. The verdict
+(no test significant after Holm) is unchanged; the table below is kept for
+history only.
 
 All 12 pre-registered tests (`RQ2_PREREGISTRATION.md` §5): 3 cells
 ({project} + {component x drop, component x bucket}) x 2 ratios (raw,
@@ -701,3 +707,73 @@ small and unstable in sign, as in the naive fits.
   SIMEX standard errors. "Each project's error rate" is implemented as
   per-project specificity only, because the audit has too few positives per
   project to estimate per-project sensitivity.
+
+## 10. Updated Holm correction after fixing `permutation_null` (2026-10-09)
+
+`fit_rq2_models.permutation_null` (used by both `fit_rq2_models.py` and
+`fit_rq2_component_models.py`) shuffled/re-lagged *inside* the already-dropna'd
+fitting rows, so every permuted refit was missing each series' first 4
+quarters relative to the reported fit (335 vs 367 rows at the primary unit;
+2,774 vs 3,919 at component/drop) — the same class of row-mismatch bug as
+§2e, just one level deeper. Fixed 2026-10-04/05 (pre-registration §11) to
+shuffle over the full panel, re-lag, then subset to the reported rows. All
+six cells were rerun (`logs/primary_{raw,corrected}.log`,
+`logs/component_{drop,bucket}_{raw,corrected}.log`; superseded logs in
+`logs/superseded_2026-10-04_permfix/`). H2 (chi-square, not permutation-based)
+is unaffected and unchanged from §6.
+
+A second null scheme, circular shift, was also added as a non-pre-registered
+robustness check (pre-registration §11): the shuffle null destroys
+design_ratio's own autocorrelation, which can make it anti-conservative for
+an autocorrelated series; circular shift preserves each series' own
+autocorrelation and only breaks its alignment with `bug_count`. It was run
+for the 3 raw-ratio cells only via `power_equivalence_rq2.py` (uncorrected is
+already primary per §11/§8b). **Shuffle remains the primary, Holm-tested
+statistic; circular is a secondary sensitivity check, not a substitute.**
+
+| Unit | Missing component | Ratio | H1 shuffle p | H1 circular p (raw only) | H1 chi-sq p | H2 chi-sq p |
+|---|---|---|---|---|---|---|
+| project x quarter | -- | raw | 0.0979 | 0.2038 | 0.021 | 0.313 |
+| project x quarter | -- | corrected | 0.2348 | -- | 0.105 | 0.173 |
+| component x quarter | drop | raw | 0.0345 | 0.1948 | 0.0076 | 0.377 |
+| component x quarter | drop | corrected | 0.0435 | -- | 0.0127 | 0.395 |
+| component x quarter | bucket | raw | **0.0070** | 0.0679 | 0.0002 | 0.207 |
+| component x quarter | bucket | corrected | **0.0060** | -- | 0.0002 | 0.229 |
+
+**Holm-adjusted (family of 12, shuffle p for H1, alpha = 0.05): still no test
+significant.** Closest: the two bucket-cell H1 tests, adjusted p = **0.072**
+(raw) and **0.077** (corrected) — both moved further from significance than
+the stale §6 numbers (0.054, 0.0715). Drop-cell H1 adjusts to 0.345/0.392,
+primary-unit raw H1 to 0.783, everything else to 1.0.
+(`apply_holm_correction.py`.)
+
+**Reading, updated from §6:**
+
+- **The verdict is unchanged (H1/H2 not supported after correction) and the
+  margin is a bit wider than previously reported**, but the qualitative
+  picture from §6 stands: `design_ratio_lag1` negative in every cell, bucket
+  cells closest to (but still short of) significance, driven by the
+  Unclassified series (§9a), drop cells and the primary unit landing around
+  p=0.03-0.10 unadjusted.
+- **The circular null is substantially less favorable to H1 than shuffle in
+  all 3 raw cells it was run for** (e.g. bucket 0.0070 -> 0.0679, primary
+  0.0979 -> 0.2038) — consistent with design_ratio having real
+  quarter-to-quarter persistence that the shuffle null discards. This is a
+  reason for caution about the shuffle p-values even though they are what's
+  pre-registered and what the Holm verdict above is based on: a more
+  autocorrelation-aware null would call the bucket cells (the closest thing
+  to a positive result anywhere in this grid) even less significant, not
+  more.
+- **Bottom line is the same as §6's**, now on firmer numbers: no significant
+  association after correction for multiple testing, with a consistently
+  negative (beneficial) point estimate for short-lag design work, and a
+  robustness check (circular null) that if anything strengthens the null
+  reading rather than weakening it.
+
+**Still open:** commit this work (all of §8-§10 is still uncommitted beyond
+the 2026-10-05 snapshot — the rerun logs, `gcp_results/rq2_power_equivalence/`,
+and `gcp_results/rq2_unclassified_check.json` were left uncommitted pending
+this write-up) and write the dissertation-chapter prose version of this
+section. Everything else on the §7 list is resolved: Rogan-Gladen (raw
+primary, SIMEX as the correction-method check), the drop/bucket divergence
+(§9a), and now the permutation-null numbers and their robustness check.

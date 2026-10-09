@@ -38,23 +38,43 @@ def holm_correction(df, p_col='p_value'):
 
 TESTS = [
     # unit, correction, missing_handling, hypothesis, p_value, note
-    # All permutation p-values below use (exceed + 1) / (n_ok + 1) (changed
-    # 2026-09-29 from exceed / n_perms). Primary unit: logs/primary_{raw,corrected}.log.
-    # Component unit: logs/component_{drop,bucket}_{raw,corrected}.log, rerun
-    # 2026-09-29 at 2000 permutations (200 couldn't resolve p below the Holm
-    # threshold of 0.05/12). Superseded logs are in logs/superseded_2026-09-28/.
-    ('project x quarter', 'raw', None, 'H1', 0.0709, 'permutation null, 1000 reps'),
+    # All permutation p-values below use (exceed + 1) / (n_ok + 1) and the
+    # pre-registered scheme='shuffle' null (within-series random permutation).
+    # Rerun 2026-10-05 after fixing permutation_null's row-loss bug (see
+    # RQ2_INITIAL_RESULTS.md: the original version lost each series' first 4
+    # rows in every permuted refit) -- every H1 p-value below is new; H2
+    # (chi-square, not permutation-based) is unaffected by that bug and
+    # unchanged from the prior transcription. Primary unit:
+    # logs/primary_{raw,corrected}.log. Component unit:
+    # logs/component_{drop,bucket}_{raw,corrected}.log (2000 reps). A
+    # circular-shift null (preserves each series' own autocorrelation,
+    # which shuffle destroys) was also run for the 3 raw-ratio cells as a
+    # non-pre-registered robustness check -- see RQ2_PREREGISTRATION.md Sec 11
+    # and RQ2_INITIAL_RESULTS.md; it is reported alongside but does not
+    # replace the shuffle p-value in this Holm family. Superseded logs are in
+    # logs/superseded_2026-10-04_permfix/.
+    ('project x quarter', 'raw', None, 'H1', 0.0979, 'permutation null (shuffle), 1000 reps'),
     ('project x quarter', 'raw', None, 'H2', 0.3126, 'chi-square LR, df=2'),
-    ('project x quarter', 'corrected', None, 'H1', 0.2068, 'permutation null, 1000 reps'),
+    ('project x quarter', 'corrected', None, 'H1', 0.2348, 'permutation null (shuffle), 1000 reps'),
     ('project x quarter', 'corrected', None, 'H2', 0.1734, 'chi-square LR, df=2'),
-    ('project x component x quarter', 'raw', 'drop', 'H1', 0.0595, 'permutation null, 2000 reps'),
+    ('project x component x quarter', 'raw', 'drop', 'H1', 0.0345, 'permutation null (shuffle), 2000 reps'),
     ('project x component x quarter', 'raw', 'drop', 'H2', 0.3768, 'chi-square LR, df=2'),
-    ('project x component x quarter', 'corrected', 'drop', 'H1', 0.0690, 'permutation null, 2000 reps'),
+    ('project x component x quarter', 'corrected', 'drop', 'H1', 0.0435, 'permutation null (shuffle), 2000 reps'),
     ('project x component x quarter', 'corrected', 'drop', 'H2', 0.3948, 'chi-square LR, df=2'),
-    ('project x component x quarter', 'raw', 'bucket', 'H1', 0.0045, 'permutation null, 2000 reps'),
+    ('project x component x quarter', 'raw', 'bucket', 'H1', 0.0070, 'permutation null (shuffle), 2000 reps'),
     ('project x component x quarter', 'raw', 'bucket', 'H2', 0.2074, 'chi-square LR, df=2'),
-    ('project x component x quarter', 'corrected', 'bucket', 'H1', 0.0065, 'permutation null, 2000 reps'),
+    ('project x component x quarter', 'corrected', 'bucket', 'H1', 0.0060, 'permutation null (shuffle), 2000 reps'),
     ('project x component x quarter', 'corrected', 'bucket', 'H2', 0.2288, 'chi-square LR, df=2'),
+]
+
+# Circular-shift null, raw-ratio cells only (power_equivalence_rq2.py hardcodes
+# design_ratio_raw; not run for the corrected ratio -- the uncorrected ratio is
+# already the primary reading per Sec 8/8b, so this gap doesn't affect the
+# headline result). Reported for comparison, NOT part of the Holm family above.
+CIRCULAR_NULL_RAW = [
+    ('project x quarter', 'raw', None, 'H1', 0.2038, 'permutation null (circular), 1000 reps'),
+    ('project x component x quarter', 'raw', 'drop', 'H1', 0.1948, 'permutation null (circular), 1000 reps'),
+    ('project x component x quarter', 'raw', 'bucket', 'H1', 0.0679, 'permutation null (circular), 1000 reps'),
 ]
 
 
@@ -67,6 +87,10 @@ def main():
     result = holm_correction(df)
     pd.set_option('display.width', 140)
     print(result.to_string(index=False))
+
+    circ = pd.DataFrame(CIRCULAR_NULL_RAW, columns=['unit', 'correction', 'missing_handling', 'hypothesis', 'p_value', 'note'])
+    print("\nCircular-shift null (raw ratio only, robustness check -- not Holm-corrected, not pre-registered):")
+    print(circ.to_string(index=False))
 
 
 if __name__ == '__main__':

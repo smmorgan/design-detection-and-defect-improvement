@@ -1,0 +1,195 @@
+{
+  "bucket_minus_unclassified_equals_drop": true,
+  "unclassified_rows_in_sample_by_project": {
+    "CONFSERVER": 57,
+    "DM": 24,
+    "DNN": 16,
+    "FAB": 0,
+    "JRASERVER": 64,
+    "MESOS": 35,
+    "MULE": 27,
+    "NEXUS": 0,
+    "SERVER": 43,
+    "TIMOB": 0
+  },
+  "full_bucket_sample": {
+    "sample": "bucket, all series",
+    "n_rows": 4185,
+    "n_series": 209,
+    "lr_stat": 22.362,
+    "df": 4,
+    "chi2_p": 0.00016977881335295108,
+    "m1_converged": true,
+    "lag_coefs": {
+      "design_ratio_lag1": -0.2965,
+      "design_ratio_lag2": -0.2259,
+      "design_ratio_lag3": 0.0103,
+      "design_ratio_lag4": 0.1297
+    }
+  },
+  "unclassified_only": {
+    "sample": "Unclassified series only",
+    "n_rows": 266,
+    "n_series": 7,
+    "lr_stat": 27.577,
+    "df": 4,
+    "chi2_p": 1.5194254757007454e-05,
+    "m1_converged": true,
+    "lag_coefs": {
+      "design_ratio_lag1": -1.9127,
+      "design_ratio_lag2": -2.06,
+      "design_ratio_lag3": 0.5424,
+      "design_ratio_lag4": 0.0192
+    },
+    "perm_p": 0.026486756621689155,
+    "n_perms_ok": 2000
+  },
+  "without_unclassified": {
+    "sample": "bucket minus Unclassified",
+    "n_rows": 3919,
+    "n_series": 202,
+    "lr_stat": 13.897,
+    "df": 4,
+    "chi2_p": 0.007632657337143829,
+    "m1_converged": true,
+    "lag_coefs": {
+      "design_ratio_lag1": -0.2322,
+      "design_ratio_lag2": -0.1622,
+      "design_ratio_lag3": 0.0194,
+      "design_ratio_lag4": 0.1326
+    }
+  },
+  "interaction_lag_x_unclassified": {
+    "lr_stat": 41.974,
+    "df": 4,
+    "chi2_p": 1.68860827849631e-08,
+    "interaction_coefs": {
+      "design_ratio_lag1:unclassified": -2.0517,
+      "design_ratio_lag2:unclassified": -2.0397,
+      "design_ratio_lag3:unclassified": 0.3378,
+      "design_ratio_lag4:unclassified": -0.4605
+    }
+  },
+  "description": [
+    {
+      "project": "CONFSERVER",
+      "n_resolved": 36268,
+      "no_component_share": 0.607,
+      "bug_share_no_comp": 0.598,
+      "bug_share_with_comp": 0.644,
+      "flagged_design_no_comp": 0.139,
+      "flagged_design_with_comp": 0.113,
+      "no_comp_share_early": 0.768,
+      "no_comp_share_middle": 0.667,
+      "no_comp_share_late": 0.385
+    },
+    {
+      "project": "DM",
+      "n_resolved": 22570,
+      "no_component_share": 0.439,
+      "bug_share_no_comp": 0.029,
+      "bug_share_with_comp": 0.15,
+      "flagged_design_no_comp": 0.455,
+      "flagged_design_with_comp": 0.386,
+      "no_comp_share_early": 0.344,
+      "no_comp_share_middle": 0.455,
+      "no_comp_share_late": 0.519
+    },
+    {
+      "project": "DNN",
+      "n_resolved": 7565,
+      "no_component_share": 0.157,
+      "bug_share_no_comp": 0.532,
+      "bug_share_with_comp": 0.717,
+      "flagged_design_no_comp": 0.116,
+      "flagged_design_with_comp": 0.065,
+      "no_comp_share_early": 0.136,
+      "no_comp_share_middle": 0.138,
+      "no_comp_share_late": 0.195
+    },
+    {
+      "project": "FAB",
+      "n_resolved": 12842,
+      "no_component_share": 0.251,
+      "bug_share_no_comp": 0.205,
+      "bug_share_with_comp": 0.292,
+      "flagged_design_no_comp": 0.272,
+      "flagged_design_with_comp": 0.26,
+      "no_comp_share_early": 0.157,
+      "no_comp_share_middle": 0.295,
+      "no_comp_share_late": 0.302
+    },
+    {
+      "project": "JRASERVER",
+      "n_resolved": 35215,
+      "no_component_share": 0.415,
+      "bug_share_no_comp": 0.357,
+      "bug_share_with_comp": 0.536,
+      "flagged_design_no_comp": 0.325,
+      "flagged_design_with_comp": 0.239,
+      "no_comp_share_early": 0.341,
+      "no_comp_share_middle": 0.525,
+      "no_comp_share_late": 0.38
+    },
+    {
+      "project": "MESOS",
+      "n_resolved": 7091,
+      "no_component_share": 0.448,
+      "bug_share_no_comp": 0.482,
+      "bug_share_with_comp": 0.539,
+      "flagged_design_no_comp": 0.299,
+      "flagged_design_with_comp": 0.267,
+      "no_comp_share_early": 0.544,
+      "no_comp_share_middle": 0.439,
+      "no_comp_share_late": 0.361
+    },
+    {
+      "project": "MULE",
+      "n_resolved": 11292,
+      "no_component_share": 0.087,
+      "bug_share_no_comp": 0.208,
+      "bug_share_with_comp": 0.5,
+      "flagged_design_no_comp": 0.395,
+      "flagged_design_with_comp": 0.297,
+      "no_comp_share_early": 0.015,
+      "no_comp_share_middle": 0.065,
+      "no_comp_share_late": 0.181
+    },
+    {
+      "project": "NEXUS",
+      "n_resolved": 9033,
+      "no_component_share": 0.379,
+      "bug_share_no_comp": 0.533,
+      "bug_share_with_comp": 0.667,
+      "flagged_design_no_comp": 0.138,
+      "flagged_design_with_comp": 0.145,
+      "no_comp_share_early": 0.624,
+      "no_comp_share_middle": 0.438,
+      "no_comp_share_late": 0.077
+    },
+    {
+      "project": "SERVER",
+      "n_resolved": 43834,
+      "no_component_share": 0.171,
+      "bug_share_no_comp": 0.463,
+      "bug_share_with_comp": 0.495,
+      "flagged_design_no_comp": 0.089,
+      "flagged_design_with_comp": 0.093,
+      "no_comp_share_early": 0.147,
+      "no_comp_share_middle": 0.104,
+      "no_comp_share_late": 0.264
+    },
+    {
+      "project": "TIMOB",
+      "n_resolved": 19574,
+      "no_component_share": 0.036,
+      "bug_share_no_comp": 0.728,
+      "bug_share_with_comp": 0.737,
+      "flagged_design_no_comp": 0.093,
+      "flagged_design_with_comp": 0.096,
+      "no_comp_share_early": 0.018,
+      "no_comp_share_middle": 0.016,
+      "no_comp_share_late": 0.075
+    }
+  ]
+}

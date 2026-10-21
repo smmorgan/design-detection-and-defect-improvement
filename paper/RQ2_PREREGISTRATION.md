@@ -21,6 +21,12 @@ the panel itself has not been built.
 
 - **H1** — design-work volume in window *t* predicts defect rate at *t+k*,
   net of activity level and past defects.
+  **Revised 2026-10-20 (§11):** *the share of non-bug work resolved in
+  window t that is design work predicts the defect rate at t+k, net of
+  activity level and past defects.* The original wording said "volume", but
+  §4 operationalised it as a share of **all** resolved tickets, bugs
+  included. That share mostly tracks bug-fixing throughput, not design work
+  (§11). The test stays two-sided.
 - **H2** — temporal-distribution features add predictive power over volume
   alone.
 - **H3** (rival) — defects at *t* predict design work at *t+k* (crisis-driven
@@ -92,6 +98,10 @@ than left implicit.
   uncorrected design ratios are carried through the full analysis and
   reported side by side (plan blocker 2) — the correction is not applied
   silently.
+  **Revised 2026-10-20 (§11):** the denominator is resolved *non-bug*
+  tickets and the numerator is design tickets among them
+  (`design_ratio_nonbug`), uncorrected. The H2 change-point feature and the
+  H3 binomial trials follow the same denominator.
 - **Outcome — bug count.** Count of `issue_type == 'Bug'` tickets *created*
   in window *t+k*, by project (and by project×component where the component
   join succeeds — see §5).
@@ -330,3 +340,28 @@ analysis in `power_equivalence_rq2.py` was written and run after seeing the
 H1/H2 results above, not specified in advance of any outcome-data modeling.
 It is read as a post hoc characterization of what effect sizes the data could
 and couldn't have detected, not a confirmatory test.
+
+**Deviation, recorded 2026-10-20 (H1 predictor re-specified, §1/§4):** found after
+all pre-registered results were in, during a critical review of the analysis. The
+classifier flags under 1% of Bug tickets as design in every project (0.0-0.8%),
+while bugs are 10-74% of resolved tickets. So the pre-registered ratio (design
+resolved / all resolved) moves with the bug share of resolved work: within-project
+correlation -0.35 to -0.96 (CONFSERVER -0.96). Bug activity is persistent, so that
+coupling alone produces the negative lag coefficients reported for H1 in every
+cell, whatever design work does. On the primary-unit sample, dividing by non-bug
+tickets instead turns lags 1-2 from -1.29/-0.78 to +0.48/+0.65.
+
+The ratio is therefore re-specified as design share of resolved non-bug tickets
+(`design_ratio_nonbug`), uncorrected (no non-bug-specific sensitivity/specificity
+exists, and the corrected cells already failed: §11 above, `RQ2_INITIAL_RESULTS.md`
+§8b). Everything else in §4-§7 is unchanged: outcome, offset, controls, lags 1-4 as
+one block, M0/M1/M2, shuffle null as the primary H1 statistic, circular shift as the
+sensitivity check. The re-specified H1 family is the 3 raw-ratio cells (project unit;
+component unit drop and bucket), Holm-corrected together with their 3 H2 tests (6
+tests). This decision was made after seeing the original results. It fixes a
+construct-validity defect; it is not a choice among working specifications. The
+original 12-test verdict is still reported, labelled as testing the
+bug-throughput-confounded ratio. Runner: `run_rq2_nonbug.sh`. Exploratory robustness
+checks (outcome definition, partial final quarter, exposure as covariate,
+per-project trends, decomposed counts, look-ahead-free change points):
+`rq2_robustness_checks.py`. Results: `RQ2_INITIAL_RESULTS.md` §11.

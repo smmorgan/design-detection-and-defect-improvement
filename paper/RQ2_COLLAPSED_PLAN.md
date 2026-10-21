@@ -38,7 +38,7 @@ One outcome, three nested hypotheses:
 
 | | Hypothesis | Replaces |
 |---|---|---|
-| **H1** | Design-work volume in window *t* predicts defect rate at *t+k*, net of activity level and past defects | old RQ2 |
+| **H1** | The share of non-bug work resolved in window *t* that is design work predicts defect rate at *t+k*, net of activity level and past defects (revised 2026-10-20 from "design-work volume"; see `RQ2_PREREGISTRATION.md` §11) | old RQ2 |
 | **H2** | Temporal-distribution features add predictive power over volume alone | old RQ3 |
 | **H3** (rival) | Defects at *t* predict design work at *t+k* — the "crisis-driven" pattern | new |
 

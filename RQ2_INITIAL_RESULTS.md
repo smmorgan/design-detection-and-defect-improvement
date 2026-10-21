@@ -777,3 +777,132 @@ this write-up) and write the dissertation-chapter prose version of this
 section. Everything else on the §7 list is resolved: Rogan-Gladen (raw
 primary, SIMEX as the correction-method check), the drop/bucket divergence
 (§9a), and now the permutation-null numbers and their robustness check.
+
+## 11. Re-specified H1 (non-bug denominator) and robustness checks (2026-10-20)
+
+### 11a. Why the predictor was re-specified
+
+The classifier flags 0.0-0.8% of Bug tickets as design in every project, while
+bugs are 10-74% of resolved tickets. The pre-registered ratio (design resolved /
+**all** resolved) therefore moves with the bug share of resolved work: the
+within-project correlation is -0.35 to -0.96 (CONFSERVER -0.96, JRASERVER -0.89).
+Bug activity is persistent, so this coupling alone produces a negative lag
+coefficient on `bug_count`. On the primary unit's reported sample, dividing by
+non-bug resolved tickets instead turns lags 1-2 from -1.29/-0.78 into +0.48/+0.65.
+The negative sign in §6/§9b/§10 ("negative in every cell", "sign stable under
+every SIMEX correction") is therefore a property of the denominator, not
+evidence about design work. Re-specification recorded in
+`paper/RQ2_PREREGISTRATION.md` §1/§4/§11.
+
+New panel columns (`build_rq2_panel.py`, `build_rq2_component_panel.py`; every
+pre-existing column was verified byte-identical after the rebuild):
+`design_ratio_nonbug`, `resolved_design_nonbug`, `resolved_bug`,
+`quarters_since_changepoint_{raw,nonbug}`, `bug_count_valid`, `bug_count_fixed`,
+`is_last_quarter`. The fit scripts take `--ratio_col design_ratio_nonbug`. For that
+ratio, M2 uses the change point computed on the same ratio, and H3 uses
+`resolved_nonbug` as its binomial trials.
+
+### 11b. Re-specified grid
+
+`run_rq2_nonbug.sh`: logs `logs/{primary,component_drop,component_bucket}_nonbug.log`
+(fits, H2 chi-square, CV, H3) and `logs/power_equivalence_{unit}_nonbug.log` ->
+`gcp_results/rq2_power_equivalence/{unit}_design_ratio_nonbug.json` (shuffle and
+circular nulls, 1000 reps each; MDE/TOST; H2 circular null, 500 reps). All
+permuted refits succeeded (3 of 1000 primary circular refits flagged non-converged).
+
+| Unit | Rows / series | lag1-4 | H1 shuffle p | H1 circular p | H2 chi-sq p | H2 circular p |
+|---|---|---|---|---|---|---|
+| project x quarter | 370 / 9 | +0.48 +0.65 +0.69 -0.28 | 0.070 | 0.111 | 2e-13 | 0.002 |
+| component, drop | 2808 / 178 | +0.09 +0.14 +0.12 +0.11 | 0.122 | 0.124 | 9e-8 | 0.018 |
+| component, bucket | 3049 / 185 | +0.07 +0.12 +0.12 +0.13 | 0.119 | 0.144 | 0.0076 | 0.214 |
+
+Holm over the re-specified 6-test family (`apply_holm_correction.py --family
+revised`): **H1 not significant in any cell** (adjusted 0.21, 0.24, 0.24). **H2
+rejects in all three cells** under the pre-registered chi-square statistic (adjusted
+1e-12, 5e-7, 0.030). §11c shows why that H2 result should not be read as evidence
+that timing matters.
+
+Effect sizes and bounds (lag1, per +10 percentage points of non-bug design share,
+conservative SE): primary +4.9% (TOST rules out effects beyond -10.6% / +11.8%);
+drop +0.9% (beyond +/-2.2%); bucket +0.7% (beyond +/-2.0%). Long-run (sum of lags)
+bounds: about +/-30% primary, -8% to +9% component. Blocked-time CV: M1 beats M0
+by 1-2% MAE at every unit. M2 is worse than M1 at the primary unit and better at
+the component unit. H3: no lag-1/2 effect at any unit; lag 4 is negative at the
+component unit (drop p = 0.018, bucket p < 0.001), with no consistent pattern
+across lags.
+
+### 11c. Robustness checks (exploratory)
+
+`rq2_robustness_checks.py` -> `gcp_results/rq2_robustness/{unit}.json`, logs
+`logs/robustness_{unit}.log`. Circular-shift null: 1000 reps at the primary unit,
+200 at the component unit (so the smallest attainable p there is 0.005). Each
+check changes one thing from the baseline: re-specified ratio, M1-complete sample.
+
+H1 (circular p; lag coefficients summed over lags 1-4 in brackets):
+
+| Check | primary | drop | bucket |
+|---|---|---|---|
+| baseline, M1-complete sample | 0.038 [+1.70] | 0.050 [+0.49] | 0.020 [+0.49] |
+| baseline, M2-complete sample (as in 11b) | 0.126 [+1.55] | 0.184 [+0.46] | 0.144 [+0.44] |
+| outcome: non-defect resolutions removed | 0.071 [+1.70] | 0.284 [+0.36] | 0.214 [+0.35] |
+| outcome: fix-type resolutions only | 0.021 [+2.24] | 0.562 [+0.20] | 0.522 [+0.22] |
+| final partial quarter dropped | 0.063 [+1.76] | 0.050 [+0.49] | 0.020 [+0.50] |
+| exposure estimated, not an offset | 0.277 [+0.63] | 0.010 [+0.47] | 0.020 [+0.41] |
+| per-project linear trends | 0.608 [+0.22] | 0.930 [+0.09] | 0.955 [+0.08] |
+| non-defect outcome + partial quarter dropped | 0.101 [+1.75] | 0.259 [+0.37] | 0.209 [+0.37] |
+| decomposed log counts (design vs other non-bug vs bug resolved) | 0.814 [+0.18] | 0.159 [+0.13] | 0.368 [+0.09] |
+| original raw ratio, M1-complete sample | 0.244 [-1.90] | 0.711 [+0.00] | 0.398 [-0.10] |
+
+H2 (circular p; change-point effect per SD of the feature):
+
+| Check | primary | drop | bucket |
+|---|---|---|---|
+| original raw cell, change point from clipped corrected ratio | 0.784 | 0.726 | 0.617 |
+| original raw cell, change point from raw ratio | 0.971 | 0.796 | 0.806 |
+| re-specified, nearest change point (as pre-registered) | 0.002 (+81%) | 0.010 (-7%) | 0.224 (-5%) |
+| re-specified, change point detected from past quarters only | 0.893 (+9%) | 0.080 (+6%) | 0.239 (+8%) |
+| re-specified, nearest change point + per-project trends | 0.080 (+74%) | 0.781 (-1%) | 0.403 (+1%) |
+
+**Reading:**
+
+- **No robust H1 association in either direction.** The negative association
+  reported in §6-§10 was produced by the denominator (11a). The positive
+  association that replaces it reaches nominal significance only on the
+  M1-complete sample with a common linear trend. It disappears with per-project
+  trends at all three units (p 0.61-0.96, coefficients near zero), and when
+  design work enters as a count beside the other non-bug and bug counts. At the
+  component unit it also disappears when non-defect bug reports are removed from
+  the outcome. A plausible source is a shared slow drift over each project's life
+  (feature-work mix and bug-reporting intensity both changing) that one common
+  linear trend cannot remove. With per-project trends, the component-unit lag
+  coefficients are 0.00-0.05.
+- **The H2 rejection is look-ahead, not timing.** The pre-registered feature is
+  "quarters since the *nearest* change point" with breaks detected on the whole
+  series. A break found from later quarters therefore sets the value of earlier
+  rows, and the feature becomes a flexible, future-informed function of project
+  time. Recomputed from past quarters only, it is null at all three units, and
+  per-project trends remove most of it. Its sign is also inconsistent across units
+  (+81% vs -7% per SD). The same leak existed in the original cells, where it
+  happened to be null; it is part of the pre-registered definition (§4), not a
+  coding bug. The Holm-significant H2 rows in 11b must be reported, labelled as a
+  property of a look-ahead feature. They are not evidence that the timing of
+  design work predicts defects.
+- **Outcome definition matters.** 31% of Bug tickets are resolved as non-defects
+  (duplicate, cannot reproduce, works as designed, support request, ...); only 49%
+  carry a fix-type resolution. Removing them changes component-unit results
+  materially (11c), so construct validity of "bug count" is a substantive threat,
+  not only a caveat.
+- **Minor checks that don't matter:** dropping the final partial quarter changes
+  nothing. Computing the original cells' change point from the raw rather than the
+  clipped corrected ratio leaves the original H2 null. Estimating the exposure
+  coefficient instead of fixing it at 1 weakens the primary-unit result and
+  slightly strengthens the component-unit one; neither changes a conclusion.
+- **Sample note:** requiring the M2 features drops rows (primary 405 -> 370,
+  drop 3835 -> 2808) because some series have no detected change point. H1 is
+  tested on the M2-complete rows as pre-registered (§2e). The M1-complete
+  results are shown above for comparison.
+
+**Not yet updated:** SIMEX (§9b) and the Unclassified-series analysis (§9a) were
+run on the original ratio and have not been redone. The §9b conclusion that the
+sign is stable under measurement-error correction applies to the confounded
+ratio only.

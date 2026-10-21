@@ -52,7 +52,15 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from build_rq2_panel import CALENDAR_EPOCH, changepoint_distances, gini, rogan_gladen
+from build_rq2_panel import (
+    CALENDAR_EPOCH,
+    REVISED_COUNT_COLS,
+    add_revised_columns,
+    changepoint_distances,
+    gini,
+    revised_counts,
+    rogan_gladen,
+)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -109,9 +117,10 @@ def build_component_series(g, project, component):
 
     cp = pd.DataFrame(index=all_quarters)
     cp = cp.join(resolved_total).join(resolved_design).join(resolved_nonbug).join(bug_count)
-    cp[['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count']] = (
-        cp[['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count']].fillna(0)
-    )
+    for s in revised_counts(g, resolved):
+        cp = cp.join(s)
+    count_cols = ['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count'] + REVISED_COUNT_COLS
+    cp[count_cols] = cp[count_cols].fillna(0)
     return cp
 
 
@@ -126,6 +135,12 @@ def build_component_panel(project, sens, spec, missing_handling):
     exploded = explode_components(df, missing_handling)
     exploded['creation_q'] = exploded['creation_date'].dt.to_period('Q')
     exploded['resolution_q'] = exploded['resolution_date'].dt.to_period('Q')
+    # The snapshot's cut falls in the *project's* final quarter; a component's
+    # own last quarter can be earlier and complete.
+    project_last_q = max(
+        df['creation_date'].dt.to_period('Q').max(),
+        df['resolution_date'].dropna().dt.to_period('Q').max(),
+    )
 
     panels = []
     for component, g in exploded.groupby('component'):
@@ -164,6 +179,8 @@ def build_component_panel(project, sens, spec, missing_handling):
         )
         cp['front_loaded_index'] = front_loaded
         cp['quarters_since_changepoint'] = changepoint_distances(cp['design_ratio_corrected'])
+        cp = add_revised_columns(cp)
+        cp['is_last_quarter'] = cp.index == project_last_q
 
         panels.append(cp.reset_index(drop=True))
 

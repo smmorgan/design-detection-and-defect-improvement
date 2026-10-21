@@ -42,6 +42,22 @@ CALENDAR_EPOCH = pd.Period('2000Q1', freq='Q')
 MIN_QUARTERS = 12
 MIN_BUGS = 50
 
+# Bug-ticket resolutions that say the report was not a code defect (duplicate,
+# not reproducible, user error, support question, closed without triage). Used
+# only for the bug_count_valid robustness outcome (RQ2_INITIAL_RESULTS.md §11);
+# unresolved bugs and ambiguous resolutions (Won't Fix, Later, Hold, ...) are
+# kept. Vocabulary taken from the union of all 10 projects' Bug resolutions.
+NON_DEFECT_RESOLUTIONS = {
+    'Duplicate', 'Cannot Reproduce', 'Not a bug', 'Not A Bug', 'Not A Problem', 'Not Our Bug',
+    'Invalid', 'Invalid: Works as Expected', 'Invalid: Environment Issue', 'Invalid: Test Error',
+    'Invalid: Not Supported', 'Works as Designed', 'Works for Me', 'Support Request', 'Answered',
+    'Handled by Support', 'Community Answered', 'Information Provided', 'Incorrectly Filed',
+    'Tracked Elsewhere', 'Resolved Locally', 'Unsolved Mysteries', 'Timed out', 'Obsolete',
+    'Incomplete', 'Needs more info', 'Gone away', 'Out of scope', 'Automatically Closed',
+}
+# Resolutions that record an actual fix (the stricter bug_count_fixed outcome).
+FIX_RESOLUTIONS = {'Fixed', 'Done', 'Complete', 'Completed', 'Resolved', 'Deployed', 'Implemented'}
+
 
 def rogan_gladen(p_apparent, sens, spec):
     denom = sens + spec - 1
@@ -101,6 +117,51 @@ def changepoint_distances(series):
     return dist.astype(float)
 
 
+def revised_counts(g, resolved):
+    """Per-quarter counts added for the H1 re-specification and the robustness
+    checks (RQ2_INITIAL_RESULTS.md §11). `g` is one series' issues, `resolved`
+    its resolved subset; both carry creation_q/resolution_q."""
+    nonbug = resolved[resolved['issue_type'] != 'Bug']
+    bugs = g[g['issue_type'] == 'Bug']
+    return [
+        nonbug.groupby('resolution_q')['pred_design'].sum().rename('resolved_design_nonbug'),
+        bugs[~bugs['resolution'].isin(NON_DEFECT_RESOLUTIONS)].groupby('creation_q').size()
+        .rename('bug_count_valid'),
+        bugs[bugs['resolution'].isin(FIX_RESOLUTIONS)].groupby('creation_q').size().rename('bug_count_fixed'),
+    ]
+
+
+REVISED_COUNT_COLS = ['resolved_design_nonbug', 'bug_count_valid', 'bug_count_fixed']
+
+
+def add_revised_columns(panel):
+    """Columns for the H1 re-specification (RQ2_PREREGISTRATION.md §11).
+
+    design_ratio_nonbug: design share of resolved *non-bug* tickets. The
+    original design_ratio_raw divides by all resolved tickets, but the
+    classifier almost never flags a Bug as design (<1% in every project), so
+    the bug share of resolved work enters the original ratio's denominator
+    and the ratio tracks bug-fixing throughput (within-project correlation
+    -0.35 to -0.96). Bug activity is persistent, so that coupling alone
+    produces a negative lag coefficient on bug_count.
+
+    quarters_since_changepoint_{raw,nonbug}: the H2 change-point feature
+    computed on the ratio the model actually uses. The original
+    quarters_since_changepoint is computed on design_ratio_corrected, which
+    clips to 0 for up to 95% of a project's quarters (RQ2_INITIAL_RESULTS.md §1).
+    """
+    panel['resolved_bug'] = panel['resolved_total'] - panel['resolved_nonbug']
+    with np.errstate(invalid='ignore', divide='ignore'):
+        panel['design_ratio_nonbug'] = np.where(
+            panel['resolved_nonbug'] > 0,
+            panel['resolved_design_nonbug'] / panel['resolved_nonbug'],
+            np.nan,
+        )
+    panel['quarters_since_changepoint_raw'] = changepoint_distances(panel['design_ratio_raw'])
+    panel['quarters_since_changepoint_nonbug'] = changepoint_distances(panel['design_ratio_nonbug'])
+    return panel
+
+
 def build_project_panel(project, sens, spec):
     df = pd.read_csv(
         LABELED_DIR / f'{project}_labeled.csv',
@@ -129,9 +190,12 @@ def build_project_panel(project, sens, spec):
 
     panel = pd.DataFrame(index=all_quarters)
     panel = panel.join(resolved_total).join(resolved_design).join(resolved_nonbug).join(bug_count)
-    panel[['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count']] = (
-        panel[['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count']].fillna(0)
-    )
+    for s in revised_counts(df, resolved):
+        panel = panel.join(s)
+    count_cols = ['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count'] + REVISED_COUNT_COLS
+    panel[count_cols] = panel[count_cols].fillna(0)
+    # The TAWOS snapshot ends partway through each project's final quarter.
+    panel['is_last_quarter'] = panel.index == last_q
 
     panel['project'] = project
     panel['quarter'] = panel.index.astype(str)
@@ -177,6 +241,7 @@ def build_project_panel(project, sens, spec):
     )
     panel['front_loaded_index'] = front_loaded
     panel['quarters_since_changepoint'] = changepoint_distances(panel['design_ratio_corrected'])
+    panel = add_revised_columns(panel)
 
     return panel.reset_index(drop=True)
 

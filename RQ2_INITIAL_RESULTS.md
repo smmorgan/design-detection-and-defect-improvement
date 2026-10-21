@@ -977,6 +977,10 @@ describes these series, but it is no longer needed to explain a divergence.
   measured association, not on the true effect of design work.
 - **H2:** the pre-registered feature leaks future information (11c). The confirmatory
   test rejects only on the re-specified ratio, and not once the leak is removed.
+  Reporting (recorded in `paper/RQ2_PREREGISTRATION.md`, 2026-10-21): the
+  pre-registered test stays the confirmatory H2 result, reported as rejected with
+  the look-ahead stated alongside; the past-only feature is shown next to it as an
+  exploratory check, not a replacement.
 - **H3:** no consistent reverse pattern.
 - **Measurement:** the classifier's non-bug specificity (0.71) is the binding
   constraint on everything downstream. It is the single change most likely to make

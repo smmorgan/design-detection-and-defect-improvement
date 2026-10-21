@@ -371,3 +371,19 @@ per-project trends, decomposed counts, look-ahead-free change points):
 tickets only (specificity 0.71 vs 0.87 on all tickets; sensitivity unchanged at 0.67).
 These are the error rates of the measurement the re-specified ratio is built from.
 Results: `RQ2_INITIAL_RESULTS.md` §11d.
+
+**Recorded 2026-10-21 (H2 reporting decision, §4/§7; not a deviation):** the
+pre-registered H2 feature is quarters-since-*nearest* change point, with PELT run
+on each full series, so a break detected from later quarters sets the value of
+earlier rows (look-ahead; `RQ2_INITIAL_RESULTS.md` §11c). On the re-specified
+ratio its chi-square test rejects in all three cells after Holm (adjusted 1e-12,
+5e-7, 0.030). The pre-registered test is **not** replaced. H2 is reported as
+specified: the confirmatory verdict is "rejected under the pre-registered test",
+stated together with the look-ahead and labelled as a property of the feature
+rather than evidence that the timing of design work predicts defects. The
+past-only change-point feature (`rq2_robustness_checks.py`; circular p 0.893,
+0.080, 0.239) is reported directly beside it as an exploratory sensitivity check,
+outside the Holm family. The alternative, a recorded deviation making the
+past-only feature the confirmatory H2 test, was rejected because it would swap a
+confirmatory test after seeing it reject. The original 12-test family's H2 rows
+(null in every cell) carry the same look-ahead and are labelled the same way.

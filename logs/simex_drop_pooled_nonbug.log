@@ -1,0 +1,26 @@
+lambda=0.5: 0.0333, 0.0690, 0.0712, 0.0740
+lambda=1.0: 0.0337, 0.0510, 0.0405, 0.0442
+lambda=1.5: 0.0182, 0.0391, 0.0484, 0.0165
+lambda=2.0: 0.0259, 0.0295, 0.0209, 0.0199
+{
+  "naive": {
+    "design_ratio_lag1": 0.08942493070053775,
+    "design_ratio_lag2": 0.1375907829070004,
+    "design_ratio_lag3": 0.11640291753424215,
+    "design_ratio_lag4": 0.11440729897303373
+  },
+  "simex_quadratic": {
+    "design_ratio_lag1": 0.2087207253733525,
+    "design_ratio_lag2": 0.2876355163767303,
+    "design_ratio_lag3": 0.2190637392156937,
+    "design_ratio_lag4": 0.24201048732041827
+  },
+  "simex_linear": {
+    "design_ratio_lag1": 0.09696051869935969,
+    "design_ratio_lag2": 0.1637205020622357,
+    "design_ratio_lag3": 0.1450460286223338,
+    "design_ratio_lag4": 0.1524086773891043
+  },
+  "n_replicates_nonconverged": 0
+}
+wrote gcp_results/rq2_simex/simex_drop_pooled_nonbug.json

@@ -52,13 +52,33 @@ UNITS = {
     'bucket': {'panel': 'data/rq2_component_panel_bucket.csv', 'series': 'project_component', 'missing': 'bucket'},
 }
 EXTRA_FIT_COLS = ['gini_design_effort', 'front_loaded_index', 'quarters_since_changepoint']
+# --ratio nonbug: the re-specified H1 predictor (RQ2_PREREGISTRATION.md §11),
+# rebuilt from non-bug tickets only and fit on the re-specified grid's rows
+# (its own change-point column; see fit_rq2_models.CHANGEPOINT_COL).
+RATIOS = {
+    'raw': {'panel_ratio': 'design_ratio_raw', 'panel_total': 'resolved_total',
+            'changepoint': 'quarters_since_changepoint', 'suffix': ''},
+    'nonbug': {'panel_ratio': 'design_ratio_nonbug', 'panel_total': 'resolved_nonbug',
+               'changepoint': 'quarters_since_changepoint_nonbug', 'suffix': '_nonbug'},
+}
 
 
-def audit_inputs():
-    sys.argv = sys.argv[:1]
+def audit_inputs(nonbug_only=False):
+    """Audit sensitivity/specificity. nonbug_only restricts to non-bug audit
+    tickets (domain estimate within each project x era stratum, same sampling
+    weights): bugs are almost never flagged, so including them inflates the
+    specificity that applies to a non-bug ratio."""
+    argv, sys.argv = sys.argv, sys.argv[:1]
     import rq2_calibration as rc
+    sys.argv = argv
     calib = pd.read_csv(rc.CALIB_OUT)
     audit = calib[calib['source'] == 'random_audit']
+    if nonbug_only:
+        types = pd.concat([pd.read_csv(f'data/tawos_full/labeled/{p}_labeled.csv', usecols=['issue_key', 'issue_type'])
+                           for p in PROJECTS])
+        audit = audit.merge(types, on='issue_key', how='left', validate='one_to_one')
+        assert audit['issue_type'].notna().all(), 'audit ticket missing from labeled files'
+        audit = audit[audit['issue_type'] != 'Bug']
     sens, spec = rc.sens_spec(audit)
     per_project_spec = {}
     for p, g in audit.groupby('project'):
@@ -75,7 +95,7 @@ def pi_power(sens, spec, lam):
     return (vecs @ np.diag(vals.real ** lam) @ np.linalg.inv(vecs)).real
 
 
-def load_tickets(unit_cfg, panel):
+def load_tickets(unit_cfg, panel, nonbug_only=False):
     """Resolved tickets mapped to their panel row(s). Returns (labels, ticket_project,
     row_index_per_link, ticket_index_per_link)."""
     series_col = unit_cfg['series']
@@ -84,9 +104,12 @@ def load_tickets(unit_cfg, panel):
     offset = 0
     for p in PROJECTS:
         df = pd.read_csv(f'data/tawos_full/labeled/{p}_labeled.csv',
-                         usecols=['issue_key', 'components', 'pred_design', 'resolution_date'],
+                         usecols=['issue_key', 'issue_type', 'components', 'pred_design', 'resolution_date'],
                          parse_dates=['resolution_date'])
-        df = df.dropna(subset=['resolution_date']).reset_index(drop=True)
+        df = df.dropna(subset=['resolution_date'])
+        if nonbug_only:
+            df = df[df['issue_type'] != 'Bug']
+        df = df.reset_index(drop=True)
         df['tid'] = np.arange(len(df)) + offset
         df['quarter'] = df['resolution_date'].dt.to_period('Q').astype(str)
         if unit_cfg['missing'] is None:
@@ -123,8 +146,11 @@ def main():
     ap.add_argument('--unit', choices=list(UNITS), required=True)
     ap.add_argument('--pi', choices=['pooled', 'project_spec'], required=True)
     ap.add_argument('--B', type=int, default=50)
+    ap.add_argument('--ratio', choices=list(RATIOS), default='raw')
     args = ap.parse_args()
     warnings.simplefilter('ignore')
+    rcfg = RATIOS[args.ratio]
+    nonbug = args.ratio == 'nonbug'
 
     cfg = UNITS[args.unit]
     series_col = cfg['series']
@@ -134,7 +160,7 @@ def main():
     lag_names = [f'design_ratio_lag{k}' for k in LAGS]
 
     panel = pd.read_csv(cfg['panel']).sort_values([series_col, 'quarter_index']).reset_index(drop=True)
-    labels, tproj, link_rows, link_tids = load_tickets(cfg, panel)
+    labels, tproj, link_rows, link_tids = load_tickets(cfg, panel, nonbug_only=nonbug)
     total = np.bincount(link_rows, minlength=len(panel)).astype(float)
 
     def ratio_from(lbl):
@@ -144,12 +170,13 @@ def main():
 
     # Validation: ticket-level rebuild must reproduce the panel exactly.
     naive_ratio = ratio_from(labels)
-    assert np.allclose(total, panel['resolved_total'].to_numpy()), 'resolved_total mismatch'
+    assert np.allclose(total, panel[rcfg['panel_total']].to_numpy()), 'ticket count mismatch'
     assert np.allclose(np.nan_to_num(naive_ratio, nan=-1),
-                       np.nan_to_num(panel['design_ratio_raw'].to_numpy(), nan=-1)), 'ratio mismatch'
+                       np.nan_to_num(panel[rcfg['panel_ratio']].to_numpy(), nan=-1)), 'ratio mismatch'
 
+    extra = [rcfg['changepoint'] if c == 'quarters_since_changepoint' else c for c in EXTRA_FIT_COLS]
     fit_cols = (['bug_count', 'bug_count_lag1', 'quarter_index', series_col, 'project', 'log_exposure']
-                + EXTRA_FIT_COLS + lag_names)
+                + extra + lag_names)
     base = add_lags(panel, series_col, naive_ratio)
     keep = base.dropna(subset=fit_cols).index  # same rows as the reported M2-complete fits
 
@@ -161,7 +188,7 @@ def main():
     naive, conv, naive_res = fit_coefs(naive_ratio)
     naive_se = naive_res.bse[lag_names].to_numpy()
 
-    sens, spec, proj_spec = audit_inputs()
+    sens, spec, proj_spec = audit_inputs(nonbug_only=nonbug)
     spec_of = ({p: spec for p in PROJECTS} if args.pi == 'pooled' else proj_spec)
 
     rng = np.random.default_rng(SEED)
@@ -189,7 +216,7 @@ def main():
     lin = [float(np.polyval(np.polyfit(lam_grid, est[:, j], 1), -1)) for j in range(len(LAGS))]
 
     out = {
-        'unit': args.unit, 'pi': args.pi, 'B': args.B, 'lambdas': LAMBDAS,
+        'unit': args.unit, 'pi': args.pi, 'ratio': rcfg['panel_ratio'], 'B': args.B, 'lambdas': LAMBDAS,
         'n_rows': int(len(keep)), 'naive_m1_converged': conv, 'n_replicates_nonconverged': int(n_nonconv),
         'sens_pooled': round(sens, 4), 'spec_pooled': round(spec, 4),
         'spec_by_project': {p: round(v, 4) for p, v in spec_of.items()},
@@ -204,7 +231,7 @@ def main():
                 'stability check, per pre-registration §8.',
     }
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    path = OUT_DIR / f'simex_{args.unit}_{args.pi}.json'
+    path = OUT_DIR / f'simex_{args.unit}_{args.pi}{rcfg["suffix"]}.json'
     path.write_text(json.dumps(out, indent=2))
     print(json.dumps({k: out[k] for k in ['naive', 'simex_quadratic', 'simex_linear',
                                           'n_replicates_nonconverged']}, indent=2))

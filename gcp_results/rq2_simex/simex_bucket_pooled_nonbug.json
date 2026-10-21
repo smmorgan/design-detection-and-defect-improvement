@@ -1,0 +1,86 @@
+{
+  "unit": "bucket",
+  "pi": "pooled",
+  "ratio": "design_ratio_nonbug",
+  "B": 50,
+  "lambdas": [
+    0.5,
+    1.0,
+    1.5,
+    2.0
+  ],
+  "n_rows": 3049,
+  "naive_m1_converged": true,
+  "n_replicates_nonconverged": 0,
+  "sens_pooled": 0.6686,
+  "spec_pooled": 0.7098,
+  "spec_by_project": {
+    "CONFSERVER": 0.7098,
+    "DM": 0.7098,
+    "DNN": 0.7098,
+    "FAB": 0.7098,
+    "JRASERVER": 0.7098,
+    "MESOS": 0.7098,
+    "MULE": 0.7098,
+    "NEXUS": 0.7098,
+    "SERVER": 0.7098,
+    "TIMOB": 0.7098
+  },
+  "coef_by_lambda": {
+    "0.0": {
+      "design_ratio_lag1": 0.07351919721874668,
+      "design_ratio_lag2": 0.11997339204070462,
+      "design_ratio_lag3": 0.11924926309102528,
+      "design_ratio_lag4": 0.12718991649380498
+    },
+    "0.5": {
+      "design_ratio_lag1": 0.019989678320360776,
+      "design_ratio_lag2": 0.059800160285680116,
+      "design_ratio_lag3": 0.07675127264174457,
+      "design_ratio_lag4": 0.08172467178001744
+    },
+    "1.0": {
+      "design_ratio_lag1": 0.02403234833429389,
+      "design_ratio_lag2": 0.04490649838743023,
+      "design_ratio_lag3": 0.04222841071922964,
+      "design_ratio_lag4": 0.052009161907190175
+    },
+    "1.5": {
+      "design_ratio_lag1": 0.012513943644554335,
+      "design_ratio_lag2": 0.03591598420396662,
+      "design_ratio_lag3": 0.049123563346633266,
+      "design_ratio_lag4": 0.017253558763638176
+    },
+    "2.0": {
+      "design_ratio_lag1": 0.022701298152927218,
+      "design_ratio_lag2": 0.025003365684407218,
+      "design_ratio_lag3": 0.02145286357167889,
+      "design_ratio_lag4": 0.01739210282163592
+    }
+  },
+  "naive": {
+    "design_ratio_lag1": 0.07351919721874668,
+    "design_ratio_lag2": 0.11997339204070462,
+    "design_ratio_lag3": 0.11924926309102528,
+    "design_ratio_lag4": 0.12718991649380498
+  },
+  "naive_se_cluster": {
+    "design_ratio_lag1": 0.03885344169719894,
+    "design_ratio_lag2": 0.10532371690978264,
+    "design_ratio_lag3": 0.11216953408356807,
+    "design_ratio_lag4": 0.1226875341939633
+  },
+  "simex_quadratic": {
+    "design_ratio_lag1": 0.1860685783669999,
+    "design_ratio_lag2": 0.24707394582387776,
+    "design_ratio_lag3": 0.22212187390615526,
+    "design_ratio_lag4": 0.25890806277039025
+  },
+  "simex_linear": {
+    "design_ratio_lag1": 0.07419590625715475,
+    "design_ratio_lag2": 0.14264957163816114,
+    "design_ratio_lag3": 0.15104927800758397,
+    "design_ratio_lag4": 0.1727405784975443
+  },
+  "note": "M1 only; no SIMEX standard errors (B and the per-replicate refits make jackknife variance estimation expensive) -- read as a point-estimate stability check, per pre-registration \u00a78."
+}

@@ -365,3 +365,9 @@ bug-throughput-confounded ratio. Runner: `run_rq2_nonbug.sh`. Exploratory robust
 checks (outcome definition, partial final quarter, exposure as covariate,
 per-project trends, decomposed counts, look-ahead-free change points):
 `rq2_robustness_checks.py`. Results: `RQ2_INITIAL_RESULTS.md` §11.
+
+**Recorded 2026-10-21 (SIMEX inputs for the re-specified ratio, §8):** SIMEX for
+`design_ratio_nonbug` uses sensitivity/specificity estimated on the non-bug audit
+tickets only (specificity 0.71 vs 0.87 on all tickets; sensitivity unchanged at 0.67).
+These are the error rates of the measurement the re-specified ratio is built from.
+Results: `RQ2_INITIAL_RESULTS.md` §11d.

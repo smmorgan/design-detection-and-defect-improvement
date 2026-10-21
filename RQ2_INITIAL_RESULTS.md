@@ -906,3 +906,78 @@ H2 (circular p; change-point effect per SD of the feature):
 run on the original ratio and have not been redone. The §9b conclusion that the
 sign is stable under measurement-error correction applies to the confounded
 ratio only.
+
+### 11d. MC-SIMEX on the re-specified ratio (2026-10-21)
+
+`simex_rq2.py --ratio nonbug` -> `gcp_results/rq2_simex/simex_{unit}_{pi}_nonbug.json`,
+logs `logs/simex_*_nonbug.log`. Same design as §9b (B = 200 primary, 50 component;
+lambda 0.5-2), with two changes. The ratio is rebuilt from non-bug tickets only (the
+rebuild reproduces `resolved_nonbug` and `design_ratio_nonbug` exactly, asserted).
+The error rates come from the **non-bug audit tickets**: specificity 0.71, not the
+all-ticket 0.87, because bugs are almost never flagged and inflate specificity.
+Sensitivity is unchanged (0.67). So sens + spec - 1 falls from 0.54 to 0.38, and
+per-project non-bug specificity ranges from 0.42 (JRASERVER) to 1.00 (TIMOB). The
+re-specified ratio is a noisier measurement than the original one. 4-5 of 1000
+primary refits did not converge.
+
+`design_ratio_nonbug` lags 1-4:
+
+| Unit | Naive | SIMEX quadratic (pooled / project spec) | SIMEX linear (pooled / project spec) |
+|---|---|---|---|
+| project x quarter | +0.48 +0.65 +0.69 -0.28 | lag1 +0.07 / +0.55; lag2 +0.26 / +1.02 | lag1 +0.70 / +0.73 |
+| component, drop | +0.09 +0.14 +0.12 +0.11 | lag1 +0.21 / +0.31; lag2 +0.29 / +0.52 | lag1 +0.10 / +0.09 |
+| component, bucket | +0.07 +0.12 +0.12 +0.13 | lag1 +0.19 / +0.29; lag2 +0.25 / +0.48 | lag1 +0.07 / +0.07 |
+
+**Reading:** no stable corrected effect. Lag-1 lambda paths: at the component unit,
+half a unit of added misclassification removes most of the coefficient (drop 0.089 ->
+0.033 pooled, 0.003 per-project), and it then stays flat near zero. The quadratic
+extrapolation is driven almost entirely by that first jump. At the primary unit the
+path is non-monotone (pooled) or falls steadily to 0.04 (per-project), and the
+quadratic and linear extrapolants disagree by up to 10x. Signs stay mostly positive,
+but the magnitude depends on the extrapolant and the error model. The illustrative
+corrected effects in §9b (-0.5 to -0.9, "5-9% fewer bugs per 10pp") belong to the
+confounded ratio and should not be reported as design-work effects.
+
+### 11e. Unclassified series on the re-specified ratio (2026-10-21)
+
+`explore_unclassified_series.py --ratio design_ratio_nonbug` ->
+`gcp_results/rq2_unclassified_check_nonbug.json`, log
+`logs/unclassified_check_nonbug.log`. Bucket M2-complete sample (3049 rows; 7
+Unclassified series, 241 rows).
+
+| Sample | Rows / series | lag1 | lag2 | H1 chi-sq p | H1 shuffle p |
+|---|---|---|---|---|---|
+| Bucket, all series | 3049 / 185 | +0.07 | +0.12 | 0.043 | 0.119 (11b) |
+| Unclassified only | 241 / 7 | -0.55 | -0.44 | 0.57 | **0.68** (2000 perms) |
+| Bucket minus Unclassified (= drop) | 2808 / 178 | +0.09 | +0.14 | 0.033 | 0.122 (11b) |
+
+Lag x Unclassified interaction: LR = 8.94, df = 4, chi-square p = 0.063 (was 42.0,
+p = 1.7e-8, on the original ratio).
+
+**Reading:** the Unclassified series' strong effect under the original ratio
+(lag1/lag2 -1.91/-2.06, permutation p = 0.018, §9a) was the same bug-share artifact
+as 11a, at its most extreme. No-component issues have the most volatile bug share
+(the no-component share itself moves by up to 54 points over a project's history),
+so the all-ticket ratio swings most there. On the non-bug ratio the Unclassified
+series carry no signal, and the drop and bucket cells agree (shuffle p 0.122 and
+0.119; lag coefficients within 0.02). The triage-practice argument in §9a still
+describes these series, but it is no longer needed to explain a divergence.
+
+### 11f. Where this leaves RQ2
+
+- **H1:** not supported under the pre-registered verdict (original ratio, 12 tests)
+  or the re-specified one (6 tests). No association survives per-project trends or
+  measurement-error correction in either direction. The informative statement is
+  the bound: at the component unit, lag-1 effects beyond about +/-2% bugs per 10pp
+  of non-bug design share are ruled out (11b). That bound is on the *apparent*
+  ratio. The scale correction alone would shrink it on the true-ratio scale
+  (multiply by sens + spec - 1 = 0.38, §8b), but per-ticket misclassification
+  attenuates the naive coefficient, which works the other way, and SIMEX (11d)
+  cannot pin down the size of that attenuation. It is therefore a bound on the
+  measured association, not on the true effect of design work.
+- **H2:** the pre-registered feature leaks future information (11c). The confirmatory
+  test rejects only on the re-specified ratio, and not once the leak is removed.
+- **H3:** no consistent reverse pattern.
+- **Measurement:** the classifier's non-bug specificity (0.71) is the binding
+  constraint on everything downstream. It is the single change most likely to make
+  a future RQ2 informative.

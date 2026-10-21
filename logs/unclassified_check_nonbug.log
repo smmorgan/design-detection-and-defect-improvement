@@ -1,0 +1,88 @@
+   project  n_resolved  no_component_share  bug_share_no_comp  bug_share_with_comp  flagged_design_no_comp  flagged_design_with_comp  flagged_design_nonbug_no_comp  flagged_design_nonbug_with_comp  no_comp_share_early  no_comp_share_middle  no_comp_share_late
+CONFSERVER       36268               0.607              0.598                0.644                   0.139                     0.113                          0.346                            0.316                0.768                 0.667               0.385
+        DM       22570               0.439              0.029                0.150                   0.455                     0.386                          0.468                            0.454                0.344                 0.455               0.519
+       DNN        7565               0.157              0.532                0.717                   0.116                     0.065                          0.249                            0.228                0.136                 0.138               0.195
+       FAB       12842               0.251              0.205                0.292                   0.272                     0.260                          0.342                            0.366                0.157                 0.295               0.302
+ JRASERVER       35215               0.415              0.357                0.536                   0.325                     0.239                          0.506                            0.516                0.341                 0.525               0.380
+     MESOS        7091               0.448              0.482                0.539                   0.299                     0.267                          0.570                            0.572                0.544                 0.439               0.361
+      MULE       11292               0.087              0.208                0.500                   0.395                     0.297                          0.495                            0.587                0.015                 0.065               0.181
+     NEXUS        9033               0.379              0.533                0.667                   0.138                     0.145                          0.294                            0.435                0.624                 0.438               0.077
+    SERVER       43834               0.171              0.463                0.495                   0.089                     0.093                          0.166                            0.183                0.147                 0.104               0.264
+     TIMOB       19574               0.036              0.728                0.737                   0.093                     0.096                          0.340                            0.364                0.018                 0.016               0.075
+
+bucket minus Unclassified == drop panel: True
+Unclassified rows in bucket M2 sample, by project: {'CONFSERVER': 57, 'DM': 24, 'DNN': 16, 'FAB': 0, 'JRASERVER': 64, 'MESOS': 0, 'MULE': 27, 'NEXUS': 30, 'SERVER': 0, 'TIMOB': 23}
+{
+  "bucket_minus_unclassified_equals_drop": true,
+  "unclassified_rows_in_sample_by_project": {
+    "CONFSERVER": 57,
+    "DM": 24,
+    "DNN": 16,
+    "FAB": 0,
+    "JRASERVER": 64,
+    "MESOS": 0,
+    "MULE": 27,
+    "NEXUS": 30,
+    "SERVER": 0,
+    "TIMOB": 23
+  },
+  "full_bucket_sample": {
+    "sample": "bucket, all series",
+    "n_rows": 3049,
+    "n_series": 185,
+    "lr_stat": 9.849,
+    "df": 4,
+    "chi2_p": 0.0430451125998016,
+    "m1_converged": true,
+    "lag_coefs": {
+      "design_ratio_lag1": 0.0735,
+      "design_ratio_lag2": 0.12,
+      "design_ratio_lag3": 0.1192,
+      "design_ratio_lag4": 0.1272
+    }
+  },
+  "unclassified_only": {
+    "sample": "Unclassified series only",
+    "n_rows": 241,
+    "n_series": 7,
+    "lr_stat": 2.94,
+    "df": 4,
+    "chi2_p": 0.5679191680689837,
+    "m1_converged": true,
+    "lag_coefs": {
+      "design_ratio_lag1": -0.5549,
+      "design_ratio_lag2": -0.4375,
+      "design_ratio_lag3": 0.3486,
+      "design_ratio_lag4": 0.5751
+    },
+    "perm_p": 0.6821589205397302,
+    "n_perms_ok": 2000
+  },
+  "without_unclassified": {
+    "sample": "bucket minus Unclassified",
+    "n_rows": 2808,
+    "n_series": 178,
+    "lr_stat": 10.463,
+    "df": 4,
+    "chi2_p": 0.033314017056962617,
+    "m1_converged": true,
+    "lag_coefs": {
+      "design_ratio_lag1": 0.0894,
+      "design_ratio_lag2": 0.1376,
+      "design_ratio_lag3": 0.1164,
+      "design_ratio_lag4": 0.1144
+    }
+  },
+  "interaction_lag_x_unclassified": {
+    "lr_stat": 8.936,
+    "df": 4,
+    "chi2_p": 0.06273036390559751,
+    "interaction_coefs": {
+      "design_ratio_lag1:unclassified": -0.8393,
+      "design_ratio_lag2:unclassified": -0.7502,
+      "design_ratio_lag3:unclassified": 0.2232,
+      "design_ratio_lag4:unclassified": 0.2269
+    }
+  },
+  "ratio": "design_ratio_nonbug"
+}

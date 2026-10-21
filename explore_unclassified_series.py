@@ -33,8 +33,8 @@ from fit_rq2_models import LAGS, fit_nb_glm, nested_lr_test
 
 PROJECTS = ['CONFSERVER', 'DM', 'DNN', 'FAB', 'JRASERVER',
             'MESOS', 'MULE', 'NEXUS', 'SERVER', 'TIMOB']
-RATIO = 'design_ratio_raw'
-OUT = 'gcp_results/rq2_unclassified_check.json'
+RATIO = 'design_ratio_raw'  # --ratio design_ratio_nonbug for the re-specified H1 (pre-registration §11)
+OUT = 'gcp_results/rq2_unclassified_check.json'  # _nonbug suffix for the re-specified ratio
 
 M0 = 'bug_count ~ bug_count_lag1 + quarter_index + C(project_component)'
 M1 = M0 + ' + ' + ' + '.join(f'design_ratio_lag{k}' for k in LAGS)
@@ -58,6 +58,9 @@ def describe():
                'bug_share_with_comp': round((df.loc[~none, 'issue_type'] == 'Bug').mean(), 3),
                'flagged_design_no_comp': round(df.loc[none, 'pred_design'].mean(), 3),
                'flagged_design_with_comp': round(df.loc[~none, 'pred_design'].mean(), 3)}
+        nb = df['issue_type'] != 'Bug'
+        row['flagged_design_nonbug_no_comp'] = round(df.loc[none & nb, 'pred_design'].mean(), 3)
+        row['flagged_design_nonbug_with_comp'] = round(df.loc[~none & nb, 'pred_design'].mean(), 3)
         for e in ['early', 'middle', 'late']:
             row[f'no_comp_share_{e}'] = round(none[era == e].mean(), 3)
         rows.append(row)
@@ -72,7 +75,7 @@ def h1(data, label, n_perms, panel=None):
            'm1_converged': bool(m1.mle_retvals['converged']),
            'lag_coefs': {k: round(float(v), 4) for k, v in m1.params.filter(like='design_ratio_lag').items()}}
     if n_perms:
-        _, perm_p, n_ok = permutation_test_h1_component(panel, data, ratio_col=RATIO, n_perms=n_perms)
+        _, perm_p, n_ok = permutation_test_h1_component(panel, data, ratio_col=ratio, n_perms=n_perms)
         out.update(perm_p=float(perm_p), n_perms_ok=int(n_ok))
     return out
 
@@ -80,8 +83,12 @@ def h1(data, label, n_perms, panel=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--n_permutations', type=int, default=2000)
+    ap.add_argument('--ratio', default=RATIO, choices=['design_ratio_raw', 'design_ratio_nonbug'])
     args = ap.parse_args()
     warnings.simplefilter('ignore')
+    global ratio
+    ratio = args.ratio
+    out_path = OUT if ratio == RATIO else OUT.replace('.json', '_nonbug.json')
 
     desc = describe()
     print(desc.to_string(index=False))
@@ -92,11 +99,11 @@ def main():
     key = ['project_component', 'quarter']
     a = bucket[~is_unc].sort_values(key).reset_index(drop=True)
     b = drop.sort_values(key).reset_index(drop=True)
-    num = ['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count', 'design_ratio_raw']
+    num = ['resolved_total', 'resolved_design', 'resolved_nonbug', 'bug_count', 'design_ratio_raw', 'design_ratio_nonbug']
     identical = a[key].equals(b[key]) and np.allclose(a[num].fillna(-1), b[num].fillna(-1))
     print(f'\nbucket minus Unclassified == drop panel: {identical}')
 
-    panel = add_lag_features(bucket, ratio_col=RATIO)
+    panel = add_lag_features(bucket, ratio_col=ratio)
     clean = panel.dropna(subset=FIT_COLS_M2).copy()
     clean['unclassified'] = (clean['component'] == 'Unclassified').astype(int)
     unc_n = clean.groupby('project')['unclassified'].sum().to_dict()
@@ -117,7 +124,8 @@ def main():
         'interaction_coefs': {k: round(float(v), 4) for k, v in mi.params.filter(like=':unclassified').items()}}
 
     results['description'] = desc.to_dict(orient='records')
-    with open(OUT, 'w') as f:
+    results['ratio'] = ratio
+    with open(out_path, 'w') as f:
         json.dump(results, f, indent=2)
     print(json.dumps({k: v for k, v in results.items() if k != 'description'}, indent=2))
 

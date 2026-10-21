@@ -1,0 +1,26 @@
+lambda=0.5: 0.0025, -0.0110, 0.0212, -0.0248
+lambda=1.0: -0.0098, -0.0395, -0.0089, -0.0344
+lambda=1.5: -0.0208, -0.0424, 0.0080, -0.0520
+lambda=2.0: 0.0027, -0.0104, -0.0074, -0.0173
+{
+  "naive": {
+    "design_ratio_lag1": 0.08942493070053775,
+    "design_ratio_lag2": 0.1375907829070004,
+    "design_ratio_lag3": 0.11640291753424215,
+    "design_ratio_lag4": 0.11440729897303373
+  },
+  "simex_quadratic": {
+    "design_ratio_lag1": 0.31371824351692446,
+    "design_ratio_lag2": 0.524577601797414,
+    "design_ratio_lag3": 0.33677853021857895,
+    "design_ratio_lag4": 0.45319626490987885
+  },
+  "simex_linear": {
+    "design_ratio_lag1": 0.09150789209969615,
+    "design_ratio_lag2": 0.13781195402273344,
+    "design_ratio_lag3": 0.1301329456171169,
+    "design_ratio_lag4": 0.11343250621987816
+  },
+  "n_replicates_nonconverged": 0
+}
+wrote gcp_results/rq2_simex/simex_drop_project_spec_nonbug.json

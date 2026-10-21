@@ -113,8 +113,12 @@ def main():
     ap.add_argument('--unit', choices=list(UNITS), required=True)
     ap.add_argument('--n_perms', type=int, default=1000)
     ap.add_argument('--n_perms_h2', type=int, default=500)
+    ap.add_argument('--ratio', default=RATIO, choices=fm.RATIO_CHOICES,
+                    help='design_ratio_nonbug for the re-specified H1 (pre-registration §11); '
+                         'output goes to <unit>_<ratio>.json instead of <unit>.json')
     args = ap.parse_args()
     warnings.simplefilter('ignore')
+    ratio = args.ratio
 
     path, series, add_lags = UNITS[args.unit]
     fe = f'C({series})'
@@ -123,7 +127,7 @@ def main():
     m1f = m0f + ' + ' + ' + '.join(lag_cols)
     m2f = m1f + ' + gini_design_effort + front_loaded_index + quarters_since_changepoint'
 
-    panel = add_lags(pd.read_csv(path), ratio_col=RATIO)
+    panel = add_lags(pd.read_csv(path), ratio_col=ratio)
     fit_cols = (['bug_count', 'bug_count_lag1', 'quarter_index', series, 'project', 'log_exposure',
                  'front_loaded_index'] + H2_FEATURES + lag_cols)
     clean = panel.dropna(subset=fit_cols)
@@ -132,7 +136,7 @@ def main():
     nulls = {}
     for i, scheme in enumerate(['shuffle', 'circular']):
         obs, p, n_ok, draws, m0, m1 = permutation_null(
-            panel, clean, series, RATIO, m0f, m1f, args.n_perms, SEED + i,
+            panel, clean, series, ratio, m0f, m1f, args.n_perms, SEED + i,
             scheme=scheme, return_draws=True)
         D = pd.DataFrame(draws)
         nulls[scheme] = {'perm_p': float(p), 'n_ok': int(n_ok),
@@ -205,10 +209,10 @@ def main():
                  'mde_1df_pct_per_sd': {k: pct(-v, 1) for k, v in mde_1df(se).items()},
                  'tost': tost(est, se, 1)}
 
-    out = {'unit': args.unit, 'ratio': RATIO, 'power': POWER, 'n_perms': args.n_perms,
+    out = {'unit': args.unit, 'ratio': ratio, 'power': POWER, 'n_perms': args.n_perms,
            'n_perms_h2': args.n_perms_h2, 'h1': h1, 'h2': h2}
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    path_out = OUT_DIR / f'{args.unit}.json'
+    path_out = OUT_DIR / (f'{args.unit}.json' if ratio == RATIO else f'{args.unit}_{ratio}.json')
     path_out.write_text(json.dumps(out, indent=2, default=float))
     print(json.dumps(out, indent=2, default=float))
     print(f'wrote {path_out}')

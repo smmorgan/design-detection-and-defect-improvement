@@ -31,12 +31,15 @@ import pandas as pd
 from fit_rq2_models import (
     LAGS,
     N_PERMUTATIONS,
+    RATIO_CHOICES,
     RNG_SEED,
+    TRIALS_COL,
     blocked_time_cv_mae,
     fit_h3_reverse,
     fit_nb_glm,
     nested_lr_test,
     permutation_null,
+    select_changepoint_feature,
 )
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -44,7 +47,8 @@ logger = logging.getLogger(__name__)
 
 
 def add_lag_features(panel, ratio_col='design_ratio_corrected'):
-    panel = panel.sort_values(['project_component', 'quarter_index']).copy()
+    panel = select_changepoint_feature(
+        panel.sort_values(['project_component', 'quarter_index']).copy(), ratio_col)
     for k in LAGS:
         panel[f'design_ratio_lag{k}'] = panel.groupby('project_component')[ratio_col].shift(k)
         panel[f'bug_count_lag{k}'] = panel.groupby('project_component')['bug_count'].shift(k)
@@ -80,8 +84,7 @@ def main():
     parser.add_argument('--n_permutations', type=int, default=2000,
                          help='See permutation_test_h1_component docstring and the '
                               'comment above for why this differs from the primary unit.')
-    parser.add_argument('--ratio_col', default='design_ratio_corrected',
-                         choices=['design_ratio_corrected', 'design_ratio_raw'])
+    parser.add_argument('--ratio_col', default='design_ratio_corrected', choices=RATIO_CHOICES)
     args = parser.parse_args()
 
     panel = pd.read_csv(args.panel)
@@ -157,14 +160,15 @@ def fit_h3_reverse_component(data, ratio_col='design_ratio_corrected'):
         ' + '.join(f'bug_count_lag{k}' for k in LAGS) +
         ' + quarter_index + C(project_component)'
     )
-    fit_cols = [ratio_col, 'resolved_total', 'project'] + [f'bug_count_lag{k}' for k in LAGS] + \
+    trials = TRIALS_COL[ratio_col]
+    fit_cols = [ratio_col, trials, 'project'] + [f'bug_count_lag{k}' for k in LAGS] + \
         ['quarter_index', 'project_component']
     clean = data.dropna(subset=fit_cols)
-    clean = clean[clean['resolved_total'] > 0]
+    clean = clean[clean[trials] > 0]
     model = smf.glm(
         formula=formula, data=clean,
         family=sm.families.Binomial(),
-        var_weights=clean['resolved_total'],
+        var_weights=clean[trials],
     )
     return model.fit(cov_type='cluster', cov_kwds={'groups': clean['project']})
 

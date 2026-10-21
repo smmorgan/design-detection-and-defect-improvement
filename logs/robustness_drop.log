@@ -1,0 +1,17 @@
+check                    rows proj      LR   chi2 p  circ p  coefficients
+baseline_m1_sample       3835   10   15.71   0.0034  0.0498  lag1-4 +0.12 +0.17 +0.10 +0.11  sum +0.49
+baseline_m2_sample       2808   10   10.46   0.0334  0.1841  lag1-4 +0.09 +0.14 +0.12 +0.11  sum +0.46
+outcome_valid            3835   10    7.69   0.1038  0.2836  lag1-4 +0.08 +0.11 +0.08 +0.09  sum +0.36
+outcome_fixed            3835   10    3.87   0.4239  0.5622  lag1-4 +0.03 +0.03 +0.13 +0.01  sum +0.20
+drop_last_quarter        3773   10   15.80   0.0033  0.0498  lag1-4 +0.11 +0.17 +0.10 +0.11  sum +0.49
+exposure_covariate       3835   10   26.07   0.0000  0.0100  lag1-4 +0.12 +0.14 +0.15 +0.06  sum +0.47
+project_trends           3835   10    0.93   0.9202  0.9303  lag1-4 +0.00 +0.05 +0.00 +0.03  sum +0.09
+combined                 3773   10    7.99   0.0920  0.2587  lag1-4 +0.08 +0.12 +0.09 +0.09  sum +0.37
+decomposed_counts       15998   10   15.07   0.0046  0.1592  lag1-4 +0.02 +0.02 +0.04 +0.05  sum +0.13
+original_raw_m1          7109   10    6.12   0.1901  0.7114  lag1-4 -0.10 -0.04 +0.03 +0.11  sum +0.00
+raw_cp_corrected         3919   10    1.96   0.3762  0.7264  change point +2.9% bugs per SD
+raw_cp_raw               4512   10    1.41   0.4941  0.7960  change point -2.4% bugs per SD
+nonbug_cp_nonbug         2808   10   32.34   0.0000  0.0100  change point -6.6% bugs per SD
+nonbug_cp_causal         3633   10   16.73   0.0002  0.0796  change point +6.1% bugs per SD
+nonbug_cp_trends         2808   10    0.88   0.6433  0.7811  change point -1.0% bugs per SD
+wrote gcp_results/rq2_robustness/drop.json

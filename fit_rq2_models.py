@@ -68,10 +68,34 @@ PANEL_PATH = 'data/rq2_panel.csv'
 LAGS = [1, 2, 3, 4]
 N_PERMUTATIONS = 1000
 RNG_SEED = 42
+RATIO_CHOICES = ['design_ratio_corrected', 'design_ratio_raw', 'design_ratio_nonbug']
+
+# design_ratio_nonbug is the re-specified H1 predictor (RQ2_PREREGISTRATION.md
+# §11): design share of resolved non-bug tickets. Its H2 change-point feature
+# and H3 binomial trials follow its own denominator. The two original ratios
+# keep the pre-registered change-point feature (computed on
+# design_ratio_corrected) so their reported results reproduce unchanged.
+CHANGEPOINT_COL = {
+    'design_ratio_corrected': 'quarters_since_changepoint',
+    'design_ratio_raw': 'quarters_since_changepoint',
+    'design_ratio_nonbug': 'quarters_since_changepoint_nonbug',
+}
+TRIALS_COL = {
+    'design_ratio_corrected': 'resolved_total',
+    'design_ratio_raw': 'resolved_total',
+    'design_ratio_nonbug': 'resolved_nonbug',
+}
+
+
+def select_changepoint_feature(panel, ratio_col):
+    """Point the M2 formula's quarters_since_changepoint at the feature that
+    matches ratio_col (see CHANGEPOINT_COL)."""
+    panel['quarters_since_changepoint'] = panel[CHANGEPOINT_COL[ratio_col]]
+    return panel
 
 
 def add_lag_features(panel, ratio_col='design_ratio_corrected'):
-    panel = panel.sort_values(['project', 'quarter_index']).copy()
+    panel = select_changepoint_feature(panel.sort_values(['project', 'quarter_index']).copy(), ratio_col)
     for k in LAGS:
         panel[f'design_ratio_lag{k}'] = panel.groupby('project')[ratio_col].shift(k)
         panel[f'bug_count_lag{k}'] = panel.groupby('project')['bug_count'].shift(k)
@@ -292,14 +316,15 @@ def fit_h3_reverse(data, ratio_col='design_ratio_corrected'):
         ' + '.join(f'bug_count_lag{k}' for k in LAGS) +
         ' + quarter_index + C(project)'
     )
-    fit_cols = [ratio_col, 'resolved_total'] + [f'bug_count_lag{k}' for k in LAGS] + \
+    trials = TRIALS_COL[ratio_col]
+    fit_cols = [ratio_col, trials] + [f'bug_count_lag{k}' for k in LAGS] + \
         ['quarter_index', 'project']
     clean = data.dropna(subset=fit_cols)
-    clean = clean[clean['resolved_total'] > 0]
+    clean = clean[clean[trials] > 0]
     model = smf.glm(
         formula=formula, data=clean,
         family=sm.families.Binomial(),
-        var_weights=clean['resolved_total'],
+        var_weights=clean[trials],
     )
     return model.fit(cov_type='cluster', cov_kwds={'groups': clean['project']})
 
@@ -311,12 +336,14 @@ def main():
                          help='Skip the 1000-permutation null (slow) -- for quick smoke tests')
     parser.add_argument('--skip_cv', action='store_true')
     parser.add_argument('--ratio_col', default='design_ratio_corrected',
-                         choices=['design_ratio_corrected', 'design_ratio_raw'],
+                         choices=RATIO_CHOICES,
                          help='Which design-ratio column feeds the lag features and H3. '
                               'design_ratio_corrected is the Rogan-Gladen-corrected primary '
                               'measure per the pre-registration; design_ratio_raw is the '
                               'uncorrected fallback -- use it if the correction is degenerate '
-                              '(see COMPONENT_SCHEMA_FINDINGS.md / RQ2 status memory).')
+                              '(see COMPONENT_SCHEMA_FINDINGS.md / RQ2 status memory). '
+                              'design_ratio_nonbug is the re-specified H1 predictor '
+                              '(RQ2_PREREGISTRATION.md §11).')
     args = parser.parse_args()
 
     panel = pd.read_csv(args.panel)

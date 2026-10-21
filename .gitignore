@@ -228,3 +228,6 @@ gcp_results/roberta_conservative_*/
 # Full TAWOS DB pulls + full-population labeled CSVs (regenerable via
 # pull_full_tawos_projects.py + the RQ2 label pipeline; ~400MB, not committed)
 data/tawos_full/
+
+# Generated public dataset release (rebuild with build_dataset_release.py)
+dataset_release/

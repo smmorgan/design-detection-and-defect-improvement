@@ -17,6 +17,8 @@ transcribed from each spec's fit_rq2_models.py / fit_rq2_component_models.py
 run and must be updated by hand if any spec is re-run.
 """
 
+import sys
+
 import numpy as np
 import pandas as pd
 
@@ -78,7 +80,31 @@ CIRCULAR_NULL_RAW = [
 ]
 
 
+# Re-specified family (RQ2_PREREGISTRATION.md §11, 2026-10-20): H1 on
+# design_ratio_nonbug, the 3 uncorrected cells, with their H2 tests (change
+# point computed on the same ratio). Same statistics as the original family:
+# shuffle permutation p for H1, chi-square LR for H2. Sources:
+# gcp_results/rq2_power_equivalence/{primary,drop,bucket}_design_ratio_nonbug.json
+# (H1, 1000 reps each) and logs/{primary,component_drop,component_bucket}_nonbug.log
+# (H2). The H2 change-point feature uses future quarters (nearest change point,
+# detected on the whole series); see RQ2_INITIAL_RESULTS.md §11 before reading
+# the H2 rows.
+REVISED_TESTS = [
+    ('project x quarter', 'nonbug', None, 'H1', 0.0699, 'permutation null (shuffle), 1000 reps'),
+    ('project x quarter', 'nonbug', None, 'H2', 2.19e-13, 'chi-square LR=58.30, df=2'),
+    ('project x component x quarter', 'nonbug', 'drop', 'H1', 0.1219, 'permutation null (shuffle), 1000 reps'),
+    ('project x component x quarter', 'nonbug', 'drop', 'H2', 9.49e-08, 'chi-square LR=32.34, df=2'),
+    ('project x component x quarter', 'nonbug', 'bucket', 'H1', 0.1189, 'permutation null (shuffle), 1000 reps'),
+    ('project x component x quarter', 'nonbug', 'bucket', 'H2', 0.00757, 'chi-square LR=9.77, df=2'),
+]
+COLUMNS = ['unit', 'correction', 'missing_handling', 'hypothesis', 'p_value', 'note']
+
+
 def main():
+    if '--family' in sys.argv and sys.argv[sys.argv.index('--family') + 1] == 'revised':
+        print("Re-specified H1 family (design_ratio_nonbug, RQ2_PREREGISTRATION.md Sec 11):")
+        print(holm_correction(pd.DataFrame(REVISED_TESTS, columns=COLUMNS)).to_string(index=False))
+        return
     df = pd.DataFrame(TESTS, columns=['unit', 'correction', 'missing_handling', 'hypothesis', 'p_value', 'note'])
     if len(df) < 12:
         print(f"WARNING: only {len(df)}/12 pre-registered tests populated -- "

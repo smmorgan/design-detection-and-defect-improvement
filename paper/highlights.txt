@@ -1,0 +1,7 @@
+Highlights
+
+- Fine-tuned RoBERTa detects design work in JIRA issues across ten held-out projects
+- With issue metadata, RoBERTa beats SVM, gradient boosting, and LLM prompting
+- Project vocabulary, not class imbalance, drives cross-project difficulty
+- Blinded adjudication traces most annotator disagreement to the design definition
+- GPU nondeterminism alone shifts LOPO F1 up to 0.02; average seeds before ranking
